@@ -33,6 +33,17 @@ export class BanCrudService {
     );
   }
 
+  private async taoMaBanMoi(maBanNhap?: string) {
+    const maBanDaNhap = String(maBanNhap || '').trim();
+    if (maBanDaNhap) return maBanDaNhap;
+
+    const [banCuoi] = await this.mysql.truyVan(
+      "SELECT MaBan FROM Ban WHERE MaBan REGEXP '^B[0-9]+$' ORDER BY CAST(SUBSTRING(MaBan, 2) AS UNSIGNED) DESC LIMIT 1",
+    );
+    const soThuTuCuoi = Number(String(banCuoi?.MaBan || '').replace(/^B/, '')) || 0;
+    return `B${String(soThuTuCuoi + 1).padStart(3, '0')}`;
+  }
+
   async taoBan(body: BanGhi) {
     const soBan = Number(body.soBan || 0);
     const [banTrungSo] = await this.mysql.truyVan(
@@ -43,10 +54,11 @@ export class BanCrudService {
       throw new BadRequestException(`Số bàn ${soBan} đã tồn tại.`);
     }
 
+    const maBan = await this.taoMaBanMoi(body.maBan);
     await this.mysql.thucThi(
       'INSERT INTO Ban (MaBan, TenBan, KhuVuc, SoBan, SoChoNgoi, ViTri, GhiChu, TrangThai) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
       [
-        body.maBan,
+        maBan,
         body.tenBan,
         chuanHoaTenKhuVucBan(`${body.khuVuc || ''} ${body.viTri || ''}`),
         soBan,
@@ -56,7 +68,7 @@ export class BanCrudService {
         TRANG_THAI_BAN.TRONG,
       ],
     );
-    return taoPhanHoi({ maBan: body.maBan }, 'Tao ban thanh cong');
+    return taoPhanHoi({ maBan }, 'Tao ban thanh cong');
   }
 
   async capNhatBan(maBan: string, body: BanGhi) {

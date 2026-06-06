@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Avatar, Button, Card, Col, Empty, Form, Input, InputNumber, Modal, Popconfirm, QRCode, Row, Segmented, Select, Space, Statistic, Table, Tag, Tooltip, Typography } from 'antd'
+import { Avatar, Button, Card, Col, Empty, Form, Input, InputNumber, Modal, Popconfirm, QRCode, Row, Segmented, Select, Space, Statistic, Table, Tag, Tooltip, Typography, message } from 'antd'
 import { DeleteOutlined, DownloadOutlined, EditOutlined, EyeOutlined, PlusOutlined, PrinterOutlined, QrcodeOutlined, TableOutlined } from '@ant-design/icons'
 import { capNhatBanApi, layDanhSachBanApi, layQrBanApi, taoBanApi, xoaBanApi } from '../../services/api/apiBanAn'
 import { layOrderDangMoTaiBanApi, layTenMonTrongChiTietOrder, xacNhanThanhToanTaiBanApi } from '../../services/api/apiBanAn'
@@ -79,7 +79,7 @@ function NoiBoQuanLyBanPage() {
 
   const luuBan = async (values) => {
     const payload = {
-      maBan: values.maBan,
+      maBan: banDangSua ? values.maBan : undefined,
       tenBan: values.tenBan,
       khuVuc: values.khuVuc,
       soChoNgoi: Number(values.sucChua),
@@ -88,15 +88,20 @@ function NoiBoQuanLyBanPage() {
       viTri: values.khuVuc,
     }
 
-    if (banDangSua) {
-      await capNhatBanApi(banDangSua.code, payload)
-    } else {
-      await taoBanApi(payload)
+    try {
+      if (banDangSua) {
+        await capNhatBanApi(banDangSua.code, payload)
+      } else {
+        await taoBanApi(payload)
+      }
+      message.success(banDangSua ? 'Đã cập nhật bàn.' : 'Đã thêm bàn mới.')
+      setBanDangSua(null)
+      setDangMoForm(false)
+      form.resetFields()
+      await taiLai()
+    } catch (loi) {
+      message.error(loi?.message || 'Không thể lưu bàn.')
     }
-    setBanDangSua(null)
-    setDangMoForm(false)
-    form.resetFields()
-    await taiLai()
   }
 
   const moQr = async (ban) => {
@@ -266,9 +271,23 @@ function NoiBoQuanLyBanPage() {
 
       <Modal open={dangMoForm} footer={null} onCancel={() => { setBanDangSua(null); setDangMoForm(false); form.resetFields(); }} title={banDangSua ? 'Sửa bàn' : 'Thêm bàn mới'} destroyOnHidden>
         <Form layout="vertical" form={form} onFinish={luuBan}>
-          <Form.Item label="Mã bàn" name="maBan" rules={[{ required: true }]}><Input readOnly={Boolean(banDangSua)} /></Form.Item>
+          {banDangSua ? <Form.Item label="Mã bàn" name="maBan"><Input readOnly /></Form.Item> : null}
           <Form.Item label="Tên bàn" name="tenBan" rules={[{ required: true }]}><Input /></Form.Item>
-          <Form.Item label="Số bàn" name="soBan" rules={[{ required: true }]}><InputNumber min={1} style={{ width: '100%' }} /></Form.Item>
+          <Form.Item
+            label="Số bàn"
+            name="soBan"
+            rules={[
+              { required: true, message: 'Vui lòng nhập số bàn.' },
+              {
+                validator: (_, giaTri) => {
+                  if (!giaTri) return Promise.resolve()
+                  const soBanMoi = Number(giaTri)
+                  const biTrungSoBan = danhSachBan.some((ban) => Number(ban.tableNumber || ban.soBan || 0) === soBanMoi && (!banDangSua || String(ban.code) !== String(banDangSua.code)))
+                  return biTrungSoBan ? Promise.reject(new Error(`Số bàn ${soBanMoi} đã tồn tại.`)) : Promise.resolve()
+                },
+              },
+            ]}
+          ><InputNumber min={1} style={{ width: '100%' }} /></Form.Item>
           <Form.Item label="Khu vực" name="khuVuc" rules={[{ required: true }]}><Select options={DANH_SACH_KHU_VUC.map((muc) => ({ label: muc, value: muc }))} /></Form.Item>
           <Form.Item label="Sức chứa" name="sucChua" rules={[{ required: true }]}><InputNumber min={1} style={{ width: '100%' }} /></Form.Item>
           <Form.Item label="Ghi chú" name="ghiChu"><Input /></Form.Item>

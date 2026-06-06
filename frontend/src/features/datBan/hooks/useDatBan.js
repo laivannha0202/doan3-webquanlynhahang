@@ -82,7 +82,9 @@ export const useDatBan = () => {
   }, [])
 
   const taoDatBan = useCallback(async ({ booking, confirmationPayload }) => {
-    const { duLieu } = await taoDatBanApi(booking)
+    const maKh = nguoiDungHienTai?.maKH
+    const bookingCoMaKH = maKh ? { ...booking, maKH: maKh } : booking
+    const { duLieu } = await taoDatBanApi(bookingCoMaKH)
     const createdBooking = chuanHoaDatBan(duLieu)
 
     datJsonLuuTru(STORAGE_KEYS.XAC_NHAN_DAT_BAN_GAN_NHAT, {

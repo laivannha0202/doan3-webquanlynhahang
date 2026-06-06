@@ -98,6 +98,8 @@ function BanGoiMonPage() {
       if (!daCo) return [...current, { maMon, tenMon, gia: giaMon, hinhAnh, soLuong: 1 }]
       return current.map((item) => item.maMon === maMon ? { ...item, soLuong: item.soLuong + 1 } : item)
     })
+    setTab('cart')
+    hienThanhCong(`${tenMon} đã được thêm vào giỏ tạm.`, 'Đã thêm món')
   }
 
   const doiSoLuong = (maMon, delta) => {
