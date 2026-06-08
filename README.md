@@ -59,10 +59,25 @@ Backend chính nằm tại `backend/nest-api/`, frontend chính nằm tại `fro
 - Xem hồ sơ cá nhân, lịch sử đơn hàng, điểm tích lũy.
 - Đánh giá sau khi sử dụng dịch vụ.
 
-### Nhân viên / Quản trị
+### Nhân viên
 
 - Đăng nhập nội bộ.
-- Dashboard vận hành, quản lý bàn, đặt bàn, đơn hàng, thực đơn, khách hàng, voucher, điểm, đánh giá, thống kê.
+- Theo dõi sơ đồ bàn, trạng thái đơn hàng.
+- Tiếp nhận đơn QR, chế biến món, phục vụ món.
+- Xác nhận thanh toán, in hóa đơn.
+- Xem và xử lý đánh giá.
+
+### Admin / Quản lý
+
+- Quản lý thực đơn (thêm, sửa, xóa món).
+- Quản lý bàn (CRUD, chuyển trạng thái bảo trì).
+- Quản lý tài khoản nhân viên.
+- Quản lý đặt bàn (duyệt, hủy, gán bàn).
+- Quản lý đơn hàng (xem tất cả, can thiệp trạng thái).
+- Quản lý voucher / mã giảm giá.
+- Duyệt đánh giá.
+- Xem thống kê doanh thu, dashboard tổng quan.
+- Cấu hình hệ thống.
 
 ## 5. Luồng nghiệp vụ chính
 

@@ -9,7 +9,7 @@
 
 | #   | Câu hỏi                                           | Quyết định                                                                                                                                                               | Ảnh hưởng trực tiếp                                                                                                                                                                               |
 | --- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Q1  | ENUM chuẩn                                        | **Việt** (`CHO_XU_LY / DANG_CHE_BIEN / SAN_SANG / DA_PHUC_VU / HOAN_THANH / DA_HUY / DA_THANH_TOAN / DA_HOAN_TIEN / ...`)                                                | Mục 3 state machine dùng Việt; `common/constants.ts` phải rewrite; `donHang/contracts.js` FE phải rewrite; mọi đoạn mã hard-code ENUM phải đổi.                                                   |
+| Q1  | ENUM chuẩn                                        | **Việt** (`DANG_CHUAN_BI / DANG_CHE_BIEN / SAN_SANG / DA_PHUC_VU / HOAN_THANH / DA_HUY / DA_THANH_TOAN / DA_HOAN_TIEN / ...`)                                                | Mục 3 state machine dùng Việt; `common/constants.ts` phải rewrite; `donHang/contracts.js` FE phải rewrite; mọi đoạn mã hard-code ENUM phải đổi.                                                   |
 | Q2  | Multi-payment THANH_CONG                          | **Chỉ 1 ThanhToan / 1 HoaDon (UPDATE dòng cũ khi retry)**                                                                                                                | Dùng `UNIQUE(MaHoaDon)` trong ThanhToan. Nếu thanh toán thất bại rồi thanh toán lại thì UPDATE dòng ThanhToan cũ, không insert thêm dòng mới. View `V_DoanhThuNgay` đơn giản hoá. Seed xoá TT017. |
 | Q3  | Reset bàn khi DonHang `DA_HUY`                    | **Tự động** về `TRONG` (qua `DANG_DON` nếu bàn đang `CO_KHACH`)                                                                                                          | Thêm `DANG_DON` state; `BanTrangThaiReconcileService`; transition `CO_KHACH → DANG_DON → TRONG` sau timeout/staff.                                                                                |
 | Q4  | Partial payment                                   | **Không** — thanh toán 1 lần                                                                                                                                             | `HoaDon.MaDonHang` UNIQUE giữ nguyên; không cần schema mở rộng; logic đơn giản.                                                                                                                   |
@@ -59,7 +59,7 @@ Hệ thống có 3 actor chính:
 | Actor               | Chức năng chính                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Giới hạn                                                                                                                |
 | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | **Khách hàng**      | **Vãng lai (QR):** quét QR bàn → xem thực đơn → gọi món → yêu cầu thanh toán. Không cần đăng nhập. Có thể nhập SĐT để tích điểm / nhận hóa đơn điện tử. **Có tài khoản:** đặt bàn (bắt buộc đăng nhập), xem/hủy đặt bàn của mình, dùng voucher cá nhân, dùng điểm tích lũy, xem lịch sử đơn + điểm, đánh giá sau khi ăn.                                                                                                                                                                                             | Không can thiệp đơn của người khác; không xem doanh thu; không dùng voucher của `KhachHang` khác (BE enforce, trả 403). |
-| **Nhân viên**       | **Phục vụ:** xem danh sách bàn + trạng thái; check-in đặt bàn (`DA_XAC_NHAN → DA_DEN`); tạo đơn hộ khách tại bàn; xem chi tiết đơn theo bàn; cập nhật món đã phục vụ (`ChiTietDonHang → DA_PHUC_VU`); chuyển bàn `DANG_DON → TRONG`. **Bếp:** xem danh sách đơn vào bếp; cập nhật trạng thái `ChiTietDonHang`: `CHO_CHE_BIEN → DANG_CHE_BIEN → SAN_SANG`. **Thu ngân:** xem hóa đơn; áp dụng voucher/điểm tại thanh toán; xác nhận thanh toán; tạo/cập nhật `HoaDon` + `ThanhToan`; chuyển đơn sang `DA_THANH_TOAN`. | Không CRUD thực đơn/bàn (riêng admin); không quản lý nhân viên; không xem báo cáo doanh thu tổng quan.                  |
+| **Nhân viên**       | **Phục vụ:** xem danh sách bàn + trạng thái; check-in đặt bàn (`DA_XAC_NHAN → DA_NHAN_BAN`); tạo đơn hộ khách tại bàn; xem chi tiết đơn theo bàn; cập nhật món đã phục vụ (`ChiTietDonHang → DA_PHUC_VU`); chuyển bàn `DANG_DON → TRONG`. **Bếp:** xem danh sách đơn vào bếp; cập nhật trạng thái `ChiTietDonHang`: `DANG_CHUAN_BI → DANG_CHE_BIEN → SAN_SANG`. **Thu ngân:** xem hóa đơn; áp dụng voucher/điểm tại thanh toán; xác nhận thanh toán; tạo/cập nhật `HoaDon` + `ThanhToan`; chuyển đơn sang `DA_THANH_TOAN`. | Không CRUD thực đơn/bàn (riêng admin); không quản lý nhân viên; không xem báo cáo doanh thu tổng quan.                  |
 | **Admin / Quản lý** | Quản lý dashboard tổng quan; CRUD bàn (kể cả `BAO_TRI`); quản lý thực đơn (món, danh mục, giá); quản lý đặt bàn (duyệt, hủy); quản lý đơn hàng (xem tất cả, can thiệp trạng thái); quản lý hóa đơn/thanh toán; quản lý voucher & điểm tích lũy; quản lý khách hàng; quản lý nhân viên (phân quyền); duyệt đánh giá; xem báo cáo doanh thu, món bán chạy, tần suất bàn; cấu hình hệ thống.                                                                                                                            | Không giới hạn nghiệp vụ; mọi thao tác đều được audit log.                                                              |
 
 **Ràng buộc chung cho mọi actor:**
@@ -95,7 +95,7 @@ Hệ thống có 3 actor chính:
 
 - **Mức độ:** Critical
 - **Bằng chứng:** `database/mysql_init_schema.sql` (toàn bộ ENUM); `backend/nest-api/src/common/constants.ts`; `don-hang-payment-status.service.ts:20-36` (Set `TRANG_THAI_DON_HANG_HOP_LE` gộp 9 Anh + 6 Việt); `database/mysql_seed_dev.sql:615-631` (UPDATE reconciliation dùng cả 2 hệ).
-- **Tác động:** Cùng một trạng thái có 2 chuỗi đại diện (chuỗi cũ tiếng Anh ↔ chuỗi Việt `CHO_XU_LY` v.v.). FE/BE có thể đọc/ghi trộn lẫn, khiến so sánh sai, view/lọc sai, đếm sai.
+- **Tác động:** Cùng một trạng thái có 2 chuỗi đại diện (chuỗi cũ tiếng Anh ↔ chuỗi Việt `DANG_CHUAN_BI` v.v.). FE/BE có thể đọc/ghi trộn lẫn, khiến so sánh sai, view/lọc sai, đếm sai.
 - **Gợi ý:** **Q1 đã chốt Việt**. Bộ ENUM Việt chính thức xem Mục 4 Câu 1. Migration cột ENUM về 1 bộ Việt; mapping function 1 chiều cho dữ liệu cũ (nếu có giá trị Anh còn sót).
 
 ### Lỗi 2: Frontend `donHang/contracts.js` dùng bộ ENUM **Anh** nhưng Q1 chốt **Việt** — phải rewrite toàn bộ file
@@ -130,7 +130,7 @@ Hệ thống có 3 actor chính:
 
 - **Mức độ:** High
 - **Bằng chứng:** `don-hang-payment-status.service.ts:20-36` (Set cố định).
-- **Tác động:** BE chấp nhận 15 giá trị cho cùng 1 trường. API client có thể gửi chuỗi cũ tiếng Anh ↔ chuỗi Việt `CHO_XU_LY` qua lại tùy ý. Không có state machine validator.
+- **Tác động:** BE chấp nhận 15 giá trị cho cùng 1 trường. API client có thể gửi chuỗi cũ tiếng Anh ↔ chuỗi Việt `DANG_CHUAN_BI` qua lại tùy ý. Không có state machine validator.
 - **Gợi ý:** **Q1 chốt Việt** → Set phải còn đúng 9 giá trị Việt (Mục 3.3). Viết hàm `kiemTraChuyenTrangThaiDonHang(cu, moi)` theo DAG.
 
 ### Lỗi 7: Seed DB001 `CHO_XAC_NHAN` cho B004 nhưng DH001 cùng `MaBan=B004` `DA_THANH_TOAN` + `MaDatBan=DB001` → mâu thuẫn
@@ -159,7 +159,7 @@ Hệ thống có 3 actor chính:
 - **Mức độ:** High
 - **Bằng chứng:** `don-hang-create-order.service.ts:74` (UPDATE bàn sang CO_KHACH); `don-hang-payment-status.service.ts:301-307` (auto-create HoaDon khi status=DA_THANH_TOAN nhưng không thấy UPDATE bàn); seed nhiều bàn TRONG dù có đơn DA_THANH_TOAN (B001, B002, B003, B004).
 - **Tác động:** Bàn cứ TRONG mãi dù đơn đã DA_THANH_TOAN → đặt nhầm khách.
-- **Gợi ý:** **Q3 đã chốt: tự động**. Trong transaction khi chuyển sang `DA_THANH_TOAN`/`HOAN_THANH`/`DA_HUY`: nếu không còn `DonHang` open nào của bàn đó (status IN ('CHO_XU_LY','DA_XAC_NHAN','DANG_CHE_BIEN','SAN_SANG','DA_PHUC_VU')) và không còn `DatBan` open → `CO_KHACH → DANG_DON → TRONG` (qua trạng thái `DANG_DON` trung gian).
+- **Gợi ý:** **Q3 đã chốt: tự động**. Trong transaction khi chuyển sang `DA_THANH_TOAN`/`HOAN_THANH`/`DA_HUY`: nếu không còn `DonHang` open nào của bàn đó (status IN ('DANG_CHUAN_BI','DA_XAC_NHAN','DANG_CHE_BIEN','SAN_SANG','DA_PHUC_VU')) và không còn `DatBan` open → `CO_KHACH → DANG_DON → TRONG` (qua trạng thái `DANG_DON` trung gian).
 
 ### Lỗi 11: **FE↔BE enum mismatch trên `Ban.TrangThai`** — Q1 chốt Việt, FE đã gửi đúng Việt
 
@@ -189,7 +189,7 @@ Hệ thống có 3 actor chính:
 - **Tác động:** 1 đơn `DA_HUY` có 1 thanh toán `THANH_CONG` — view doanh thu sẽ cộng nhầm 126.500đ vào doanh thu ngày.
 - **Gợi ý:** **Q2 chốt: xoá TT017 trong seed**. Thêm invariant ở BE: khi chuyển `DonHang → DA_HUY` → set `ThanhToan.TrangThai = 'THAT_BAI'` cho tất cả payment chưa THANH_CONG.
 
-### Lỗi 15: Nhiều bàn `TRONG` dù có đơn `DA_THANH_TOAN`/`SAN_SANG`/`CHO_XU_LY` (B001, B002, B003, B004)
+### Lỗi 15: Nhiều bàn `TRONG` dù có đơn `DA_THANH_TOAN`/`SAN_SANG`/`DANG_CHUAN_BI` (B001, B002, B003, B004)
 
 - **Mức độ:** High
 - **Bằng chứng:** Seed `database/mysql_seed_dev.sql`; block UPDATE reconciliation cuối file.
@@ -222,7 +222,7 @@ Hệ thống có 3 actor chính:
 - **Mức độ:** Medium
 - **Bằng chứng:** `mysql_init_schema.sql` (`ChiTietDonHang.TrangThai` ENUM hiện đang dùng giá trị chưa chuẩn hoá theo Q1).
 - **Tác động:** Bếp có thể đánh trạng thái cuối/huỷ từng món; tổng đơn chỉ chuyển khi item cuối cùng hoàn tất. Không tự động đồng bộ.
-- **Gợi ý:** **Q1 chốt Việt** → ENUM `ChiTietDonHang.TrangThai` phải rewrite về `CHO_CHE_BIEN / DANG_CHE_BIEN / SAN_SANG / DA_PHUC_VU / HOAN_THANH / DA_HUY`. Rõ ràng: `ChiTietDonHang.TrangThai` quản lý per-item; `DonHang.TrangThai` tổng hợp. Thêm rule: khi tất cả item `HOAN_THANH` → `DonHang` chuyển `SAN_SANG` (hoặc `DA_PHUC_VU` tuỳ flow).
+- **Gợi ý:** **Q1 chốt Việt** → ENUM `ChiTietDonHang.TrangThai` phải rewrite về `DANG_CHUAN_BI / DANG_CHE_BIEN / SAN_SANG / DA_PHUC_VU / HOAN_THANH / DA_HUY`. Rõ ràng: `ChiTietDonHang.TrangThai` quản lý per-item; `DonHang.TrangThai` tổng hợp. Thêm rule: khi tất cả item `HOAN_THANH` → `DonHang` chuyển `SAN_SANG` (hoặc `DA_PHUC_VU` tuỳ flow).
 
 ### Lỗi 20: `DonHang.MaKH` null nhiều đơn trong seed (DH004, DH013, DH018) — `if (trangThaiCongDiem.has(trangThai) && don.MaKH)` im lặng skip tích điểm
 
@@ -231,12 +231,12 @@ Hệ thống có 3 actor chính:
 - **Tác động:** Khách vãng lai tại bàn QR không bao giờ được tích điểm, không có cảnh báo.
 - **Gợi ý:** FE cung cấp tùy chọn nhập SĐT khi thanh toán → nếu khách nhập SĐT thì tự tạo `KhachHang` ẩn danh (nếu chưa tồn tại), BE upsert `MaKH` rồi tích điểm; nếu khách không nhập SĐT thì đơn vẫn tạo bình thường nhưng không tích điểm. Không chặn luồng QR chỉ vì thiếu SĐT.
 
-### Lỗi 21: `ThanhToanPage.jsx` **không gọi endpoint thanh toán** — đơn tạo xong cứ ở `CHO_XU_LY`, phụ thuộc staff thao tác
+### Lỗi 21: `ThanhToanPage.jsx` **không gọi endpoint thanh toán** — đơn tạo xong cứ ở `DANG_CHUAN_BI`, phụ thuộc staff thao tác
 
 - **Mức độ:** High
 - **Bằng chứng:** `frontend/src/pages/ThanhToanPage.jsx` (gọi `taoDonHangApi`, sau đó `xoaPhieuGiamGiaDaApDung + xoaBanNhapTamThanhToan + xoaToanBoGio + navigate('/ho-so')`); `taoDonHangApi` trong `apiDonHang.js` chỉ gọi `POST /don-hang`.
 - **Tác động:**
-  - Đơn (gắn bàn hoặc từ đặt bàn) luôn ở `CHO_XU_LY` → không có `HoaDon` → `layTongQuan()` trả 0 cho ngày đó.
+  - Đơn (gắn bàn hoặc từ đặt bàn) luôn ở `DANG_CHUAN_BI` → không có `HoaDon` → `layTongQuan()` trả 0 cho ngày đó.
   - Voucher (`maGiamGia`) và điểm (`soDiem`) trong payload bị BE bỏ qua nếu không có route thanh toán riêng.
   - Khách không nhận được hoá đơn/email xác nhận thanh toán.
 - **Gợi ý:**
@@ -287,15 +287,15 @@ Hệ thống có 3 actor chính:
 - TRONG ↔ BAO_TRI: Admin đổi.
 - TRONG → DA_DAT: khi booking được xác nhận (`DatBan.TrangThai` chuyển sang `DA_XAC_NHAN`).
 - TRONG → CO_KHACH: khi khách gọi món trực tiếp tại bàn (QR tại bàn) hoặc nhân viên tạo order tại bàn (`DonHang` được INSERT với `MaBan`).
-- DA_DAT → CO_KHACH: khi khách đặt bàn đến check-in (`DatBan.TrangThai` chuyển sang `DA_DEN` hoặc `DonHang` được tạo thuộc bàn đó).
+- DA_DAT → CO_KHACH: khi khách đặt bàn đến check-in (`DatBan.TrangThai` chuyển sang `DA_NHAN_BAN` hoặc `DonHang` được tạo thuộc bàn đó).
 - CO_KHACH → DANG_DON: customer rời (sau khi đơn HOAN_THANH/DA_HUY) HOẶC staff bấm "Dọn bàn". **Q3: tự động**.
 - DANG_DON → TRONG: timeout 15 phút HOẶC staff bấm "Sẵn sàng".
 - **Constraint cứng** (theo từng trạng thái bàn):
   - `TRONG`: không có `DonHang`/`DatBan` active nào thuộc bàn.
   - `DA_DAT`: phải có ít nhất 1 `DatBan` `DA_XAC_NHAN` thuộc bàn.
     - `CHO_XAC_NHAN` chưa giữ bàn cứng — bàn vẫn có thể là `TRONG`, chưa làm bàn thành `DA_DAT`.
-    - `DA_DEN` nghĩa là khách đã đến/check-in — bàn phải chuyển sang `CO_KHACH`.
-  - `CO_KHACH`: phải có `DonHang` open (status ∈ `{CHO_XU_LY, DA_XAC_NHAN, DANG_CHE_BIEN, SAN_SANG, DA_PHUC_VU}`) thuộc bàn **hoặc** `DatBan` đang sử dụng (`DA_DEN`).
+    - `DA_NHAN_BAN` nghĩa là khách đã đến/check-in — bàn phải chuyển sang `CO_KHACH`.
+  - `CO_KHACH`: phải có `DonHang` open (status ∈ `{DANG_CHUAN_BI, DA_XAC_NHAN, DANG_CHE_BIEN, SAN_SANG, DA_PHUC_VU}`) thuộc bàn **hoặc** `DatBan` đang sử dụng (`DA_NHAN_BAN`).
   - `DANG_DON`: không bắt buộc có `DonHang`/`DatBan` active, nhưng phải là trạng thái sau khi đơn/booking vừa đóng (status cuối = `HOAN_THANH/DA_HUY/DA_THANH_TOAN`) hoặc đang trong thời gian dọn bàn (timeout 15 phút hoặc staff bấm "Sẵn sàng").
   - `BAO_TRI`: không nhận booking/order mới. Có thể đi kèm `DonHang`/`DatBan` cũ đang chờ xử lý nhưng bàn không giao dịch.
 
@@ -318,7 +318,7 @@ Hệ thống có 3 actor chính:
           │ khách tới
           ▼
    ┌──────────────────┐
-   │     DA_DEN       │  ← đã gán món/order (lưu DB)
+   │     DA_NHAN_BAN       │  ← đã gán món/order (lưu DB)
    └────┬─────────────┘
           │ đơn xong
           ▼
@@ -338,15 +338,15 @@ Hệ thống có 3 actor chính:
    └──────────────────┘
 ```
 
-- **DB ENUM chính thức** (6 giá trị, không bao gồm `MOI`): `CHO_XAC_NHAN / DA_XAC_NHAN / DA_DEN / HOAN_THANH / DA_HUY / KHONG_DEN / HET_HAN`.
+- **DB ENUM chính thức** (6 giá trị, không bao gồm `MOI`): `CHO_XAC_NHAN / DA_XAC_NHAN / DA_NHAN_BAN / HOAN_THANH / DA_HUY / KHONG_DEN / HET_HAN`.
 - `MOI` chỉ là trạng thái tạm trên frontend (UI khi user mở form đặt bàn), không bao giờ ghi vào DB. Khi user submit form, `MOI → CHO_XAC_NHAN` và dòng mới được INSERT với `TrangThai = 'CHO_XAC_NHAN'`.
-- Chỉ cho phép chuyển trạng thái theo chiều mũi tên. Nếu muốn huỷ `DA_DEN` → phải qua `HOAN_THANH` (đóng order) trước.
+- Chỉ cho phép chuyển trạng thái theo chiều mũi tên. Nếu muốn huỷ `DA_NHAN_BAN` → phải qua `HOAN_THANH` (đóng order) trước.
 
 ### 3.3. `DonHang.TrangThai` — 9 trạng thái (Việt)
 
 ```
    ┌──────────────────┐
-   │    CHO_XU_LY     │  (tạo từ FE)
+   │    DANG_CHUAN_BI     │  (tạo từ FE)
    └────┬─────────────┘
          │ staff xác nhận
          ▼
@@ -376,7 +376,7 @@ Hệ thống có 3 actor chính:
    │   HOAN_THANH     │  (đơn kết thúc, release bàn)
    └──────────────────┘
 
-   Cho phép huỷ từ CHO_XU_LY/DA_XAC_NHAN/DANG_CHE_BIEN:
+   Cho phép huỷ từ DANG_CHUAN_BI/DA_XAC_NHAN/DANG_CHE_BIEN:
    ┌──────────────────┐
    │     DA_HUY       │  ← Q3: tự động trigger reset bàn
    └──────────────────┘
@@ -420,7 +420,7 @@ Hệ thống có 3 actor chính:
 ### 3.5. `ChiTietDonHang.TrangThai` — 6 trạng thái (Việt)
 
 ```
-   CHO_CHE_BIEN → DANG_CHE_BIEN → SAN_SANG → DA_PHUC_VU → HOAN_THANH
+   DANG_CHUAN_BI → DANG_CHE_BIEN → SAN_SANG → DA_PHUC_VU → HOAN_THANH
                        ↓                ↓
                     DA_HUY          DA_HUY
 ```
@@ -451,10 +451,10 @@ Hệ thống có 3 actor chính:
 - Lý do chốt: dễ đọc cho người Việt, khớp với phần lớn seed hiện hữu.
 - Việc cần làm: rewrite `common/constants.ts` + mọi helper trong `donHang/contracts.js`; mapping ngược 1 chiều cho dữ liệu cũ (nếu có seed nào còn giá trị Anh).
 - Bộ ENUM Việt chính thức áp dụng:
-  - `DonHang.TrangThai`: `CHO_XU_LY / DA_XAC_NHAN / DANG_CHE_BIEN / SAN_SANG / DA_PHUC_VU / HOAN_THANH / DA_HUY / DA_THANH_TOAN / DA_HOAN_TIEN`.
-  - `DatBan.TrangThai` DB: `CHO_XAC_NHAN / DA_XAC_NHAN / DA_DEN / HOAN_THANH / DA_HUY / KHONG_DEN / HET_HAN`. `MOI` chỉ là trạng thái tạm trên FE (khi user mở form đặt bàn), không lưu DB.
+  - `DonHang.TrangThai`: `DANG_CHUAN_BI / DA_XAC_NHAN / DANG_CHE_BIEN / SAN_SANG / DA_PHUC_VU / HOAN_THANH / DA_HUY / DA_THANH_TOAN / DA_HOAN_TIEN`.
+  - `DatBan.TrangThai` DB: `CHO_XAC_NHAN / DA_XAC_NHAN / DA_NHAN_BAN / HOAN_THANH / DA_HUY / KHONG_DEN / HET_HAN`. `MOI` chỉ là trạng thái tạm trên FE (khi user mở form đặt bàn), không lưu DB.
   - `Ban.TrangThai`: `TRONG / DA_DAT / CO_KHACH / DANG_DON / BAO_TRI`.
-  - `ChiTietDonHang.TrangThai`: `CHO_CHE_BIEN / DANG_CHE_BIEN / SAN_SANG / DA_PHUC_VU / HOAN_THANH / DA_HUY`.
+  - `ChiTietDonHang.TrangThai`: `DANG_CHUAN_BI / DANG_CHE_BIEN / SAN_SANG / DA_PHUC_VU / HOAN_THANH / DA_HUY`.
   - `ThanhToan.TrangThai`: `CHO_THANH_TOAN / THANH_CONG / THAT_BAI / DA_HOAN_TIEN`.
 
 ### Câu 2: Nhiều `ThanhToan` `THANH_CONG` cho cùng `HoaDon` — có cho phép không? — ✅ **ĐÃ CHỐT: KHÔNG (UPDATE dòng cũ khi retry)**
@@ -559,9 +559,9 @@ Hệ thống có 3 actor chính:
 
 - **Mục tiêu:** Đưa 5 cột trạng thái về 1 bộ Việt duy nhất:
   - `Ban.TrangThai`: `TRONG / DA_DAT / CO_KHACH / DANG_DON / BAO_TRI`.
-  - `DatBan.TrangThai`: `CHO_XAC_NHAN / DA_XAC_NHAN / DA_DEN / HOAN_THANH / DA_HUY / KHONG_DEN / HET_HAN` (MOI là FE/temp, không lưu DB).
-  - `DonHang.TrangThai`: `CHO_XU_LY / DA_XAC_NHAN / DANG_CHE_BIEN / SAN_SANG / DA_PHUC_VU / HOAN_THANH / DA_HUY / DA_THANH_TOAN / DA_HOAN_TIEN`.
-  - `ChiTietDonHang.TrangThai`: `CHO_CHE_BIEN / DANG_CHE_BIEN / SAN_SANG / DA_PHUC_VU / HOAN_THANH / DA_HUY`.
+  - `DatBan.TrangThai`: `CHO_XAC_NHAN / DA_XAC_NHAN / DA_NHAN_BAN / HOAN_THANH / DA_HUY / KHONG_DEN / HET_HAN` (MOI là FE/temp, không lưu DB).
+  - `DonHang.TrangThai`: `DANG_CHUAN_BI / DA_XAC_NHAN / DANG_CHE_BIEN / SAN_SANG / DA_PHUC_VU / HOAN_THANH / DA_HUY / DA_THANH_TOAN / DA_HOAN_TIEN`.
+  - `ChiTietDonHang.TrangThai`: `DANG_CHUAN_BI / DANG_CHE_BIEN / SAN_SANG / DA_PHUC_VU / HOAN_THANH / DA_HUY`.
   - `ThanhToan.TrangThai`: `CHO_THANH_TOAN / THANH_CONG / THAT_BAI / DA_HOAN_TIEN`.
   - Tham chiếu chi tiết: Mục 3 (state machine) + Mục 4 Câu 1.
 - **Phạm vi áp dụng Q1:** 5 cột trạng thái nghiệp vụ lõi ở trên. Các ENUM kỹ thuật/danh mục khác (`LoaiMa`, `PhamVi`, `LoaiGiam`, runtime voucher state) **ngoài phạm vi** DB-1, giữ nguyên nếu không gây lỗi nghiệp vụ.
@@ -573,7 +573,7 @@ Hệ thống có 3 actor chính:
   SELECT TrangThai, COUNT(*) FROM DonHang GROUP BY TrangThai;
   -- Sau migration: chỉ còn giá trị Việt
   SELECT TrangThai, COUNT(*) FROM DonHang GROUP BY TrangThai;
-  -- Expect: chỉ thấy CHO_XU_LY, DA_XAC_NHAN, DANG_CHE_BIEN, SAN_SANG, DA_PHUC_VU, HOAN_THANH, DA_HUY, DA_THANH_TOAN, DA_HOAN_TIEN
+  -- Expect: chỉ thấy DANG_CHUAN_BI, DA_XAC_NHAN, DANG_CHE_BIEN, SAN_SANG, DA_PHUC_VU, HOAN_THANH, DA_HUY, DA_THANH_TOAN, DA_HOAN_TIEN
   ```
 
 #### DB-2. UNIQUE constraint cho ThanhToan (Q2)
@@ -645,7 +645,7 @@ Hệ thống có 3 actor chính:
 - **File:** `backend/nest-api/src/modules/don-hang/don-hang-payment-status.service.ts`.
 - **Rủi ro:** Logic phức tạp dễ sót; cần transaction.
 - **Verify:** Unit test:
-  - Transition `CHO_XU_LY → DA_XAC_NHAN` OK; `CHO_XU_LY → DA_HUY` OK; `DA_HUY → DA_XAC_NHAN` FAIL.
+  - Transition `DANG_CHUAN_BI → DA_XAC_NHAN` OK; `DANG_CHUAN_BI → DA_HUY` OK; `DA_HUY → DA_XAC_NHAN` FAIL.
   - Sau khi `DA_THANH_TOAN` + reset bàn: `SELECT * FROM Ban WHERE MaBan=?` → expect `DANG_DON` hoặc `TRONG`.
 
 #### BE-4. Sửa `thong-ke.service.ts:layTongQuan()`
@@ -827,7 +827,7 @@ Hệ thống có 3 actor chính:
 | Khái niệm        | Field FE                  | Field BE (DB)                             | Ghi chú                                                                                                                                                                                                                               |
 | ---------------- | ------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Mã đơn hàng      | `maDonHang`               | `DonHang.MaDonHang`                       | VARCHAR(20) DHxxx                                                                                                                                                                                                                     |
-| Trạng thái đơn   | `trangThai`               | `DonHang.TrangThai`                       | **Q1 ENUM Việt**: `CHO_XU_LY / DA_XAC_NHAN / DANG_CHE_BIEN / SAN_SANG / DA_PHUC_VU / HOAN_THANH / DA_HUY / DA_THANH_TOAN / DA_HOAN_TIEN`                                                                                              |
+| Trạng thái đơn   | `trangThai`               | `DonHang.TrangThai`                       | **Q1 ENUM Việt**: `DANG_CHUAN_BI / DA_XAC_NHAN / DANG_CHE_BIEN / SAN_SANG / DA_PHUC_VU / HOAN_THANH / DA_HUY / DA_THANH_TOAN / DA_HOAN_TIEN`                                                                                              |
 | Mã KH            | `maKH`                    | `DonHang.MaKH`                            | nullable — lỗi #20                                                                                                                                                                                                                    |
 | Mã bàn           | `maBan`                   | `DonHang.MaBan`                           | nullable về mặt schema, **nhưng trong scope hiện tại mọi `DonHang` đều phải gắn `MaBan` hoặc `MaDatBan`** (theo Mục 1.1). Trường hợp `MaBan IS NULL` chỉ xuất hiện ở dữ liệu cũ / edge case, không phải nghiệp vụ chính của hệ thống. |
 | Mã đặt bàn       | `maDatBan`                | `DonHang.MaDatBan`                        | Dùng khi đơn được tạo từ luồng đặt bàn.                                                                                                                                                                                               |

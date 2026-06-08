@@ -13,12 +13,12 @@
 -- 1. BAN
 -- ============================================================
 -- Cu: Available, Occupied, Reserved, Maintenance
--- Moi: TRONG, CO_KHACH, DA_DAT, BAO_TRI
+-- Moi: TRONG, DA_DAT, CO_KHACH, DANG_DON, BAO_TRI
 -- ============================================================
 ALTER TABLE Ban
   MODIFY COLUMN TrangThai ENUM(
     'Available','Occupied','Reserved','Maintenance',
-    'TRONG','CO_KHACH','DA_DAT','BAO_TRI'
+    'TRONG','DA_DAT','CO_KHACH','DANG_DON','BAO_TRI'
   ) NOT NULL DEFAULT 'Available';
 
 UPDATE Ban SET TrangThai = 'TRONG'      WHERE TrangThai = 'Available';
@@ -28,7 +28,7 @@ UPDATE Ban SET TrangThai = 'BAO_TRI'    WHERE TrangThai = 'Maintenance';
 
 ALTER TABLE Ban
   MODIFY COLUMN TrangThai ENUM(
-    'TRONG','CO_KHACH','DA_DAT','BAO_TRI'
+    'TRONG','DA_DAT','CO_KHACH','DANG_DON','BAO_TRI'
   ) NOT NULL DEFAULT 'TRONG';
 
 
@@ -36,7 +36,7 @@ ALTER TABLE Ban
 -- 2. DATBAN
 -- ============================================================
 -- Cu: 23 gia tri tron Anh+Viet (Pending, Confirmed, Seated, Completed, Cancelled, NoShow, Expired, YEU_CAU_DAT_BAN, GIU_CHO_TAM, DA_XAC_NHAN, DA_GAN_BAN, CAN_GOI_LAI, TU_CHOI_HET_CHO, CHO_XAC_NHAN, DA_GHI_NHAN, DA_CHECK_IN, DA_XEP_BAN, DANG_PHUC_VU, DA_NHAN_BAN, DA_HOAN_THANH, DA_HUY, KHONG_DEN)
--- Moi: CHO_XAC_NHAN, DA_XAC_NHAN, DA_DEN, HOAN_THANH, DA_HUY, KHONG_DEN, HET_HAN
+-- Moi: CHO_XAC_NHAN, DA_XAC_NHAN, DA_NHAN_BAN, HOAN_THANH, DA_HUY, KHONG_DEN, HET_HAN
 -- ============================================================
 ALTER TABLE DatBan
   MODIFY COLUMN TrangThai ENUM(
@@ -44,12 +44,12 @@ ALTER TABLE DatBan
     'YEU_CAU_DAT_BAN','GIU_CHO_TAM','DA_XAC_NHAN','DA_GAN_BAN','CAN_GOI_LAI',
     'TU_CHOI_HET_CHO','CHO_XAC_NHAN','DA_GHI_NHAN','DA_CHECK_IN','DA_XEP_BAN',
     'DANG_PHUC_VU','DA_NHAN_BAN','DA_HOAN_THANH','DA_HUY','KHONG_DEN',
-    'CHO_XAC_NHAN','DA_XAC_NHAN','DA_DEN','HOAN_THANH','HET_HAN'
+    'CHO_XAC_NHAN','DA_XAC_NHAN','DA_NHAN_BAN','HOAN_THANH','HET_HAN'
   ) NOT NULL DEFAULT 'Pending';
 
 UPDATE DatBan SET TrangThai = 'CHO_XAC_NHAN' WHERE TrangThai IN ('Pending','YEU_CAU_DAT_BAN','GIU_CHO_TAM','CAN_GOI_LAI','CHO_XAC_NHAN');
 UPDATE DatBan SET TrangThai = 'DA_XAC_NHAN'  WHERE TrangThai IN ('Confirmed','DA_XAC_NHAN','DA_GAN_BAN','DA_GHI_NHAN');
-UPDATE DatBan SET TrangThai = 'DA_DEN'       WHERE TrangThai IN ('Seated','DA_CHECK_IN','DA_XEP_BAN','DANG_PHUC_VU','DA_NHAN_BAN');
+UPDATE DatBan SET TrangThai = 'DA_NHAN_BAN'  WHERE TrangThai IN ('Seated','DA_CHECK_IN','DA_XEP_BAN','DANG_PHUC_VU','DA_NHAN_BAN');
 UPDATE DatBan SET TrangThai = 'HOAN_THANH'   WHERE TrangThai = 'Completed';
 UPDATE DatBan SET TrangThai = 'DA_HUY'       WHERE TrangThai IN ('Cancelled','TU_CHOI_HET_CHO');
 UPDATE DatBan SET TrangThai = 'KHONG_DEN'    WHERE TrangThai = 'NoShow';
@@ -57,7 +57,7 @@ UPDATE DatBan SET TrangThai = 'HET_HAN'      WHERE TrangThai = 'Expired';
 
 ALTER TABLE DatBan
   MODIFY COLUMN TrangThai ENUM(
-    'CHO_XAC_NHAN','DA_XAC_NHAN','DA_DEN','HOAN_THANH','DA_HUY','KHONG_DEN','HET_HAN'
+    'CHO_XAC_NHAN','DA_XAC_NHAN','DA_NHAN_BAN','HOAN_THANH','DA_HUY','KHONG_DEN','HET_HAN'
   ) NOT NULL DEFAULT 'CHO_XAC_NHAN';
 
 
@@ -65,16 +65,16 @@ ALTER TABLE DatBan
 -- 3. DONHANG
 -- ============================================================
 -- Cu: Pending, Confirmed, Preparing, Ready, Served, Serving, Paid, Cancelled, Completed + CHO_XU_LY, DANG_CHE_BIEN, SAN_SANG, DANG_PHUC_VU, DA_THANH_TOAN, DA_HUY
--- Moi: CHO_XU_LY, DA_XAC_NHAN, DANG_CHE_BIEN, SAN_SANG, DA_PHUC_VU, HOAN_THANH, DA_HUY, DA_THANH_TOAN, DA_HOAN_TIEN
+-- Moi: DANG_CHUAN_BI, DA_XAC_NHAN, DANG_CHE_BIEN, SAN_SANG, DA_PHUC_VU, HOAN_THANH, DA_HUY, DA_THANH_TOAN, DA_HOAN_TIEN
 -- ============================================================
 ALTER TABLE DonHang
   MODIFY COLUMN TrangThai ENUM(
     'Pending','Confirmed','Preparing','Ready','Served','Serving','Paid','Cancelled','Completed',
-    'CHO_XU_LY','DA_XAC_NHAN','DANG_CHE_BIEN','SAN_SANG','DANG_PHUC_VU','DA_THANH_TOAN','DA_HUY',
+    'DANG_CHUAN_BI','DA_XAC_NHAN','DANG_CHE_BIEN','SAN_SANG','DANG_PHUC_VU','DA_THANH_TOAN','DA_HUY',
     'HOAN_THANH','DA_HOAN_TIEN'
   ) NOT NULL DEFAULT 'Pending';
 
-UPDATE DonHang SET TrangThai = 'CHO_XU_LY'     WHERE TrangThai IN ('Pending','CHO_XU_LY');
+UPDATE DonHang SET TrangThai = 'DANG_CHUAN_BI' WHERE TrangThai IN ('Pending','CHO_XU_LY');
 UPDATE DonHang SET TrangThai = 'DA_XAC_NHAN'   WHERE TrangThai = 'Confirmed';
 UPDATE DonHang SET TrangThai = 'DANG_CHE_BIEN' WHERE TrangThai IN ('Preparing','DANG_CHE_BIEN');
 UPDATE DonHang SET TrangThai = 'SAN_SANG'      WHERE TrangThai = 'Ready';
@@ -85,23 +85,23 @@ UPDATE DonHang SET TrangThai = 'DA_THANH_TOAN' WHERE TrangThai = 'Paid';
 
 ALTER TABLE DonHang
   MODIFY COLUMN TrangThai ENUM(
-    'CHO_XU_LY','DA_XAC_NHAN','DANG_CHE_BIEN','SAN_SANG','DA_PHUC_VU','HOAN_THANH','DA_HUY','DA_THANH_TOAN','DA_HOAN_TIEN'
-  ) NOT NULL DEFAULT 'CHO_XU_LY';
+    'DANG_CHUAN_BI','DA_XAC_NHAN','DANG_CHE_BIEN','SAN_SANG','DA_PHUC_VU','HOAN_THANH','DA_HUY','DA_THANH_TOAN','DA_HOAN_TIEN'
+  ) NOT NULL DEFAULT 'DANG_CHUAN_BI';
 
 
 -- ============================================================
 -- 4. CHI TIET DON HANG
 -- ============================================================
 -- Cu: Pending, Preparing, Ready, Served, Done, Cancelled
--- Moi: CHO_CHE_BIEN, DANG_CHE_BIEN, SAN_SANG, DA_PHUC_VU, HOAN_THANH, DA_HUY
+-- Moi: DANG_CHUAN_BI, DANG_CHE_BIEN, SAN_SANG, DA_PHUC_VU, HOAN_THANH, DA_HUY
 -- ============================================================
 ALTER TABLE ChiTietDonHang
   MODIFY COLUMN TrangThai ENUM(
     'Pending','Preparing','Ready','Served','Done','Cancelled',
-    'CHO_CHE_BIEN','DANG_CHE_BIEN','SAN_SANG','DA_PHUC_VU','HOAN_THANH','DA_HUY'
+    'DANG_CHUAN_BI','DANG_CHE_BIEN','SAN_SANG','DA_PHUC_VU','HOAN_THANH','DA_HUY'
   ) NOT NULL DEFAULT 'Pending';
 
-UPDATE ChiTietDonHang SET TrangThai = 'CHO_CHE_BIEN' WHERE TrangThai IN ('Pending','CHO_CHE_BIEN');
+UPDATE ChiTietDonHang SET TrangThai = 'DANG_CHUAN_BI' WHERE TrangThai IN ('Pending','CHO_CHE_BIEN');
 UPDATE ChiTietDonHang SET TrangThai = 'DANG_CHE_BIEN' WHERE TrangThai IN ('Preparing','DANG_CHE_BIEN');
 UPDATE ChiTietDonHang SET TrangThai = 'SAN_SANG'      WHERE TrangThai = 'Ready';
 UPDATE ChiTietDonHang SET TrangThai = 'DA_PHUC_VU'    WHERE TrangThai = 'Served';
@@ -110,8 +110,8 @@ UPDATE ChiTietDonHang SET TrangThai = 'DA_HUY'        WHERE TrangThai = 'Cancell
 
 ALTER TABLE ChiTietDonHang
   MODIFY COLUMN TrangThai ENUM(
-    'CHO_CHE_BIEN','DANG_CHE_BIEN','SAN_SANG','DA_PHUC_VU','HOAN_THANH','DA_HUY'
-  ) NOT NULL DEFAULT 'CHO_CHE_BIEN';
+    'DANG_CHUAN_BI','DANG_CHE_BIEN','SAN_SANG','DA_PHUC_VU','HOAN_THANH','DA_HUY'
+  ) NOT NULL DEFAULT 'DANG_CHUAN_BI';
 
 
 -- ============================================================

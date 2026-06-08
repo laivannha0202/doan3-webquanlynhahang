@@ -6,7 +6,7 @@ Trong API, quyền tương ứng là `admin`.
 
 ---
 
-### UC-AD-01: Quản lý thực đơn
+## UC-AD-01: Quản lý thực đơn
 
 - **Mã use case:** UC-AD-01
 - **Tên use case:** Quản lý thực đơn
@@ -37,7 +37,7 @@ Trong API, quyền tương ứng là `admin`.
 
 ---
 
-### UC-AD-02: Quản lý bàn
+## UC-AD-02: Quản lý bàn
 
 - **Mã use case:** UC-AD-02
 - **Tên use case:** Quản lý bàn
@@ -68,7 +68,7 @@ Trong API, quyền tương ứng là `admin`.
 
 ---
 
-### UC-AD-03: Quản lý nhân viên
+## UC-AD-03: Quản lý nhân viên
 
 - **Mã use case:** UC-AD-03
 - **Tên use case:** Quản lý nhân viên
@@ -97,7 +97,7 @@ Trong API, quyền tương ứng là `admin`.
 
 ---
 
-### UC-AD-04: Quản lý khách hàng
+## UC-AD-04: Quản lý khách hàng
 
 - **Mã use case:** UC-AD-04
 - **Tên use case:** Quản lý khách hàng
@@ -123,7 +123,7 @@ Trong API, quyền tương ứng là `admin`.
 
 ---
 
-### UC-AD-05: Quản lý đặt bàn
+## UC-AD-05: Quản lý đặt bàn
 
 - **Mã use case:** UC-AD-05
 - **Tên use case:** Quản lý đặt bàn
@@ -151,7 +151,7 @@ Trong API, quyền tương ứng là `admin`.
 
 ---
 
-### UC-AD-06: Quản lý đơn hàng
+## UC-AD-06: Quản lý đơn hàng
 
 - **Mã use case:** UC-AD-06
 - **Tên use case:** Quản lý đơn hàng
@@ -179,7 +179,7 @@ Trong API, quyền tương ứng là `admin`.
 
 ---
 
-### UC-AD-07: Quản lý voucher
+## UC-AD-07: Quản lý voucher
 
 - **Mã use case:** UC-AD-07
 - **Tên use case:** Quản lý voucher / mã giảm giá
@@ -208,7 +208,7 @@ Trong API, quyền tương ứng là `admin`.
 
 ---
 
-### UC-AD-08: Duyệt đánh giá
+## UC-AD-08: Duyệt đánh giá
 
 - **Mã use case:** UC-AD-08
 - **Tên use case:** Duyệt đánh giá
@@ -236,7 +236,7 @@ Trong API, quyền tương ứng là `admin`.
 
 ---
 
-### UC-AD-09: Xem thống kê doanh thu
+## UC-AD-09: Xem thống kê doanh thu
 
 - **Mã use case:** UC-AD-09
 - **Tên use case:** Xem thống kê doanh thu
@@ -263,7 +263,7 @@ Trong API, quyền tương ứng là `admin`.
 
 ---
 
-### UC-AD-10: Xem dashboard tổng quan
+## UC-AD-10: Xem dashboard tổng quan
 
 - **Mã use case:** UC-AD-10
 - **Tên use case:** Xem dashboard tổng quan
@@ -289,7 +289,7 @@ Trong API, quyền tương ứng là `admin`.
 
 ---
 
-### UC-AD-11: Cấu hình hệ thống
+## UC-AD-11: Cấu hình hệ thống
 
 - **Mã use case:** UC-AD-11
 - **Tên use case:** Cấu hình hệ thống

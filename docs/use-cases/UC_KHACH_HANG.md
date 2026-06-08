@@ -47,8 +47,8 @@ Trong API, quyền tương ứng là `customer-auth` (khách đã đăng nhập)
   2. Hệ thống hiển thị thực đơn của bàn.
   3. Khách chọn món, chọn số lượng, thêm vào giỏ hàng tạm.
   4. Khách xác nhận gửi đơn.
-  5. Hệ thống tạo `DonHang` với `MaBan`, `TrangThai = 'CHO_XU_LY'`.
-  6. Hệ thống tạo `ChiTietDonHang` cho từng món (`TrangThai = 'CHO_CHE_BIEN'`).
+  5. Hệ thống tạo `DonHang` với `MaBan`, `TrangThai = 'DANG_CHUAN_BI'`.
+  6. Hệ thống tạo `ChiTietDonHang` cho từng món (`TrangThai = 'DANG_CHUAN_BI'`).
   7. Hệ thống cập nhật `Ban.TrangThai = 'CO_KHACH'`.
   8. Trả về `maDonHang` cho khách.
 - **Luồng thay thế:**
@@ -59,7 +59,7 @@ Trong API, quyền tương ứng là `customer-auth` (khách đã đăng nhập)
 - **Dữ liệu vào:** `maBan` (từ QR), danh sách `{ maMon, soLuong }`.
 - **Dữ liệu ra:** `DonHang` gồm `maDonHang`, danh sách món, tổng tiền.
 - **API liên quan:** `GET /api/ban/:maBan/thuc-don`, `POST /api/ban/:maBan/order`, `GET /api/ban/:maBan/order`.
-- **Trạng thái thay đổi:** `DonHang` → `CHO_XU_LY`; `Ban.TrangThai` → `CO_KHACH`.
+- **Trạng thái thay đổi:** `DonHang` → `DANG_CHUAN_BI`; `Ban.TrangThai` → `CO_KHACH`.
 - **Quy tắc nghiệp vụ:**
   - Không yêu cầu đăng nhập. Đơn gắn `MaBan` (không `MaKH` nếu khách không đăng nhập).
   - Không có luồng đặt món online / mang về / ship — đơn phải gắn bàn.
@@ -243,7 +243,7 @@ Trong API, quyền tương ứng là `customer-auth` (khách đã đăng nhập)
   5. Hệ thống gọi `PATCH /api/dat-ban/:maDatBan/status` với `trangThai = 'DA_HUY'`.
   6. Hiển thị thông báo "Hủy đặt bàn thành công".
 - **Luồng thay thế:**
-  - Đặt bàn ở trạng thái `DA_DEN` hoặc `HOAN_THANH`: không cho phép hủy (liên hệ nhà hàng).
+  - Đặt bàn ở trạng thái `DA_NHAN_BAN` hoặc `HOAN_THANH`: không cho phép hủy (liên hệ nhà hàng).
 - **Luồng lỗi:**
   - Đặt bàn không thuộc sở hữu: 403 "Bạn không có quyền hủy đặt bàn này".
   - Đặt bàn đã hủy: thông báo "Đặt bàn đã được hủy trước đó".
@@ -254,7 +254,7 @@ Trong API, quyền tương ứng là `customer-auth` (khách đã đăng nhập)
 - **Quy tắc nghiệp vụ:**
   - `customer-own` — chỉ hủy đặt bàn của chính mình.
   - Chỉ hủy được khi trạng thái là `CHO_XAC_NHAN` hoặc `DA_XAC_NHAN`.
-  - `DA_DEN` trở đi không cho hủy online.
+  - `DA_NHAN_BAN` trở đi không cho hủy online.
 - **Acceptance Criteria:**
   - Hủy thành công → `DatBan.TrangThai = 'DA_HUY'`.
   - Hủy đặt bàn của người khác → 403.
@@ -363,31 +363,4 @@ Trong API, quyền tương ứng là `customer-auth` (khách đã đăng nhập)
   - Đánh giá đơn của người khác → 403.
   - Đánh giá đơn chưa hoàn tất → 400.
 
----
 
-## UC-KH-12: Xem hồ sơ / điểm tích lũy
-
-- **Mã use case:** UC-KH-12
-- **Tên use case:** Xem hồ sơ và điểm tích lũy
-- **Actor chính:** Khách hàng (đã đăng nhập)
-- **Mục tiêu:** Khách xem và sửa thông tin cá nhân, xem điểm tích lũy và lịch sử.
-- **Điều kiện bắt đầu:** Khách đã đăng nhập.
-- **Luồng chính:**
-  1. Khách truy cập `/ho-so`.
-  2. Hệ thống hiển thị thông tin cá nhân (họ tên, SĐT, email, địa chỉ).
-  3. Hệ thống hiển thị số điểm hiện tại (`GET /api/diem-tich-luy/me`).
-  4. Hệ thống hiển thị lịch sử biến động điểm (`GET /api/diem-tich-luy/me/history`).
-  5. Khách có thể chỉnh sửa thông tin cá nhân (PUT).
-- **Luồng thay thế:**
-  - Khách muốn đổi mật khẩu: bấm "Đổi mật khẩu" → `PUT /api/auth/doi-mat-khau`.
-- **Luồng lỗi:**
-  - Token hết hạn: yêu cầu đăng nhập lại.
-- **Dữ liệu vào:** `maKh` (từ token), thông tin cập nhật (nếu sửa).
-- **Dữ liệu ra:** Thông tin `NguoiDung` + `KhachHang` + điểm + lịch sử điểm.
-- **API liên quan:** `GET /api/auth/me`, `PUT /api/auth/profile`, `PUT /api/auth/doi-mat-khau`, `GET /api/diem-tich-luy/me`, `GET /api/diem-tich-luy/me/history`.
-- **Trạng thái thay đổi:** `PUT /api/auth/profile` → cập nhật thông tin. `PUT /api/auth/doi-mat-khau` → thay đổi mật khẩu.
-- **Quy tắc nghiệp vụ:** `customer-own` — chỉ xem/sửa hồ sơ của chính mình.
-- **Acceptance Criteria:**
-  - Hiển thị đúng thông tin, điểm, lịch sử.
-  - Sửa thông tin thành công.
-  - Đổi mật khẩu thành công.

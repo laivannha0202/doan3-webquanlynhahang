@@ -1,4 +1,4 @@
-# Ma tran phan quyen API
+# Ma trận phân quyền API
 
 Cap nhat: 2026-04-11
 

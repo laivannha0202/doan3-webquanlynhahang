@@ -49,10 +49,10 @@ const TRANG_THAI_DON_HANG_DANG_HOAT_DONG = new Set([
   'Ready',
   'Served',
   'Serving',
-  'CHO_XU_LY',
+  'DANG_CHUAN_BI',
   'DANG_CHE_BIEN',
   'SAN_SANG',
-  'DANG_PHUC_VU',
+  'DA_PHUC_VU',
 ])
 
 const TRANG_THAI_DON_HANG_KET_THUC = new Set([
