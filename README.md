@@ -81,14 +81,14 @@ Backend chính nằm tại `backend/nest-api/`, frontend chính nằm tại `fro
 
 ### Luồng khách hàng đặt bàn
 
-1. Khách hàng đăng nhập hoặc nhập thông tin cần thiết.
+1. Khách hàng **đăng nhập tài khoản khách hàng**.
 2. Chọn ngày giờ, số lượng khách và khu vực/bàn nếu có.
-3. Hệ thống ghi nhận yêu cầu đặt bàn.
+3. Hệ thống ghi nhận yêu cầu đặt bàn (DatBan gắn MaKH).
 4. Nhân viên xác nhận hoặc xử lý trạng thái đặt bàn.
 
-### Luồng gọi món tại bàn qua QR
+### Luồng gọi món tại bàn qua QR (public)
 
-1. Khách hàng quét QR tại bàn.
+1. Khách hàng quét QR tại bàn — **không cần đăng nhập**.
 2. Hệ thống mở giao diện thực đơn theo bàn.
 3. Khách chọn món và gửi đơn.
 4. Nhân viên tiếp nhận, cập nhật trạng thái đơn.

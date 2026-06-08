@@ -38,10 +38,10 @@ Tai lieu nay tom tat quyen truy cap cho cac endpoint trong `backend/nest-api/src
 | POST | `/api/ban/:maBan/order` | public | Khach tai ban tao order qua QR |
 | GET | `/api/ban/:maBan/order` | public | Xem order dang mo tai ban |
 | POST | `/api/ban/:maBan/yeu-cau-thanh-toan` | public | Khach tai ban gui yeu cau thanh toan |
-| POST | `/api/ban/:maBan/xac-nhan-thanh-toan` | public | Dang de public theo nghiep vu hien tai |
+| POST | `/api/ban/:maBan/xac-nhan-thanh-toan` | staff | Thu ngan/xac nhan thanh toan tai ban |
 | GET | `/api/dat-ban` | staff | Danh sach booking noi bo |
 | GET | `/api/dat-ban/khach/:maKh` | customer-own | Khach chi xem lich su dat ban cua chinh minh |
-| POST | `/api/dat-ban` | customer-own | Khach tao booking cho chinh minh; noi bo co the tao booking thay mat khach |
+| POST | `/api/dat-ban` | customer-auth | Khach dang nhap tao booking cho chinh minh (DatBan bat buoc gan MaKH); noi bo co the tao booking thay mat khach |
 | GET | `/api/dat-ban/availability` | public | Kiem tra kha dung dat ban |
 | PATCH | `/api/dat-ban/:maDatBan` | staff | Sua booking |
 | PATCH | `/api/dat-ban/:maDatBan/status` | staff | Doi trang thai booking |
@@ -69,28 +69,43 @@ Backend dang kiem tra so huu du lieu theo `Authorization` header o cac nhom rout
 - `danh-gia`
 - `don-hang/:maDonHang`
 
-### 2. Muc `staff`
+### 2. Muc `customer-auth`
+
+`customer-auth` nghia la khach hang **bat buoc dang nhap** (co token JWT hop le). DatBan bat buoc gan MaKH. Khach chi xem/huy DatBan cua chinh minh.
+
+- `POST /api/dat-ban`
+
+### 3. Muc `staff`
 
 `staff` nghia la:
 
 - `NhanVien`
 - hoac `Admin`
 
-### 3. Cac endpoint van de `public`
+### 4. Cac endpoint van de `public-qr` (public danh cho flow QR tai ban)
 
-Cac endpoint sau van de `public` vi dang phuc vu flow QR ban / dat hang cong khai hien tai:
+Cac endpoint sau van de `public` vi dang phuc vu flow QR goi mon tai ban (khach khong can dang nhap):
 
 - `/api/ban/:maBan/order`
 - `/api/ban/:maBan/order` (GET)
 - `/api/ban/:maBan/yeu-cau-thanh-toan`
-- `/api/ban/:maBan/xac-nhan-thanh-toan`
 - `/api/don-hang` (POST)
 
-Neu muon siet them, can chot lai nghiep vu truoc khi doi contract frontend.
+### 5. Luong dat ban yeu cau dang nhap
+
+- `POST /api/dat-ban`: `customer-auth` — khach phai dang nhap, DatBan gan MaKH.
+- `GET /api/dat-ban/khach/:maKh`: `customer-own` — khach chi xem dat ban cua chinh minh.
+- `PATCH /api/dat-ban/:maDatBan`: `staff` — staff/xu ly dat ban.
+- `PATCH /api/dat-ban/:maDatBan/status`: `staff` — doi trang thai dat ban.
+- `PATCH /api/dat-ban/:maDatBan/assign-tables`: `staff` — gan ban cho dat ban.
+
+### 6. Thanh toan tai ban
+
+- `POST /api/ban/:maBan/xac-nhan-thanh-toan`: `staff` — thu ngan/xac nhan thanh toan.
 
 ## Khuyen nghi tiep theo
 
 1. Tach rieng `public-qr` thanh muc quyen rieng neu muon ro nghia hon `public`.
 2. Bo sung test backend cho cac truong hop `401` / `403`.
-3. Neu chot nghiep vu, doi `/api/ban/:maBan/xac-nhan-thanh-toan` thanh `staff` thay vi `public`.
+3. Dat-ban da chot la customer-auth (bat buoc dang nhap) — khong con dat ban public bang ten + SĐT.
 4. Can nhac khoa hon nua `POST /api/don-hang` neu khong con can flow tao don cong khai.

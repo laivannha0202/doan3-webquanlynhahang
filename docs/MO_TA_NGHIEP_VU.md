@@ -33,14 +33,14 @@ Hệ thống hiện có các luồng chính cho khách hàng:
 - xem trang chủ và giới thiệu nhà hàng
 - xem thực đơn công khai
 - đăng ký, đăng nhập
-- đặt bàn
+- đặt bàn (yêu cầu đăng nhập, tài khoản khách hàng)
 - thêm món vào giỏ hàng
-- thanh toán
+- thanh toán (chỉ cho đơn gắn bàn hoặc đơn từ đặt bàn, không phải luồng đặt món online/mang về/ship)
 - xem hồ sơ cá nhân
 - xem lịch sử đơn hàng
 - xem lịch sử đặt bàn
 - gửi đánh giá cho đơn hàng đủ điều kiện
-- gọi món tại bàn qua mã QR theo `maBan`
+- gọi món tại bàn qua mã QR theo `maBan` (không cần đăng nhập)
 
 ### 3.2 Nhân viên / nội bộ
 
