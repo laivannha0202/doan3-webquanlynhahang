@@ -1,11 +1,13 @@
 export const TRANG_THAI_DON_HANG = Object.freeze({
-  MOI_TAO: 'Pending',
-  DA_XAC_NHAN: 'Confirmed',
-  DANG_CHUAN_BI: 'Preparing',
-  SAN_SANG: 'Ready',
-  DANG_PHUC_VU: 'Served',
-  HOAN_THANH: 'Completed',
-  DA_HUY: 'Cancelled',
+  CHO_XU_LY: 'CHO_XU_LY',
+  DA_XAC_NHAN: 'DA_XAC_NHAN',
+  DANG_CHE_BIEN: 'DANG_CHE_BIEN',
+  SAN_SANG: 'SAN_SANG',
+  DA_PHUC_VU: 'DA_PHUC_VU',
+  HOAN_THANH: 'HOAN_THANH',
+  DA_HUY: 'DA_HUY',
+  DA_THANH_TOAN: 'DA_THANH_TOAN',
+  DA_HOAN_TIEN: 'DA_HOAN_TIEN',
 })
 
 export const LOAI_DON_HANG = Object.freeze({
@@ -54,4 +56,3 @@ export const chuanHoaKetQuaVoucher = (nguon = {}) => ({
   soTienGiamThucTe: Number(layGiaTri(nguon, 'soTienGiamThucTe', 'SoTienGiamThucTe', 'discountAmount', 'DiscountAmount') || 0),
   thongDiep: String(layGiaTri(nguon, 'thongDiep', 'ThongDiep', 'message', 'Message', 'moTa', 'MoTa', 'description', 'Description') || '').trim(),
 })
-

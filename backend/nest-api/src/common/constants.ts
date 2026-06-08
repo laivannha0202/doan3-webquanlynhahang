@@ -39,109 +39,111 @@ export const PHAM_VI_MA_GIAM_GIA = {
 
 export const SO_NGAY_HIEU_LUC_VOUCHER_DOI_DIEM = 30;
 
-// ========== Trạng thái bàn ăn ==========
+// ========== Trạng thái bàn ăn (theo Q1: ENUM Việt) ==========
 
 export const TRANG_THAI_BAN = {
-  TRONG: 'Available',
-  GIU_CHO: 'Reserved',
-  DANG_SU_DUNG: 'Occupied',
-  BAN: 'Maintenance',
+  TRONG: 'TRONG',
+  DA_DAT: 'DA_DAT',
+  CO_KHACH: 'CO_KHACH',
+  DANG_DON: 'DANG_DON',
+  BAO_TRI: 'BAO_TRI',
 } as const;
 
 export const TRANG_THAI_DAT_BAN = {
-  PENDING: 'Pending',
-  CONFIRMED: 'Confirmed',
-  SEATED: 'Seated',
-  COMPLETED: 'Completed',
-  NO_SHOW: 'NoShow',
-  EXPIRED: 'Expired',
   CHO_XAC_NHAN: 'CHO_XAC_NHAN',
   DA_XAC_NHAN: 'DA_XAC_NHAN',
-  DA_GAN_BAN: 'DA_GAN_BAN',
-  DA_GHI_NHAN: 'DA_GHI_NHAN',
-  GIU_CHO_TAM: 'GIU_CHO_TAM',
-  DA_CHECK_IN: 'DA_CHECK_IN',
-  DA_XEP_BAN: 'DA_XEP_BAN',
-  DANG_PHUC_VU: 'DANG_PHUC_VU',
-  DA_NHAN_BAN: 'DA_NHAN_BAN',
-  DA_HOAN_THANH: 'DA_HOAN_THANH',
+  DA_DEN: 'DA_DEN',
+  HOAN_THANH: 'HOAN_THANH',
   DA_HUY: 'DA_HUY',
-  CANCELLED: 'Cancelled',
   KHONG_DEN: 'KHONG_DEN',
-  TU_CHOI_HET_CHO: 'TU_CHOI_HET_CHO',
-  CAN_GOI_LAI: 'CAN_GOI_LAI',
+  HET_HAN: 'HET_HAN',
 } as const;
 
 export const TRANG_THAI_BAN_KHONG_THE_DAT = [
-  TRANG_THAI_BAN.DANG_SU_DUNG,
-  TRANG_THAI_BAN.GIU_CHO,
-  TRANG_THAI_BAN.BAN,
+  TRANG_THAI_BAN.CO_KHACH,
+  TRANG_THAI_BAN.DA_DAT,
+  TRANG_THAI_BAN.BAO_TRI,
 ];
 
 export function chuanHoaTrangThaiBan(trangThai: string): string {
   const gt = (trangThai || '').trim().toUpperCase();
   if (['TRONG', 'AVAILABLE'].includes(gt)) return TRANG_THAI_BAN.TRONG;
-  if (['GIU_CHO', 'RESERVED', 'CHO_THANH_TOAN'].includes(gt))
-    return TRANG_THAI_BAN.GIU_CHO;
-  if (['DANG_SU_DUNG', 'CO_KHACH', 'OCCUPIED'].includes(gt))
-    return TRANG_THAI_BAN.DANG_SU_DUNG;
-  if (['BAN', 'CAN_DON', 'MAINTENANCE', 'DIRTY'].includes(gt))
-    return TRANG_THAI_BAN.BAN;
+  if (['DA_DAT', 'RESERVED', 'GIU_CHO'].includes(gt)) return TRANG_THAI_BAN.DA_DAT;
+  if (['CO_KHACH', 'DANG_SU_DUNG', 'OCCUPIED'].includes(gt)) return TRANG_THAI_BAN.CO_KHACH;
+  if (['DANG_DON'].includes(gt)) return TRANG_THAI_BAN.DANG_DON;
+  if (['BAO_TRI', 'BAN', 'CAN_DON', 'MAINTENANCE', 'DIRTY'].includes(gt)) return TRANG_THAI_BAN.BAO_TRI;
   // Fallback an toàn: coi là chờ dọn
-  return TRANG_THAI_BAN.BAN;
+  return TRANG_THAI_BAN.BAO_TRI;
 }
 
+// ========== Trạng thái đơn hàng (theo Q1: ENUM Việt) ==========
+
+export const TRANG_THAI_DON_HANG = {
+  CHO_XU_LY: 'CHO_XU_LY',
+  DA_XAC_NHAN: 'DA_XAC_NHAN',
+  DANG_CHE_BIEN: 'DANG_CHE_BIEN',
+  SAN_SANG: 'SAN_SANG',
+  DA_PHUC_VU: 'DA_PHUC_VU',
+  HOAN_THANH: 'HOAN_THANH',
+  DA_HUY: 'DA_HUY',
+  DA_THANH_TOAN: 'DA_THANH_TOAN',
+  DA_HOAN_TIEN: 'DA_HOAN_TIEN',
+} as const;
+
 export const TRANG_THAI_DON_HANG_DANG_MO = new Set([
-  'Pending',
-  'Confirmed',
-  'Preparing',
-  'Ready',
-  'Served',
-  'Serving',
-  'DANG_PHUC_VU',
-  'CHO_XU_LY',
-  'DANG_CHE_BIEN',
-  'SAN_SANG',
+  TRANG_THAI_DON_HANG.CHO_XU_LY,
+  TRANG_THAI_DON_HANG.DA_XAC_NHAN,
+  TRANG_THAI_DON_HANG.DANG_CHE_BIEN,
+  TRANG_THAI_DON_HANG.SAN_SANG,
+  TRANG_THAI_DON_HANG.DA_PHUC_VU,
 ]);
 
 export const TRANG_THAI_DON_HANG_KET_THUC = new Set([
-  'Paid',
-  'Cancelled',
-  'Completed',
-  'DA_THANH_TOAN',
-  'DA_HUY',
+  TRANG_THAI_DON_HANG.HOAN_THANH,
+  TRANG_THAI_DON_HANG.DA_THANH_TOAN,
+  TRANG_THAI_DON_HANG.DA_HOAN_TIEN,
+  TRANG_THAI_DON_HANG.DA_HUY,
 ]);
 
+// ========== Trạng thái đặt bàn (theo Q1: ENUM Việt) ==========
+
 export const TRANG_THAI_DAT_BAN_GIU_BAN = new Set([
-  'Pending',
-  'Confirmed',
-  'YEU_CAU_DAT_BAN',
-  'GIU_CHO_TAM',
-  'DA_XAC_NHAN',
-  'DA_GAN_BAN',
-  'CAN_GOI_LAI',
-  'CHO_XAC_NHAN',
-  'DA_GHI_NHAN',
+  TRANG_THAI_DAT_BAN.CHO_XAC_NHAN,
+  TRANG_THAI_DAT_BAN.DA_XAC_NHAN,
 ]);
 
 export const TRANG_THAI_DAT_BAN_SU_DUNG_BAN = new Set([
-  'Seated',
-  'DA_CHECK_IN',
-  'DA_XEP_BAN',
-  'DANG_PHUC_VU',
-  'DA_NHAN_BAN',
+  TRANG_THAI_DAT_BAN.DA_DEN,
 ]);
 
 export const TRANG_THAI_DAT_BAN_KET_THUC = new Set([
-  'Completed',
-  'Cancelled',
-  'NoShow',
-  'Expired',
-  'DA_HOAN_THANH',
-  'DA_HUY',
-  'KHONG_DEN',
-  'TU_CHOI_HET_CHO',
+  TRANG_THAI_DAT_BAN.HOAN_THANH,
+  TRANG_THAI_DAT_BAN.DA_HUY,
+  TRANG_THAI_DAT_BAN.KHONG_DEN,
+  TRANG_THAI_DAT_BAN.HET_HAN,
 ]);
+
+// ========== Trạng thái chi tiết đơn hàng (theo Q1: ENUM Việt) ==========
+
+export const TRANG_THAI_CHI_TIET_DON_HANG = {
+  CHO_CHE_BIEN: 'CHO_CHE_BIEN',
+  DANG_CHE_BIEN: 'DANG_CHE_BIEN',
+  SAN_SANG: 'SAN_SANG',
+  DA_PHUC_VU: 'DA_PHUC_VU',
+  HOAN_THANH: 'HOAN_THANH',
+  DA_HUY: 'DA_HUY',
+} as const;
+
+// ========== Trạng thái thanh toán (theo Q1: ENUM Việt) ==========
+
+export const TRANG_THAI_THANH_TOAN = {
+  CHO_THANH_TOAN: 'CHO_THANH_TOAN',
+  THANH_CONG: 'THANH_CONG',
+  THAT_BAI: 'THAT_BAI',
+  DA_HOAN_TIEN: 'DA_HOAN_TIEN',
+} as const;
+
+// ========== Helper functions ==========
 
 export const laTrangThaiDonHangDangMo = (trangThai: string) =>
   TRANG_THAI_DON_HANG_DANG_MO.has(String(trangThai || '').trim());

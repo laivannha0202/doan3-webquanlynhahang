@@ -156,7 +156,7 @@ Trong API, quyền tương ứng là `staff` (JWT có `vaiTro='NhanVien'` hoặc
 - **Luồng chính:**
   1. Nhân viên xem danh sách món `SAN_SANG` của bàn (UC-NV-05).
   2. Nhân viên xác nhận đã mang món ra cho khách.
-  3. Hệ thống gọi API cập nhật `ChiTietDonHang.TrangThai` → `DA_PHUC_VU`.
+  3. Hệ thống cập nhật `ChiTietDonHang.TrangThai` → `DA_PHUC_VU`.
   4. Nếu tất cả món đã `DA_PHUC_VU`/`DA_HUY`, gợi ý chuyển `DonHang` → `DA_PHUC_VU`.
 - **Luồng thay thế:**
   - Nhân viên mang một phần món: cập nhật từng món riêng lẻ.
@@ -330,7 +330,7 @@ Trong API, quyền tương ứng là `staff` (JWT có `vaiTro='NhanVien'` hoặc
   - Voucher hết hạn/hết lượt: thông báo "Mã không hợp lệ".
   - Voucher không đúng chủ: thông báo "Mã không thuộc về khách này".
 - **Dữ liệu vào:** `maDonHang`, `maCode` (voucher), `soDiem` (điểm).
-- **Dữ liệu ra:** Số tiền giảm, tổng thanh toán.
+- **Dữ liệu ra:** Số tiền giảm, tổng thanh toán sau giảm.
 - **API liên quan:** `POST /api/ma-giam-gia/validate`.
 - **Trạng thái thay đổi:** Chưa thay đổi dữ liệu (chỉ xem trước). Thay đổi khi xác nhận thanh toán (UC-NV-13).
 - **Quy tắc nghiệp vụ:** `staff`. Voucher `CUSTOMER/LOYALTY/VIP` phải đúng chủ (Q8).
@@ -372,8 +372,6 @@ Trong API, quyền tương ứng là `staff` (JWT có `vaiTro='NhanVien'` hoặc
   - Tích điểm nếu có `MaKH`.
 
 ---
-
-## Chung
 
 ### UC-NV-14: Xem danh sách booking
 

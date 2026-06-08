@@ -1,6 +1,6 @@
 # Use Case: Khách hàng
 
-Actor này bao gồm 2 loại: **Khách vãng lai tại bàn (QR)** — không cần đăng nhập, và **Khách có tài khoản/thành viên** — bắt buộc đăng nhập để đặt bàn, dùng voucher, tích điểm, đánh giá.
+Actor này bao gồm 2 loại: **Khách vãng lai tại bàn (QR)** — không cần đăng nhập, và **Khách có tài khoản/thành viên** — bắt buộc đăng nhập để đặt bàn, dùng voucher, tích điểm, đánh giá.  
 Trong API, quyền tương ứng là `customer-auth` (khách đã đăng nhập) hoặc `public` (khách vãng lai).
 
 ---
@@ -373,7 +373,7 @@ Trong API, quyền tương ứng là `customer-auth` (khách đã đăng nhập)
 - **Điều kiện bắt đầu:** Khách đã đăng nhập.
 - **Luồng chính:**
   1. Khách truy cập `/ho-so`.
-  2. Hệ thống hiển thị thông tin cá nhân (họ tên, email, SĐT, địa chỉ).
+  2. Hệ thống hiển thị thông tin cá nhân (họ tên, SĐT, email, địa chỉ).
   3. Hệ thống hiển thị số điểm hiện tại (`GET /api/diem-tich-luy/me`).
   4. Hệ thống hiển thị lịch sử biến động điểm (`GET /api/diem-tich-luy/me/history`).
   5. Khách có thể chỉnh sửa thông tin cá nhân (PUT).
