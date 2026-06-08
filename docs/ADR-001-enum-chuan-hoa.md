@@ -11,9 +11,9 @@ Cac ENUM ky thuat/danh muc khac (`VaiTro`, `GioiTinh`, `TinhTrang`, `LoaiGiam`, 
 | Bang | Cot | Gia tri Viet chinh thuc |
 |---|---|---|
 | `Ban` | `TrangThai` | `TRONG`, `DA_DAT`, `CO_KHACH`, `DANG_DON`, `BAO_TRI` |
-| `DatBan` | `TrangThai` | `CHO_XAC_NHAN`, `DA_XAC_NHAN`, `DA_NHAN_BAN`, `HOAN_THANH`, `DA_HUY`, `KHONG_DEN`, `HET_HAN` |
-| `DonHang` | `TrangThai` | `DANG_CHUAN_BI`, `DA_XAC_NHAN`, `DANG_CHE_BIEN`, `SAN_SANG`, `DA_PHUC_VU`, `HOAN_THANH`, `DA_HUY`, `DA_THANH_TOAN`, `DA_HOAN_TIEN` |
-| `ChiTietDonHang` | `TrangThai` | `DANG_CHUAN_BI`, `DANG_CHE_BIEN`, `SAN_SANG`, `DA_PHUC_VU`, `HOAN_THANH`, `DA_HUY` |
+| `DatBan` | `TrangThai` | `CHO_XAC_NHAN`, `DA_XAC_NHAN`, `DA_DEN`, `HOAN_THANH`, `DA_HUY`, `KHONG_DEN`, `HET_HAN` |
+| `DonHang` | `TrangThai` | `CHO_XU_LY`, `DA_XAC_NHAN`, `DANG_CHE_BIEN`, `SAN_SANG`, `DA_PHUC_VU`, `HOAN_THANH`, `DA_HUY`, `DA_THANH_TOAN`, `DA_HOAN_TIEN` |
+| `ChiTietDonHang` | `TrangThai` | `CHO_CHE_BIEN`, `DANG_CHE_BIEN`, `SAN_SANG`, `DA_PHUC_VU`, `HOAN_THANH`, `DA_HUY` |
 | `ThanhToan` | `TrangThai` | `CHO_THANH_TOAN`, `THANH_CONG`, `THAT_BAI`, `DA_HOAN_TIEN` |
 
 ## Ly do

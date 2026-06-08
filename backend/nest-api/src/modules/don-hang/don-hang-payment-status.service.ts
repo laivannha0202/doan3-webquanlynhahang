@@ -27,10 +27,10 @@ const TRANG_THAI_DON_HANG_HOP_LE = new Set([
   'Paid',
   'Cancelled',
   'Completed',
-  'DANG_CHUAN_BI',
+  'CHO_XU_LY',
   'DANG_CHE_BIEN',
   'SAN_SANG',
-  'DA_PHUC_VU',
+  'DANG_PHUC_VU',
   'DA_THANH_TOAN',
   'DA_HUY',
 ]);
