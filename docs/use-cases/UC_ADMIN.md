@@ -1,6 +1,7 @@
 # Use Case: Admin / Quản lý
 
-Actor này có toàn quyền trên hệ thống. Mọi thao tác đều được audit log.  
+Actor này có toàn quyền trên hệ thống. Mọi thao tác đều được audit log.
+
 Trong API, quyền tương ứng là `admin`.
 
 ---

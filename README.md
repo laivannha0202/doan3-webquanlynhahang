@@ -26,9 +26,9 @@
 
 ## 1. Giới thiệu dự án
 
-Hệ thống quản lý nhà hàng hỗ trợ tin học hóa các nghiệp vụ vận hành cơ bản: khách hàng xem thực đơn, đặt bàn, gọi món qua QR, thanh toán, xem lịch sử và đánh giá dịch vụ. Nhân viên/quản trị có thể quản lý bàn, đặt bàn, đơn hàng, món ăn, tài khoản nội bộ, khách hàng, đánh giá, mã giảm giá, điểm tích lũy và thống kê doanh thu cơ bản.
+Hệ thống quản lý nhà hàng hỗ trợ các nghiệp vụ cơ bản: khách hàng xem thực đơn, đặt bàn, gọi món qua QR, thanh toán, xem lịch sử và đánh giá dịch vụ; nhân viên/quản trị quản lý bàn, đặt bàn, đơn hàng, thực đơn, khách hàng, voucher, điểm tích lũy và thống kê doanh thu.
 
-Backend chính nằm tại `backend/nest-api/`, frontend chính nằm tại `frontend/`. Frontend gọi backend qua các API có tiền tố `/api`.
+Backend chính nằm tại `backend/nest-api/`, frontend chính nằm tại `frontend/`.
 
 ## 2. Mục tiêu đề tài
 
@@ -36,16 +36,16 @@ Backend chính nằm tại `backend/nest-api/`, frontend chính nằm tại `fro
 - Giảm thao tác thủ công khi đặt bàn, gọi món và thanh toán.
 - Hỗ trợ nhân viên theo dõi trạng thái bàn, đặt bàn và đơn hàng.
 - Hỗ trợ quản trị xem thống kê, quản lý dữ liệu vận hành.
-- Tạo trải nghiệm thuận tiện cho khách hàng thông qua giao diện web và QR gọi món tại bàn.
+- Tạo trải nghiệm thuận tiện cho khách hàng qua web và QR gọi món tại bàn.
 
 ## 3. Công nghệ sử dụng
 
-| Thành phần   | Công nghệ                                                           |
-| ------------ | ------------------------------------------------------------------- |
-| Frontend     | React, Vite, React Router, Ant Design, TanStack Query, Day.js, XLSX |
-| Backend      | NestJS, TypeScript, JWT, Swagger, class-validator, bcryptjs         |
-| Database     | MySQL                                                               |
-| Công cụ khác | npm, ESLint, Jest, Prettier                                         |
+| Thành phần | Công nghệ |
+|---|---|
+| Frontend | React, Vite, React Router, Ant Design, TanStack Query, Day.js, XLSX |
+| Backend | NestJS, TypeScript, JWT, Swagger, class-validator, bcryptjs |
+| Database | MySQL |
+| Công cụ khác | npm, ESLint, Jest, Prettier |
 
 ## 4. Chức năng chính
 
@@ -53,31 +53,16 @@ Backend chính nằm tại `backend/nest-api/`, frontend chính nằm tại `fro
 
 - Xem trang chủ, giới thiệu, thực đơn.
 - Đăng ký / đăng nhập.
-- Đặt bàn (yêu cầu đăng nhập tài khoản khách hàng) và xem/hủy đặt bàn của chính mình.
-- Gọi món tại bàn qua QR theo mã bàn — không cần đăng nhập.
-- Quản lý giỏ hàng (chỉ dùng cho đơn gắn bàn hoặc đơn từ đặt bàn).
-- Thanh toán (chỉ dùng cho đơn gắn bàn hoặc đơn từ đặt bàn).
-- Xem hồ sơ cá nhân.
-- Xem lịch sử đơn hàng.
-- Xem điểm tích lũy, lịch sử điểm và đổi điểm lấy voucher.
+- Đặt bàn (yêu cầu đăng nhập) và xem/hủy đặt bàn của chính mình.
+- Gọi món tại bàn qua QR.
+- Thanh toán (đơn gắn bàn hoặc đơn từ đặt bàn).
+- Xem hồ sơ cá nhân, lịch sử đơn hàng, điểm tích lũy.
 - Đánh giá sau khi sử dụng dịch vụ.
-
-> **Ghi chú:** Hệ thống không hỗ trợ đặt món online / mang về / ship. Mọi đơn hàng đều phải gắn với bàn hoặc đặt bàn.
 
 ### Nhân viên / Quản trị
 
 - Đăng nhập nội bộ.
-- Dashboard vận hành.
-- Quản lý bàn và sơ đồ bàn.
-- Quản lý đặt bàn.
-- Quản lý đơn hàng gọi món tại bàn.
-- Quản lý thực đơn / món ăn.
-- Quản lý khách hàng.
-- Quản lý tài khoản nhân viên / quản trị.
-- Quản lý mã giảm giá.
-- Quản lý điểm tích lũy thông qua hồ sơ khách hàng và voucher đổi điểm.
-- Duyệt / quản lý đánh giá.
-- Thống kê doanh thu / hoạt động cơ bản.
+- Dashboard vận hành, quản lý bàn, đặt bàn, đơn hàng, thực đơn, khách hàng, voucher, điểm, đánh giá, thống kê.
 
 ## 5. Luồng nghiệp vụ chính
 
@@ -95,6 +80,8 @@ Backend chính nằm tại `backend/nest-api/`, frontend chính nằm tại `fro
 3. Khách chọn món và gửi đơn.
 4. Nhân viên tiếp nhận, cập nhật trạng thái đơn.
 5. Khách thanh toán và có thể đánh giá dịch vụ.
+
+> **Ghi chú:** Hệ thống không hỗ trợ đặt món online / mang về / ship. Mọi đơn hàng trong phạm vi đồ án phải gắn với bàn hoặc đặt bàn.
 
 ### Luồng quản trị vận hành
 

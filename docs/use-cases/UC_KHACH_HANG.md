@@ -1,6 +1,7 @@
 # Use Case: Khách hàng
 
-Actor này bao gồm 2 loại: **Khách vãng lai tại bàn (QR)** — không cần đăng nhập, và **Khách có tài khoản/thành viên** — bắt buộc đăng nhập để đặt bàn, dùng voucher, tích điểm, đánh giá.  
+Actor này bao gồm 2 loại: **Khách vãng lai tại bàn (QR)** — không cần đăng nhập, và **Khách có tài khoản/thành viên** — bắt buộc đăng nhập để đặt bàn, dùng voucher, tích điểm, đánh giá.
+
 Trong API, quyền tương ứng là `customer-auth` (khách đã đăng nhập) hoặc `public` (khách vãng lai).
 
 ---
@@ -190,7 +191,7 @@ Trong API, quyền tương ứng là `customer-auth` (khách đã đăng nhập)
 - **Quy tắc nghiệp vụ:**
   - Bắt buộc đăng nhập (`customer-auth`). `DatBan` gắn `MaKH`.
   - Chỉ bàn `TRONG` được chọn. `BAO_TRI` không hiển thị.
-  - Không cho phép đặt bàn public bằng tên + SĐT.
+  - Phải đăng nhập mới đặt bàn được — không nhận đặt bàn bằng tên + SĐT.
   - Sau khi đặt, bàn chưa chuyển `DA_DAT` ngay — chỉ chuyển khi staff duyệt (`DA_XAC_NHAN`).
 - **Acceptance Criteria:**
   - Chưa đăng nhập → chuyển hướng đăng nhập.

@@ -1,6 +1,7 @@
 # Use Case: Nhân viên
 
-Actor này bao gồm các nghiệp vụ nội bộ: **Phục vụ**, **Bếp**, **Thu ngân**.  
+Actor này bao gồm các nghiệp vụ nội bộ: **Phục vụ**, **Bếp**, **Thu ngân**.
+
 Trong API, quyền tương ứng là `staff` (JWT có `vaiTro='NhanVien'` hoặc `'Admin'`).
 
 ---
