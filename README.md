@@ -40,12 +40,12 @@ Backend chính nằm tại `backend/nest-api/`, frontend chính nằm tại `fro
 
 ## 3. Công nghệ sử dụng
 
-| Thành phần | Công nghệ |
-|---|---|
-| Frontend | React, Vite, React Router, Ant Design, TanStack Query, Day.js, XLSX |
-| Backend | NestJS, TypeScript, JWT, Swagger, class-validator, bcryptjs |
-| Database | MySQL |
-| Công cụ khác | npm, ESLint, Jest, Prettier |
+| Thành phần   | Công nghệ                                                           |
+| ------------ | ------------------------------------------------------------------- |
+| Frontend     | React, Vite, React Router, Ant Design, TanStack Query, Day.js, XLSX |
+| Backend      | NestJS, TypeScript, JWT, Swagger, class-validator, bcryptjs         |
+| Database     | MySQL                                                               |
+| Công cụ khác | npm, ESLint, Jest, Prettier                                         |
 
 ## 4. Chức năng chính
 
@@ -53,14 +53,16 @@ Backend chính nằm tại `backend/nest-api/`, frontend chính nằm tại `fro
 
 - Xem trang chủ, giới thiệu, thực đơn.
 - Đăng ký / đăng nhập.
-- Đặt bàn và xem lịch sử đặt bàn.
-- Gọi món tại bàn qua QR theo mã bàn.
-- Quản lý giỏ hàng.
-- Thanh toán đơn gọi món.
+- Đặt bàn (yêu cầu đăng nhập tài khoản khách hàng) và xem/hủy đặt bàn của chính mình.
+- Gọi món tại bàn qua QR theo mã bàn — không cần đăng nhập.
+- Quản lý giỏ hàng (chỉ dùng cho đơn gắn bàn hoặc đơn từ đặt bàn).
+- Thanh toán (chỉ dùng cho đơn gắn bàn hoặc đơn từ đặt bàn).
 - Xem hồ sơ cá nhân.
 - Xem lịch sử đơn hàng.
 - Xem điểm tích lũy, lịch sử điểm và đổi điểm lấy voucher.
 - Đánh giá sau khi sử dụng dịch vụ.
+
+> **Ghi chú:** Hệ thống không hỗ trợ đặt món online / mang về / ship. Mọi đơn hàng đều phải gắn với bàn hoặc đặt bàn.
 
 ### Nhân viên / Quản trị
 
@@ -107,30 +109,30 @@ Backend chính nằm tại `backend/nest-api/`, frontend chính nằm tại `fro
 
 ### Giao diện khách hàng
 
-| Trang chủ | Thực đơn | Đặt bàn |
-|---|---|---|
+| Trang chủ                                  | Thực đơn                                 | Đặt bàn                                      |
+| ------------------------------------------ | ---------------------------------------- | -------------------------------------------- |
 | ![Trang chủ](screenshots/01-trang-chu.png) | ![Thực đơn](screenshots/02-thuc-don.png) | ![Đặt bàn](screenshots/03-dat-ban-login.png) |
 
-| Giỏ hàng | Đánh giá | Giới thiệu |
-|---|---|---|
+| Giỏ hàng                                 | Đánh giá                                 | Giới thiệu                                   |
+| ---------------------------------------- | ---------------------------------------- | -------------------------------------------- |
 | ![Giỏ hàng](screenshots/04-gio-hang.png) | ![Đánh giá](screenshots/05-danh-gia.png) | ![Giới thiệu](screenshots/06-gioi-thieu.png) |
 
-| Trang chủ khách hàng | Thanh toán | Hồ sơ |
-|---|---|---|
+| Trang chủ khách hàng                                             | Thanh toán                                              | Hồ sơ                                         |
+| ---------------------------------------------------------------- | ------------------------------------------------------- | --------------------------------------------- |
 | ![Trang chủ khách hàng](screenshots/19-khach-hang-trang-chu.png) | ![Thanh toán](screenshots/22-khach-hang-thanh-toan.png) | ![Hồ sơ](screenshots/23-khach-hang-ho-so.png) |
 
 ### Giao diện quản trị / nội bộ
 
-| Đăng nhập nội bộ | Dashboard | Quản lý thực đơn |
-|---|---|---|
+| Đăng nhập nội bộ                                    | Dashboard                                        | Quản lý thực đơn                                       |
+| --------------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------ |
 | ![Đăng nhập nội bộ](screenshots/08-admin-login.png) | ![Dashboard](screenshots/09-admin-dashboard.png) | ![Quản lý thực đơn](screenshots/11-admin-thuc-don.png) |
 
-| Quản lý đặt bàn | Khách hàng | Đơn hàng |
-|---|---|---|
+| Quản lý đặt bàn                                      | Khách hàng                                         | Đơn hàng                                 |
+| ---------------------------------------------------- | -------------------------------------------------- | ---------------------------------------- |
 | ![Quản lý đặt bàn](screenshots/12-admin-dat-ban.png) | ![Khách hàng](screenshots/14-admin-khach-hang.png) | ![Đơn hàng](screenshots/16-don-hang.png) |
 
-| Nhân viên | Thống kê | Đánh giá nội bộ |
-|---|---|---|
+| Nhân viên                                  | Thống kê                                 | Đánh giá nội bộ                                        |
+| ------------------------------------------ | ---------------------------------------- | ------------------------------------------------------ |
 | ![Nhân viên](screenshots/15-nhan-vien.png) | ![Thống kê](screenshots/17-thong-ke.png) | ![Đánh giá nội bộ](screenshots/18-danh-gia-noi-bo.png) |
 
 ## 7. Cấu trúc thư mục
@@ -241,10 +243,10 @@ JWT_REFRESH_EXPIRES_IN=7d
 
 Thư mục `database/` hiện có:
 
-| File | Mục đích |
-|---|---|
-| `mysql_init_schema.sql` | Khởi tạo schema MySQL |
-| `mysql_seed_dev.sql` | Dữ liệu mẫu phục vụ phát triển/demo |
+| File                    | Mục đích                            |
+| ----------------------- | ----------------------------------- |
+| `mysql_init_schema.sql` | Khởi tạo schema MySQL               |
+| `mysql_seed_dev.sql`    | Dữ liệu mẫu phục vụ phát triển/demo |
 
 Import database theo thứ tự:
 
@@ -259,13 +261,13 @@ Lưu ý: `DB_AUTO_INIT=true` trong backend hiện chỉ kiểm tra kết nối M
 
 Dữ liệu demo được ghi trong `database/mysql_seed_dev.sql`. Không sử dụng các tài khoản này cho môi trường production.
 
-| Vai trò | Email | Mật khẩu |
-|---|---|---|
-| Admin | `admin@nhahang.com` | `Admin@123` |
-| Nhân viên | `an.nv@nhahang.com` | `Staff@123` |
-| Nhân viên | `bich.lt@nhahang.com` | `Staff@123` |
-| Khách hàng | `khach1@gmail.com` | `Khach@123` |
-| Khách hàng | `mai.pt@gmail.com` | `Khách@123` |
+| Vai trò    | Email                 | Mật khẩu    |
+| ---------- | --------------------- | ----------- |
+| Admin      | `admin@nhahang.com`   | `Admin@123` |
+| Nhân viên  | `an.nv@nhahang.com`   | `Staff@123` |
+| Nhân viên  | `bich.lt@nhahang.com` | `Staff@123` |
+| Khách hàng | `khach1@gmail.com`    | `Khach@123` |
+| Khách hàng | `mai.pt@gmail.com`    | `Khách@123` |
 
 Một số tài khoản seed khác có thể tồn tại để kiểm thử dữ liệu mở rộng. Cập nhật theo dữ liệu seed của dự án khi thay đổi file seed.
 
@@ -273,18 +275,18 @@ Một số tài khoản seed khác có thể tồn tại để kiểm thử dữ
 
 Các lệnh dưới đây khớp với `package.json` ở root:
 
-| Lệnh | Ý nghĩa |
-|---|---|
-| `npm run dev` | Chạy frontend Vite |
-| `npm run dev:frontend` | Chạy frontend Vite |
-| `npm run dev:backend` | Chạy backend NestJS ở chế độ development |
-| `npm run build` | Build frontend và backend |
-| `npm run build:frontend` | Build frontend |
-| `npm run build:backend` | Build backend |
-| `npm run lint` | Chạy lint frontend và backend |
-| `npm run test` | Chạy test frontend và backend |
-| `npm run preview` | Preview bản build frontend |
-| `npm run smoke:api` | Chạy smoke test API theo script hiện có |
+| Lệnh                     | Ý nghĩa                                  |
+| ------------------------ | ---------------------------------------- |
+| `npm run dev`            | Chạy frontend Vite                       |
+| `npm run dev:frontend`   | Chạy frontend Vite                       |
+| `npm run dev:backend`    | Chạy backend NestJS ở chế độ development |
+| `npm run build`          | Build frontend và backend                |
+| `npm run build:frontend` | Build frontend                           |
+| `npm run build:backend`  | Build backend                            |
+| `npm run lint`           | Chạy lint frontend và backend            |
+| `npm run test`           | Chạy test frontend và backend            |
+| `npm run preview`        | Preview bản build frontend               |
+| `npm run smoke:api`      | Chạy smoke test API theo script hiện có  |
 
 Một số lệnh riêng:
 
@@ -297,13 +299,13 @@ npm --prefix backend/nest-api run test
 
 ## 13. Tài liệu liên quan
 
-| Tài liệu | Nội dung |
-|---|---|
-| `docs/MO_TA_NGHIEP_VU.md` | Mô tả nghiệp vụ và hiện trạng triển khai |
-| `docs/ma-tran-phan-quyen-api.md` | Ma trận phân quyền API |
-| `docs/quytacfe.md` | Quy tắc frontend |
-| `backend/README.md` | Ghi chú backend cấp thư mục |
-| `backend/nest-api/README.md` | Ghi chú backend NestJS |
+| Tài liệu                         | Nội dung                                 |
+| -------------------------------- | ---------------------------------------- |
+| `docs/MO_TA_NGHIEP_VU.md`        | Mô tả nghiệp vụ và hiện trạng triển khai |
+| `docs/ma-tran-phan-quyen-api.md` | Ma trận phân quyền API                   |
+| `docs/quytacfe.md`               | Quy tắc frontend                         |
+| `backend/README.md`              | Ghi chú backend cấp thư mục              |
+| `backend/nest-api/README.md`     | Ghi chú backend NestJS                   |
 
 ## Ghi chú
 
