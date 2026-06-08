@@ -24,7 +24,13 @@ Hiện trạng đúng của repo:
 - khi cần kiểm tra API đang chạy thật, ưu tiên đọc `backend/nest-api/src/modules/**`
 - khi cần kiểm tra route giao diện, ưu tiên đọc `frontend/src/App.jsx`
 
-## 3. Nhóm nghiệp vụ đã có trong mã nguồn
+## 3. Actor chính và nhóm nghiệp vụ
+
+Hệ thống có **3 actor chính**: **Khách hàng**, **Nhân viên**, **Admin / Quản lý**.
+
+- **Nhân viên** bao gồm các nghiệp vụ nội bộ: phục vụ (xem bàn, tạo đơn, phục vụ món), bếp (chế biến), thu ngân (thanh toán, hóa đơn).
+- **Quyền `staff`** trong API tương ứng actor **Nhân viên**.
+- Toàn bộ tài liệu (state machine, route, API) dùng 3 actor này làm trụ.
 
 ### 3.1 Khách hàng
 
@@ -54,13 +60,14 @@ Khu vực nội bộ hiện có:
 - theo dõi và cập nhật trạng thái đơn hàng gọi món tại bàn
 - xem và xử lý đánh giá
 
-### 3.3 Quản trị
+### 3.3 Admin / Quản lý
 
 Tài khoản quản trị hiện có thêm các nhóm chức năng:
 
 - quản lý món ăn
 - quản lý tài khoản nội bộ
 - quản lý bàn nâng cao
+- quản lý voucher và khuyến mãi
 - xem thống kê doanh thu mức cơ bản trên dashboard / trang nội bộ
 
 ## 4. Các route giao diện chính

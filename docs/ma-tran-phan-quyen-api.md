@@ -7,9 +7,10 @@ Tai lieu nay tom tat quyen truy cap cho cac endpoint trong `backend/nest-api/src
 ## Quy uoc muc quyen
 
 - `public`: khong can dang nhap
-- `customer-own`: khach hang phai dang nhap va chi duoc thao tac du lieu cua chinh minh
-- `staff`: nhan vien noi bo hoac admin
-- `admin`: chi quan tri vien
+- `customer-own`: khach hang (actor **Khách hàng**) phai dang nhap va chi duoc thao tac du lieu cua chinh minh
+- `customer-auth`: khach hang (actor **Khách hàng**) bat buoc dang nhap
+- `staff`: nhan vien noi bo (actor **Nhân viên** — bao gồm phục vụ, bếp, thu ngân) hoac admin
+- `admin`: chi quan tri vien (actor **Admin / Quản lý**)
 
 ## Bang endpoint
 

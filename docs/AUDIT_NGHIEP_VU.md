@@ -44,36 +44,25 @@ Phạm vi dự án **KHÔNG bao gồm** các luồng sau. Mọi tham chiếu/tí
 
 > Quyết định này có hiệu lực từ 2026-06-06. Mọi tài liệu, code, page, endpoint nào rơi vào các luồng trên đều nằm trong phạm vi dọn dẹp (xem thêm Lỗi 21 và các ghi chú tương ứng).
 
-### 1.3. Tác nhân nội bộ
+### 1.3. Actor chính của hệ thống
 
-| Tác nhân | Quyền chính |
+Hệ thống có 3 actor chính:
+
+| Actor | Mô tả |
 |---|---|
-| Nhân viên phục vụ (`NhanVien`) | Xem bàn, check-in đặt bàn, tạo đơn hộ khách, cập nhật đã phục vụ, chuyển bàn `DANG_DON → TRONG` |
-| Nhân viên bếp | Xem đơn bếp, cập nhật trạng thái chế biến món (`ChiTietDonHang`) |
-| Thu ngân | Xem hóa đơn, áp voucher/điểm, xác nhận thanh toán, tạo/cập nhật `HoaDon`/`ThanhToan` |
-| Admin (`Admin`) | Quản lý toàn bộ hệ thống |
+| **Khách hàng** | Khách vãng lai tại bàn (QR gọi món, không cần đăng nhập) hoặc khách có tài khoản / thành viên (đặt bàn, tích điểm, đánh giá, xem lịch sử). |
+| **Nhân viên** | Nhân viên nội bộ, đảm nhiệm các nghiệp vụ: phục vụ (xem bàn, check-in đặt bàn, tạo đơn, phục vụ món), bếp (xem đơn bếp, cập nhật trạng thái chế biến món), thu ngân (xem hóa đơn, áp voucher/điểm, xác nhận thanh toán). |
+| **Admin / Quản lý** | Quản lý toàn bộ hệ thống — bàn, thực đơn, nhân viên, khách hàng, voucher, doanh thu, đánh giá, cấu hình. |
 
-### 1.4. Ma trận vai trò và chức năng
+### 1.4. Ma trận actor và chức năng
 
-Chốt 6 vai trò trong phạm vi hệ thống:
-
-1. **Admin / Quản lý**
-2. **Nhân viên phục vụ**
-3. **Nhân viên bếp**
-4. **Thu ngân**
-5. **Khách hàng vãng lai tại bàn** (gọi món QR — không cần tài khoản)
-6. **Khách có tài khoản / thành viên** (bắt buộc cho đặt bàn, optional cho QR gọi món)
-
-| Vai trò | Chức năng chính | Giới hạn |
+| Actor | Chức năng chính | Giới hạn |
 |---|---|---|
-| **Admin / Quản lý** | Quản lý dashboard tổng quan; quản lý bàn (CRUD, chuyển trạng thái `BAO_TRI`); quản lý thực đơn (món, danh mục, giá); quản lý đặt bàn (duyệt, hủy); quản lý đơn hàng (xem tất cả, can thiệp trạng thái); quản lý hóa đơn/thanh toán; quản lý voucher & điểm tích lũy; quản lý khách hàng; quản lý nhân viên (phân quyền); duyệt đánh giá; xem báo cáo doanh thu, món bán chạy, tần suất bàn; cấu hình hệ thống (cấu hình chung, múi giờ, ngưỡng timeout). | Không giới hạn nghiệp vụ; mọi thao tác đều được audit log. |
-| **Nhân viên phục vụ** | Xem danh sách bàn + trạng thái hiện tại; check-in đặt bàn (`DatBan.DA_XAC_NHAN → DA_DEN`); tạo đơn hộ khách tại bàn (gắn `MaBan`); xem chi tiết đơn theo bàn; cập nhật món đã phục vụ (`ChiTietDonHang → DA_PHUC_VU`); chuyển bàn `DANG_DON → TRONG` (sau khi dọn xong/staff bấm "Sẵn sàng"). | Không xem doanh thu; không sửa voucher/điểm; không tạo/xóa tài khoản nhân viên; không can thiệp trạng thái `BAO_TRI`. |
-| **Nhân viên bếp** | Xem danh sách đơn vào bếp; cập nhật trạng thái `ChiTietDonHang`: `CHO_CHE_BIEN → DANG_CHE_BIEN → SAN_SANG`. | **Không** xem doanh thu; **không** sửa voucher/điểm; **không** quản lý nhân viên; **không** can thiệp đơn tổng (`DonHang.TrangThai`); **không** thao tác thanh toán. |
-| **Thu ngân** | Xem hóa đơn; áp dụng voucher/điểm tại thời điểm thanh toán; xác nhận thanh toán; tạo/cập nhật `HoaDon` + `ThanhToan`; chuyển đơn sang `DA_THANH_TOAN`; hỗ trợ chốt bàn (phối hợp phục vụ). | Không CRUD thực đơn/bàn; không phân quyền nhân viên; không tạo/hủy đặt bàn (thuộc phục vụ + admin). |
-| **Khách hàng vãng lai tại bàn** | Quét QR bàn → mở thực đơn; gọi món tại bàn; yêu cầu thanh toán; **không cần đăng nhập, không cần tài khoản**; nếu muốn tích điểm thì nhập SĐT (FE upsert `KhachHang` ẩn danh). | Không xử lý đặt bàn (đặt bàn là luồng riêng, bắt buộc đăng nhập tài khoản khách hàng). Không dùng voucher cá nhân (vì chưa đăng nhập); không xem lịch sử đơn của người khác; không đánh giá. |
-| **Khách có tài khoản / thành viên** | Đăng nhập **là required cho đặt bàn** — không bắt buộc cho gọi món QR; dùng cho: đặt bàn (chọn khung giờ, có thể chọn món trước); xem/hủy đặt bàn của mình; dùng voucher cá nhân (`CUSTOMER/LOYALTY/VIP`); dùng điểm tích lũy; xem lịch sử đơn + lịch sử điểm; đánh giá sau khi ăn. | Không can thiệp đơn của người khác; không xem doanh thu; không dùng voucher của `KhachHang` khác (BE enforce ownership, trả 403 — Q8). |
+| **Khách hàng** | **Vãng lai (QR):** quét QR bàn → xem thực đơn → gọi món → yêu cầu thanh toán. Không cần đăng nhập. Có thể nhập SĐT để tích điểm / nhận hóa đơn điện tử. **Có tài khoản:** đặt bàn (bắt buộc đăng nhập), xem/hủy đặt bàn của mình, dùng voucher cá nhân, dùng điểm tích lũy, xem lịch sử đơn + điểm, đánh giá sau khi ăn. | Không can thiệp đơn của người khác; không xem doanh thu; không dùng voucher của `KhachHang` khác (BE enforce, trả 403). |
+| **Nhân viên** | **Phục vụ:** xem danh sách bàn + trạng thái; check-in đặt bàn (`DA_XAC_NHAN → DA_DEN`); tạo đơn hộ khách tại bàn; xem chi tiết đơn theo bàn; cập nhật món đã phục vụ (`ChiTietDonHang → DA_PHUC_VU`); chuyển bàn `DANG_DON → TRONG`. **Bếp:** xem danh sách đơn vào bếp; cập nhật trạng thái `ChiTietDonHang`: `CHO_CHE_BIEN → DANG_CHE_BIEN → SAN_SANG`. **Thu ngân:** xem hóa đơn; áp dụng voucher/điểm tại thanh toán; xác nhận thanh toán; tạo/cập nhật `HoaDon` + `ThanhToan`; chuyển đơn sang `DA_THANH_TOAN`. | Không CRUD thực đơn/bàn (riêng admin); không quản lý nhân viên; không xem báo cáo doanh thu tổng quan. |
+| **Admin / Quản lý** | Quản lý dashboard tổng quan; CRUD bàn (kể cả `BAO_TRI`); quản lý thực đơn (món, danh mục, giá); quản lý đặt bàn (duyệt, hủy); quản lý đơn hàng (xem tất cả, can thiệp trạng thái); quản lý hóa đơn/thanh toán; quản lý voucher & điểm tích lũy; quản lý khách hàng; quản lý nhân viên (phân quyền); duyệt đánh giá; xem báo cáo doanh thu, món bán chạy, tần suất bàn; cấu hình hệ thống. | Không giới hạn nghiệp vụ; mọi thao tác đều được audit log. |
 
-**Ràng buộc chung cho mọi vai trò:**
+**Ràng buộc chung cho mọi actor:**
 
 - **Không có luồng đặt món online / mang về / ship** (theo Mục 1.2). Mọi `DonHang` trong scope **phải gắn `MaBan` hoặc `MaDatBan`** (nullable về mặt schema, nhưng nghiệp vụ chính bắt buộc).
 - **QR gọi món tại bàn là public** — khách truy cập được, không yêu cầu đăng nhập.
@@ -82,10 +71,6 @@ Chốt 6 vai trò trong phạm vi hệ thống:
 - **Đặt bàn yêu cầu khách đăng nhập.** `DatBan` phải gắn `MaKH`. Khách chỉ xem/hủy `DatBan` của chính mình. Tên + SĐT lấy từ hồ sơ khách hàng hoặc cho khách xác nhận/cập nhật khi đặt bàn.
 - Voucher + điểm chỉ áp dụng tại **thời điểm thanh toán** (lưu snapshot trên `DonHang`/`HoaDon`).
 - Voucher thuộc loại `CUSTOMER/LOYALTY/VIP` bắt buộc đúng chủ sở hữu (BE enforce, Q8).
-
-**Ghi chú đơn giản hóa cho đồ án:**
-
-> Nếu muốn đồ án gọn, có thể **gộp `Nhân viên phục vụ` + `Thu ngân` thành 1 role `NhanVien`** (cùng quyền). Tài liệu này vẫn mô tả tách rõ 2 vai trò để phản ánh đúng nghiệp vụ thực tế; phạm vi code có thể chọn `NhanVien = Phục vụ ∪ Thu ngân` tuỳ độ phức tạp của đồ án. `Nhân viên bếp` và 3 role còn lại giữ tách biệt.
 
 ### 1.5. Bảng thực thể nghiệp vụ cốt lõi
 
