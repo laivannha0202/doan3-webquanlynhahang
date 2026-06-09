@@ -7,17 +7,26 @@ import {
 import { Reflector } from '@nestjs/core';
 import { THU_NGAN_KEY } from '../decorators/thu-ngan.decorator';
 
-const THU_NGAN_VARIANTS = new Set([
-  'thu ngan',
-  'thungan',
-  'thu_ngan',
-  'cashier',
-]);
+function normalize(value: string): string {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[\s_-]/g, '');
+}
+
+const THU_NGAN_VARIANTS = new Set(['thungan', 'cashier']);
+const QUAN_LY_VARIANTS = new Set(['quanly', 'manager']);
 
 function isThuNgan(value?: string): boolean {
   if (!value) return false;
-  const normalized = String(value).trim().toLowerCase().replace(/[\s_-]/g, '');
-  return THU_NGAN_VARIANTS.has(normalized);
+  return THU_NGAN_VARIANTS.has(normalize(value));
+}
+
+function isQuanLy(value?: string): boolean {
+  if (!value) return false;
+  return QUAN_LY_VARIANTS.has(normalize(value));
 }
 
 @Injectable()
@@ -41,8 +50,11 @@ export class ThuNganGuard implements CanActivate {
 
     if (user.vaiTro === 'Admin') return true;
 
-    if (isThuNgan(user.chucVu)) return true;
+    if (isQuanLy(user.vaiTro)) return true;
+    if (isQuanLy(user.chucVu)) return true;
+    if (isQuanLy(user.chucNangPhu)) return true;
 
+    if (isThuNgan(user.chucVu)) return true;
     if (isThuNgan(user.chucNangPhu)) return true;
 
     throw new ForbiddenException(
