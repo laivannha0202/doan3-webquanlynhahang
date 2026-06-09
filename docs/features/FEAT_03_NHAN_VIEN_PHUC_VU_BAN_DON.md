@@ -1,412 +1,518 @@
-# FEAT_03: Nhân viên — Phục vụ bàn, đơn hàng, check-in đặt bàn
+# FEAT-03: Nhân viên — Phục vụ: Bán hàng & quản lý đơn
 
-> Mã feature: FEAT_03
-> Actor chính: **Nhân viên phục vụ** (đăng nhập nội bộ)
-> Phiên bản: 1.0 — 2026-06-09
+> **Phạm vi:** Nhân viên (sub-role: Phục vụ) quản lý bàn, tạo đơn giúp khách (kiosk), theo dõi trạng thái đơn, chuyển trạng thái phục vụ.  
+> **Liên quan:** FEAT-01 (QR ordering khách tự đặt), FEAT-04 (bếp xử lý), FEAT-05 (thu ngân thanh toán).
 
 ---
 
 ## 1. Mục tiêu
 
-Cho phép nhân viên phục vụ quản lý sơ đồ bàn, check-in khách đặt bàn, gán/chuyển bàn, tiếp nhận đơn QR, phục vụ món cho khách, và dọn bàn sau khi khách rời.
-
-Luồng này tương ứng với UC-NV-02 → UC-NV-07.
+- Nhân viên phụ trách khu vực quản lý trạng thái bàn (dọn bàn, xếp bàn cho khách đặt trước).
+- Nhân viên phụ vụ tạo đơn hàng giúp khách tại quầy/kiosk (khách không tự order).
+- Nhân viên theo dõi đơn hàng và chuyển trạng thái khi phục vụ (`DANG_PHUC_VU` → `HOAN_THANH`).
+- Phân quyền chặt chẽ: chỉ nhân viên có sub-role **Phục vụ** mới thực hiện được các thao tác trên.
 
 ---
 
 ## 2. Actor sử dụng
 
-| Actor | Quyền API | Ghi chú |
-|-------|-----------|---------|
-| Nhân viên phục vụ | `staff` | JWT `vaiTro='NhanVien'` hoặc `'Admin'` |
+| Actor | Vai trò | Ghi chú |
+|-------|---------|---------|
+| **Nhân viên** | Diễn viên chính | Sub-role: **Phục vụ** — phụ trách khu vực, phục vụ khách, tạo đơn tại quầy |
+
+> **Lưu ý:** Actor chính là "Nhân viên". Sub-role "Phục vụ" xác định quyền hạn cụ thể.  
+> Trong code, `VaiTro` = `NHAN_VIEN`, `ChucNangPhu` = `PHUC_VU`.
 
 ---
 
-## 3. Route / trang liên quan
+## 3. Route / Trang
 
-| Route | Mô tả | Component/Trang |
-|-------|-------|----------------|
-| `/noi-bo/so-do-ban` | Sơ đồ bàn (bản đồ trực quan) | `SoDoBanPage.jsx` |
-| `/noi-bo/dat-ban` | Quản lý đặt bàn (danh sách + thao tác) | `DatBanNoiBoPage.jsx` |
-| `/noi-bo/don-hang` | Danh sách đơn hàng (phục vụ / bếp) | `DonHangNoiBoPage.jsx` |
-| `/noi-bo/quan-ly-ban` | Quản lý bàn (CRUD, trạng thái) | `QuanLyBanPage.jsx` |
+| Route | Trang | Yêu cầu đăng nhập | Role |
+|-------|-------|--------------------|------|
+| `/noi-bo/quan-ly-ban` | Quản lý bàn — xem trạng thái tất cả bàn | ✅ | Nhân viên |
+| `/noi-bo/tao-don` | Tạo đơn giúp khách tại quầy/kiosk | ✅ | Nhân viên |
+| `/noi-bo/don-hang` | Danh sách đơn hàng đang xử lý | ✅ | Nhân viên |
+| `/noi-bo/don-hang/:maDonHang` | Chi tiết đơn hàng | ✅ | Nhân viên |
+
+> **Lưu ý:** Routes trên cần được xác minh trong code. Nếu chưa có route riêng,  
+> có thể nằm trong route admin hoặc trang quản lý chung.
 
 ---
 
 ## 4. Danh sách màn hình
 
-### Màn hình 4.1: Sơ đồ bàn (`/noi-bo/so-do-ban`)
-- Grid/bản đồ hiển thị tất cả bàn theo khu vực.
-- Mỗi bàn hiển thị: tên bàn, trạng thái (`TRONG`, `DA_DAT`, `CO_KHACH`, `DANG_DON`, `BAO_TRI`), mã booking (nếu có).
-- Click vào bàn → xem chi tiết: đơn hiện tại, booking, khách.
-- Lọc theo trạng thái hoặc khu vực.
-
-### Màn hình 4.2: Danh sách đặt bàn (`/noi-bo/dat-ban`)
-- Bảng danh sách booking.
-- Lọc: trạng thái (`CHO_XAC_NHAN`, `DA_XAC_NHAN`, `DA_NHAN_BAN`…), ngày.
-- Thao tác: Duyệt (`CHO_XAC_NHAN → DA_XAC_NHAN`), Check-in (`DA_XAC_NHAN → DA_NHAN_BAN`), Gán bàn, Hủy.
-
-### Màn hình 4.3: Danh sách đơn hàng (`/noi-bo/don-hang`)
-- Bảng đơn hàng theo trạng thái.
-- Lọc: `DANG_CHUAN_BI`, `DA_XAC_NHAN`, `DANG_CHE_BIEN`, `SAN_SANG`, `DA_PHUC_VU`.
-- Click vào đơn → xem chi tiết + cập nhật trạng thái.
-
-### Màn hình 4.4: Quản lý bàn (`/noi-bo/quan-ly-ban`)
-- CRUD bàn: thêm, sửa, xóa, chuyển trạng thái `BAO_TRI`.
-- Xuất QR bàn.
+| STT | Màn hình | Mô tả |
+|-----|----------|-------|
+| 1 | **Quản lý bàn** | Sơ đồ tất cả bàn theo khu vực. Hiển thị trạng thái: TRONG (xanh), DA_DAT (vàng), CO_KHACH (cam), DANG_DON (đỏ), BAO_TRI (xám). |
+| 2 | **Tạo đơn tại quầy** | Chọn bàn → chọn món → thêm vào đơn → xác nhận tạo đơn. |
+| 3 | **Danh sách đơn** | Danh sách đơn hàng theo trạng thái. Tab: `DANG_CHUAN_BI` / `DANG_PHUC_VU` / `HOAN_THANH` / `DA_THANH_TOAN` / `DA_HUY`. |
+| 4 | **Chi tiết đơn** | Xem chi tiết đơn: bàn, danh sách món, trạng thái từng món, tổng tiền. Nút chuyển trạng thái. |
 
 ---
 
 ## 5. Thành phần giao diện
 
-### Component `SoDoBan`
-- Grid layout hiển thị bàn.
-- Badge màu theo trạng thái:
-  - `TRONG`: xanh lá
-  - `DA_DAT`: cam
-  - `CO_KHACH`: đỏ
-  - `DANG_DON`: vàng
-  - `BAO_TRI`: xám
+### 5.1 Quản lý bàn
 
-### Component `ChiTietBan`
-- Modal/drawer khi click vào bàn.
-- Thông tin: tên bàn, trạng thái, booking (nếu có), đơn hiện tại (nếu có).
-- Nút thao tác: Check-in, Gán bàn, Dọn bàn.
+| Thành phần | Mô tả |
+|------------|-------|
+| Filter khu vực | Select / tabs: Tất cả + từng khu vực |
+| Card bàn | Hiển thị: tên bàn, số chỗ ngồi, trạng thái (badge màu). Click để xem chi tiết |
+| Badge trạng thái | `TRONG` = xanh, `DA_DAT` = vàng, `CO_KHACH` = cam, `DANG_DON` = đỏ, `BAO_TRI` = xám |
+| Nút "Dọn bàn" | Chỉ hiện khi `TrangThai = DANG_DON` |
+| Nút "Xếp bàn" | Chỉ hiện khi `TrangThai = DA_DAT` — khách đến nhận bàn |
+| Nút "Bảo trì" | Chuyển bàn sang `BAO_TRI` |
 
-### Component `DanhSachDatBan`
-- Bảng phân trang.
-- Filter trạng thái + ngày.
-- Nút: Duyệt, Check-in, Hủy.
+### 5.2 Tạo đơn tại quầy
 
-### Component `DanhSachDonHang`
-- Bảng phân trang.
-- Filter trạng thái.
-- Badge trạng thái từng món.
+| Thành phần | Mô tả |
+|------------|-------|
+| Chọn bàn | Select: chỉ hiện bàn `CO_KHACH` hoặc `TRONG` |
+| Danh mục + món | Giống FEAT-01: danh mục tabs + card món + tìm kiếm |
+| Giỏ hàng | Danh sách món đã chọn, số lượng, tổng tiền |
+| Ghi chú đơn | Textarea — max 500 ký tự |
+| Nút "Tạo đơn" | Disabled nếu giỏ trống hoặc chưa chọn bàn |
+| Nút "Hủy" | Reset form |
 
-### Component `QuanLyBanForm`
-- Form thêm/sửa bàn: tên, khu vực, sức chứa, trạng thái.
+### 5.3 Danh sách đơn
+
+| Thành phần | Mô tả |
+|------------|-------|
+| Tab trạng thái | `DANG_CHUAN_BI` / `DANG_PHUC_VU` / `HOAN_THANH` / `DA_THANH_TOAN` / `DA_HUY` |
+| Card đơn | Hiển thị: mã đơn, bàn, thời gian tạo, số món, tổng tiền, trạng thái |
+| Badge trạng thái | Màu theo trạng thái |
+| Click card → Chi tiết đơn | |
+
+### 5.4 Chi tiết đơn
+
+| Thành phần | Mô tả |
+|------------|-------|
+| Thông tin đơn | Mã đơn, bàn, thời gian, khách (nếu có) |
+| Danh sách món | Tên món, số lượng, đơn giá, thành tiền, trạng thái từng món |
+| Tổng tiền | Bold |
+| Nút chuyển trạng thái | `DANG_CHUAN_BI` → `DANG_PHUC_VU` (khi bắt đầu phục vụ) |
+| Nút hoàn thành | `DANG_PHUC_VU` → `HOAN_THANH` (khi phục vụ xong) |
+| Nút hủy đơn | `DANG_CHUAN_BI` → `DA_HUY` (chỉ khi chưa bắt đầu) |
 
 ---
 
 ## 6. Dữ liệu hiển thị
 
-### Sơ đồ bàn (từ `GET /api/ban`)
-```
-[
-  {
-    maBan: string,
-    tenBan: string,
-    khuVuc: string,
-    sucChua: number,
-    trangThai: string,  // "TRONG" | "DA_DAT" | "CO_KHACH" | "DANG_DON" | "BAO_TRI"
-    donHienTai: { maDonHang, tongTien, trangThai } | null,
-    datBan: { maDatBan, khachHang, gioDat, soNguoi } | null
-  }
-]
+### 6.1 Danh sách bàn (GET `/api/ban`)
+
+```typescript
+// Response 200
+{
+  data: Ban[];
+  total: number;
+}
+
+// Ban object
+{
+  MaBan: string;          // "BAN01"
+  TenBan: string;         // "Bàn 1"
+  MaKhuVuc: string;       // "KV01"
+  SoChoNgoi: number;      // 4
+  TrangThai: "TRONG" | "DA_DAT" | "CO_KHACH" | "DANG_DON" | "BAO_TRI";
+  KhuVuc: {
+    MaKhuVuc: string;
+    TenKhuVuc: string;
+  };
+}
 ```
 
-### Danh sách đặt bàn (từ `GET /api/dat-ban`)
-```
-[
-  {
-    maDatBan: string,
-    ngayDat: string,
-    gioDat: string,
-    soNguoi: number,
-    trangThai: string,
-    khachHang: { maKH, tenKH, sdt },
-    ban: { maBan, tenBan } | null,
-    ghiChu: string
-  }
-]
+### 6.2 Tạo đơn tại quầy (POST `/api/ban/:maBan/order`)
+
+```typescript
+// Request body
+{
+  MaBan: string;          // Bắt buộc
+  MaKH?: string;          // Nếu khách có tài khoản. Null nếu khách vãng lai
+  GhiChuDonHang?: string;
+  ChiTietDonHang: {
+    MaMonAn: string;
+    SoLuong: number;
+    GhiChu?: string;
+  }[];
+}
+
+// Response 201
+{
+  MaDonHang: string;
+  MaBan: string;
+  TrangThai: "DANG_CHUAN_BI";
+  NgayTao: string;
+  TongTien: number;
+  ChiTietDonHang: ChiTietDonHangItem[];
+}
 ```
 
-### Danh sách đơn hàng (từ `GET /api/don-hang`)
+### 6.3 Danh sách đơn (GET `/api/don-hang`)
+
+```typescript
+// Query params: page, limit, TrangThai, MaBan
+// Response 200
+{
+  data: DonHang[];
+  total: number;
+}
 ```
-[
-  {
-    maDonHang: string,
-    maBan: string,
-    tenBan: string,
-    trangThai: string,
-    tongTien: number,
-    soMon: number,
-    ngayTao: string
-  }
-]
+
+### 6.4 Cập nhật trạng thái (PATCH `/api/don-hang/:maDonHang/status`)
+
+```typescript
+// Request body
+{
+  TrangThai: "DANG_PHUC_VU" | "HOAN_THANH" | "DA_HUY";
+}
+
+// Response 200
+{
+  MaDonHang: string;
+  TrangThai: string;
+  NgayCapNhat: string;
+}
+```
+
+### 6.5 Cập nhật trạng thái bàn (PUT `/api/ban/:maBan/trang-thai`)
+
+```typescript
+// Request body
+{
+  TrangThai: "TRONG" | "BAO_TRI";
+}
+
+// Response 200
+{
+  MaBan: string;
+  TrangThai: string;
+}
 ```
 
 ---
 
 ## 7. Form nhập liệu
 
-### Form check-in đặt bàn
-| Field | Kiểu | Bắt buộc | Validate |
-|-------|------|-----------|----------|
-| `maDatBan` | (từ danh sách) | Có | Phải ở `DA_XAC_NHAN` |
+### 7.1 Tạo đơn tại quầy
 
-### Form gán bàn
-| Field | Kiểu | Bắt buộc | Validate |
-|-------|------|-----------|----------|
-| `maBan` | select | Có | Bàn phải ở `TRONG` |
-| `maDatBan` | (từ danh sách) | Có | Phải ở `DA_XAC_NHAN` |
+| Field | Kiểu | Validation | Ghi chú |
+|-------|------|-----------|---------|
+| Bàn | Select | Bắt buộc. Chỉ hiện `TRONG` hoặc `CO_KHACH` | |
+| Số lượng món | Number | ≥ 1, ≤ 99 | |
+| Ghi chú đơn | Textarea | Max 500 ký tự | Tùy chọn |
 
-### Form dọn bàn
-| Field | Kiểu | Bắt buộc | Validate |
-|-------|------|-----------|----------|
-| `maBan` | (từ sơ đồ) | Có | Bàn phải ở `DANG_DON` |
+### 7.2 Chuyển trạng thái bàn
 
-### Form thêm/sửa bàn
-| Field | Kiểu | Bắt buộc | Validate |
-|-------|------|-----------|----------|
-| `tenBan` | text | Có | ≥ 2 ký tự, trùng → 400 |
-| `khuVuc` | text | Có | — |
-| `sucChua` | number | Có | 1–20 |
-| `trangThai` | select | Có | `TRONG` hoặc `BAO_TRI` |
+| Field | Kiểu | Validation | Ghi chú |
+|-------|------|-----------|---------|
+| Trạng thái mới | Select | Chỉ hiện giá trị hợp lệ theo trạng thái hiện tại | |
 
 ---
 
 ## 8. Nút thao tác
 
-| Nút | Vị trí | Hành động |
-|-----|--------|-----------|
-| "Duyệt" | Danh sách đặt bàn | `PATCH /api/dat-ban/:maDatBan/status` với `DA_XAC_NHAN` |
-| "Check-in" | Danh sách đặt bàn / Chi tiết bàn | `PATCH /api/dat-ban/:maDatBan/status` với `DA_NHAN_BAN` |
-| "Gán bàn" | Chi tiết đặt bàn | `PATCH /api/dat-ban/:maDatBan/assign-tables` |
-| "Chuyển bàn" | Chi tiết đặt bàn | Gán bàn mới → bàn cũ về `TRONG`, bàn mới → `DA_DAT` |
-| "Hủy" | Danh sách đặt bàn | `PATCH /api/dat-ban/:maDatBan/status` với `DA_HUY` |
-| "Sẵn sàng" | Chi tiết bàn (DANG_DON) | `PATCH /api/ban/:maBan/status` với `TRONG` |
-| "Xuất QR" | Quản lý bàn | `GET /api/ban/:maBan/qr` |
-| "Thêm bàn" | Quản lý bàn | `POST /api/ban` |
-| "Sửa bàn" | Quản lý bàn | `PUT /api/ban/:maBan` |
-| "Xóa bàn" | Quản lý bàn | `DELETE /api/ban/:maBan` |
-| "Bảo trì" | Quản lý bàn | `PATCH /api/ban/:maBan/status` với `BAO_TRI` |
+| Nút | Vị trí | Hành động | Khi nào disabled |
+|-----|--------|----------|-----------------|
+| **Tạo đơn** | Form tạo đơn | POST `/api/ban/:maBan/order` | Giỏ trống, chưa chọn bàn, đang loading |
+| **Dọn bàn** | Card bàn | PUT `/api/ban/:maBan/trang-thai` → `TRONG` | Trạng thái ≠ `DANG_DON` |
+| **Xếp bàn** | Card bàn | PUT `/api/ban/:maBan/dat-ban/:maDatBan/xep-ban` → `CO_KHACH` | Trạng thái ≠ `DA_DAT` |
+| **Bảo trì** | Card bàn | PUT `/api/ban/:maBan/trang-thai` → `BAO_TRI` | — |
+| **Chuyển trạng thái** | Chi tiết đơn | PATCH `/api/don-hang/:maDonHang/status` | Trạng thái hiện tại không cho phép chuyển |
+| **Hủy đơn** | Chi tiết đơn | PATCH `/api/don-hang/:maDonHang/status` → `DA_HUY` | Đơn đã `DANG_PHUC_VU` trở đi |
 
 ---
 
 ## 9. API liên quan
 
-### `GET /api/ban` — staff
-- Danh sách tất cả bàn.
-- Response: danh sách `Ban` + trạng thái + đơn/booking hiện tại.
+| Method | Endpoint | Quyền | Input | Output | Ghi chú |
+|--------|----------|-------|-------|--------|---------|
+| `GET` | `/api/ban` | Nhân viên (Phục vụ) | Query: `MaKhuVuc`, `TrangThai` | `{ data: Ban[], total }` | Xem danh sách bàn |
+| `GET` | `/api/ban/:maBan` | Nhân viên (Phục vụ) | `maBan` (path) | `Ban` object | Chi tiết bàn |
+| `PUT` | `/api/ban/:maBan/trang-thai` | Nhân viên (Phục vụ) | `{ TrangThai }` | `Ban` (200) | Chuyển trạng thái bàn |
+| `PUT` | `/api/ban/:maBan/dat-ban/:maDatBan/xep-ban` | Nhân viên (Phục vụ) | `maBan`, `maDatBan` | `Ban` (200) | Xếp bàn cho DatBan |
+| `POST` | `/api/ban/:maBan/order` | Nhân viên | `maBan` (path) + `DonHangCreateDto` | `DonHang` (201) | Tạo đơn cho bàn |
+| `GET` | `/api/ban/:maBan/order` | Nhân viên | `maBan` (path) | `DonHang` + `ChiTietDonHang` | Xem trạng thái đơn theo bàn |
+| `GET` | `/api/don-hang` | Nhân viên | Query: `page`, `limit`, `TrangThai`, `MaBan` | `{ data: DonHang[], total }` | Danh sách đơn |
+| `PATCH` | `/api/don-hang/:maDonHang/status` | Nhân viên | `{ TrangThai }` | `DonHang` (200) | Chuyển trạng thái |
+| `PATCH` | `/api/don-hang/chi-tiet/:maChiTiet/status` | Nhân viên | `{ TrangThai }` | `ChiTietDonHang` (200) | Chuyển trạng thái món |
+| `GET` | `/api/khu-vuc` | Nhân viên (Phục vụ) | Query: `page`, `limit` | `{ data: KhuVuc[], total }` | Danh sách khu vực |
+| `GET` | `/api/thuc-don` | Public | Query: `page`, `limit` | `{ data: MonAn[], total }` | Danh sách món ăn |
 
-### `GET /api/dat-ban` — staff
-- Danh sách tất cả đặt bàn.
-
-### `PATCH /api/dat-ban/:maDatBan/status` — staff
-- Duyệt / Check-in / Hủy đặt bàn.
-- Request: `{ trangThai: 'DA_XAC_NHAN' | 'DA_NHAN_BAN' | 'DA_HUY' }`
-- Side effects:
-  - `DA_XAC_NHAN`: `Ban.TrangThai` → `DA_DAT` (nếu đã gán bàn).
-  - `DA_NHAN_BAN`: `Ban.TrangThai` → `CO_KHACH`.
-  - `DA_HUY`: `Ban.TrangThai` → `TRONG` (nếu bàn đang `DA_DAT`).
-
-### `PATCH /api/dat-ban/:maDatBan/assign-tables` — staff
-- Gán bàn cho đặt bàn.
-- Request: `{ maBan }`
-- Constraint: Bàn phải ở `TRONG`.
-- Side effect: `Ban.TrangThai` → `DA_DAT`.
-
-### `GET /api/don-hang` — staff
-- Danh sách đơn hàng (filter trạng thái).
-
-### `GET /api/don-hang/:maDonHang` — staff
-- Chi tiết đơn hàng.
-
-### `PATCH /api/ban/:maBan/status` — staff
-- Cập nhật trạng thái bàn (dọn bàn, bảo trì).
-- Request: `{ trangThai: 'TRONG' | 'BAO_TRI' }`
-
-### `GET /api/ban/:maBan/qr` — staff
-- Xuất QR code cho bàn.
-
-### `POST /api/ban` — admin
-- Tạo bàn mới.
-
-### `PUT /api/ban/:maBan` — admin
-- Sửa thông tin bàn.
-
-### `DELETE /api/ban/:maBan` — admin
-- Xóa bàn.
+> **Lưu ý:** Tất cả endpoint trên yêu cầu JWT token có `VaiTro = NHAN_VIEN`.
 
 ---
 
 ## 10. Luồng xử lý chính
 
-### 10a. Xem sơ đồ bàn
+### 10.1 Phục vụ — Quản lý bàn
+
 ```
-1. Nhân viên vào /noi-bo/so-do-ban
-2. GET /api/ban → hiển thị sơ đồ
-3. Click vào bàn → xem chi tiết
+1. Nhân viên đăng nhập (VaiTro: NHAN_VIEN, ChucNangPhu: PHUC_VU)
+   → Vào trang `/noi-bo/don-hang`
+
+2. Hiển thị sơ đồ bàn theo khu vực:
+   - TRONG (xanh): bàn trống
+   - DA_DAT (vàng): bàn đã đặt trước, chờ khách đến
+   - CO_KHACH (cam): có khách đang ngồi
+   - DANG_DON (đỏ): cần dọn dẹp
+   - BAO_TRI (xám): đang bảo trì
+
+3. Nhân viên dọn bàn:
+   a. Click bàn có TrangThai = DANG_DON
+   b. Nhấn "Dọn bàn"
+   c. PUT /api/ban/:maBan/trang-thai → { TrangThai: "TRONG" }
+   d. Bàn chuyển sang TRONG
+
+4. Nhân viên xếp bàn cho DatBan:
+   a. Click bàn có TrangThai = DA_DAT
+   b. Nhấn "Xếp bàn"
+   c. PUT /api/ban/:maBan/dat-ban/:maDatBan/xep-ban
+   d. Bàn chuyển sang CO_KHACES
+   e. DatBan chuyển sang DA_NHAN_BAN
+
+5. Nhân viên chuyển bàn sang bảo trì:
+   a. Click bàn bất kỳ (trừ CO_KHACH nếu đang có khách)
+   b. Nhấn "Bảo trì"
+   c. PUT /api/ban/:maBan/trang-thai → { TrangThai: "BAO_TRI" }
 ```
 
-### 10b. Check-in đặt bàn
+### 10.2 Phục vụ — Tạo đơn tại quầy
+
 ```
-1. Từ danh sách đặt bàn, tìm booking DA_XAC_NHAN
-2. Bấm "Check-in"
-3. PATCH /api/dat-ban/:maDatBan/status { trangThai: 'DA_NHAN_BAN' }
-4. Backend: DatBan.TrangThai → DA_NHAN_BAN, Ban.TrangThai → CO_KHACH
-5. Hiển thị thông báo thành công
+1. Nhân viên vào `/noi-bo/tao-don`
+
+2. Chọn bàn từ dropdown (chỉ hiện TRONG hoặc CO_KHACH)
+
+3. Chọn món từ thực đơn (giống luồng FEAT-01):
+   - Browse danh mục → chọn món → thêm số lượng → ghi chú
+
+4. Kiểm tra giỏ hàng → tổng tiền
+
+5. Nhấn "Tạo đơn" → POST `/api/ban/:maBan/order`
+   Body: {
+     MaBan: "BAN01",
+     MaKH: "KH001" | null,    // Null nếu khách vãng lai
+     ChiTietDonHang: [...]
+   }
+
+6. Backend:
+   a. Validate MaBan tồn tại, không BAO_TRI
+   b. Validate MaMonAn còn hàng
+   c. Tính tổng tiền
+   d. Tạo DonHang (TrangThai: DANG_CHUAN_BI)
+   e. Tạo ChiTietDonHang
+   f. Cập nhật bàn → CO_KHACH (nếu TRONG)
+   g. Trả 201
+
+7. Frontend: hiển thị thông báo "Tạo đơn thành công! Mã: DH001234"
+   → Chuyển sang trang danh sách đơn
 ```
 
-### 10c. Gán bàn
-```
-1. Từ chi tiết đặt bàn DA_XAC_NHAN
-2. Xem danh sách bàn TRONG
-3. Chọn bàn → bấm "Gán bàn"
-4. PATCH /api/dat-ban/:maDatBan/assign-tables { maBan }
-5. Backend: Ban.TrangThai → DA_DAT
-6. Hiển thị thông báo thành công
-```
+### 10.3 Phục vụ — Theo dõi & chuyển trạng thái đơn
 
-### 10d. Dọn bàn
 ```
-1. Từ sơ đồ bàn, thấy bàn ở DANG_DON
-2. Nhân viên dọn bàn thực tế
-3. Bấm "Sẵn sàng"
-4. PATCH /api/ban/:maBan/status { trangThai: 'TRONG' }
-5. Backend: Ban.TrangThai → TRONG
-```
+1. Nhân viên vào `/noi-bo/don-hang`
 
-### 10e. Phục vụ món
-```
-1. Từ danh sách đơn hàng, xem đơn cần phục vụ
-2. Xem chi tiết đơn → danh sách món + trạng thái
-3. Cập nhật món đã phục vụ: ChiTietDonHang.TrangThai → DA_PHUC_VU
-4. Khi tất cả món DA_PHUC_VU → gợi ý chuyển đơn → HOAN_THANH
+2. Xem danh sách đơn theo tab trạng thái
+
+3. Khi bắt đầu phục vụ (mang món ra bàn):
+   a. Click đơn có TrangThai = DANG_CHUAN_BI
+   b. Nhấn "Bắt đầu phục vụ"
+   c. PATCH `/api/don-hang/:maDonHang/status` → `{ TrangThai: "DANG_PHUC_VU" }`
+   d. DonHang → DANG_PHUC_VU
+
+4. Khi phục vụ xong (tất cả món đã ra):
+   a. Click đơn có TrangThai = DANG_PHUC_VU
+   b. Nhấn "Hoàn thành"
+   c. PATCH `/api/don-hang/:maDonHang/status` → `{ TrangThai: "HOAN_THANH" }`
+   d. DonHang → HOAN_THANH
+   e. Chuyển sang FEAT-05 (thu ngân thanh toán)
+
+5. Khi cần hủy đơn (chưa bắt đầu chế biến):
+   a. Click đơn có TrangThai = DANG_CHUAN_BI
+   b. Nhấn "Hủy đơn" → xác nhận
+   c. PATCH `/api/don-hang/:maDonHang/status` → `{ TrangThai: "DA_HUY" }`
+   d. DonHang → DA_HUY
 ```
 
 ---
 
 ## 11. Luồng thay thế
 
-### 11a. Đổi bàn cho booking
+### 11.1 Khách vãng lai không có tài khoản
+
 ```
-1. Chọn booking đang gán bàn
-2. Bàn cũ → TRONG
-3. Gán bàn mới → DA_DAT
+1. Nhân viên tạo đơn tại quầy → MaKH = null
+2. Đơn hàng vẫn tạo được, gắn với MaBan
+3. Khách theo dõi trạng thái qua màn hình tại bàn (FEAT-01)
+4. Thu ngân thanh toán tiền mặt (FEAT-05)
 ```
 
-### 11b. Khách đến sớm
+### 11.2 Khách đã có tài khoản
+
 ```
-1. Check-in khách đến sớm hơn giờ đặt
-2. Vẫn check-in được nếu bàn TRONG hoặc DA_DAT
+1. Nhân viên hỏi SĐT hoặc email khách hàng
+2. Tìm KhachHang → lấy MaKH
+3. Tạo đơn với MaKH trong body
+4. Khách có thể xem lịch sử đơn trên app (FEAT-02)
 ```
 
-### 11c. Khách đến trễ
+### 11.3 Bếp không xử lý kịp
+
 ```
-1. Nhân viên chọn giữ bàn hoặc hủy booking
-2. Hủy → DatBan.TrangThai → DA_HUY, Ban → TRONG
+1. Nhân viên thấy đơn chờ quá lâu
+2. Nhân viên liên hệ bếp trực tiếp (ngoài hệ thống)
+3. Hệ thống không có tính năng thông báo/gợi ý cho bếp
+```
+
+### 11.4 Lỗi khi chuyển trạng thái
+
+```
+1. PATCH `/api/don-hang/:maDonHang/status` trả 400
+   → "Không thể chuyển từ trạng thái '{hiện tại}' sang '{mới}'"
+2. Hiển thị toast lỗi
+3. Reload danh sách đơn
 ```
 
 ---
 
 ## 12. Luồng lỗi
 
-| Mã lỗi | Tình huống | Hiển thị |
-|---------|-----------|----------|
-| `400` | Check-in booking đã hủy/hết hạn | "Booking không hợp lệ" |
-| `400` | Gán bàn đang CO_KHACH | "Bàn không khả dụng" |
-| `400` | Gán bàn BAO_TRI | "Bàn không khả dụng" |
-| `400` | Dọn bàn đang CO_KHACH | "Bàn đang có khách" |
-| `400` | Dọn bàn đang TRONG | "Bàn đã sẵn sàng" |
-| `400` | Xóa bàn đang có đơn/booking | "Không thể xóa bàn đang hoạt động" |
-| `400` | Tên bàn trùng | "Bàn đã tồn tại" |
-| `404` | Đơn hàng không tồn tại | "Không tìm thấy đơn hàng" |
+| Mã lỗi | Thông báo | Hành động |
+|---------|----------|----------|
+| 400 - Chuyển trạng thái không hợp lệ | "Không thể chuyển từ '{hiện tại}' sang '{mới}'" | Toast lỗi |
+| 400 - Bàn đang bảo trì | "Bàn này đang bảo trì. Không thể tạo đơn." | Chọn bàn khác |
+| 400 - Món hết hàng | "Món '{tên}' vừa hết hàng." | Xóa khỏi giỏ |
+| 401 - Token hết hạn | "Phiên đã hết hạn." | Redirect đăng nhập |
+| 403 - Không có quyền | "Bạn không có quyền thao tác này." | — |
+| 404 - Không tìm thấy | "Không tìm thấy đơn/bàn." | Reload danh sách |
+| 500 - Lỗi server | "Đã xảy ra lỗi." | Retry |
 
 ---
 
 ## 13. Trạng thái thay đổi
 
-### Khi check-in đặt bàn
-| Entity | Field | Giá trị cũ | Giá trị mới |
-|--------|-------|-----------|-------------|
-| `DatBan` | `TrangThai` | `DA_XAC_NHAN` | `DA_NHAN_BAN` |
-| `Ban` | `TrangThai` | `DA_DAT` | `CO_KHACH` |
+### 13.1 DonHang
 
-### Khi gán bàn
-| Entity | Field | Giá trị cũ | Giá trị mới |
-|--------|-------|-----------|-------------|
-| `Ban` (mới) | `TrangThai` | `TRONG` | `DA_DAT` |
+| Trạng thái hiện tại | Trigger | Trạng thái tiếp theo | Actor |
+|--------------------|---------|---------------------|-------|
+| *(khởi tạo)* | `POST /api/ban/:maBan/order` (nhân viên tạo) | `DANG_CHUAN_BI` | Nhân viên |
+| `DANG_CHUAN_BI` | Nhân viên bắt đầu phục vụ | `DANG_PHUC_VU` | Nhân viên (Phục vụ) |
+| `DANG_PHUC_VU` | Nhân viên hoàn thành | `HOAN_THANH` | Nhân viên (Phục vụ) |
+| `HOAN_THANH` | Thu ngân thanh toán | `DA_THANH_TOAN` | Nhân viên (Thu ngân) — FEAT-05 |
+| `DANG_CHUAN_BI` | Nhân viên hủy | `DA_HUY` | Nhân viên (Phục vụ) |
 
-### Khi dọn bàn
-| Entity | Field | Giá trị cũ | Giá trị mới |
-|--------|-------|-----------|-------------|
-| `Ban` | `TrangThai` | `DANG_DON` | `TRONG` |
+### 13.2 ChiTietDonHang
 
-### Khi phục vụ món
-| Entity | Field | Giá trị cũ | Giá trị mới |
-|--------|-------|-----------|-------------|
-| `ChiTietDonHang` | `TrangThai` | `SAN_SANG` | `DA_PHUC_VU` |
+| Trạng thái hiện tại | Trigger | Trạng thái tiếp theo | Actor |
+|--------------------|---------|---------------------|-------|
+| `DANG_CHUAN_BI` | Bếp bắt đầu chế biến | `DANG_PHUC_VU` | Nhân viên (Bếp) — FEAT-04 |
+| `DANG_PHUC_VU` | Bếp hoàn thành | `HOAN_THANH` | Nhân viên (Bếp) — FEAT-04 |
+| `DANG_CHUAN_BI` | Nhân viên hủy món | `DA_HUY` | Nhân viên (Phục vụ) |
 
-### Khi hủy đặt bàn
-| Entity | Field | Giá trị cũ | Giá trị mới |
-|--------|-------|-----------|-------------|
-| `DatBan` | `TrangThai` | `CHO_XAC_NHAN` / `DA_XAC_NHAN` | `DA_HUY` |
-| `Ban` | `TrangThai` | `DA_DAT` | `TRONG` |
+### 13.3 Ban
+
+| Trạng thái hiện tại | Trigger | Trạng thái tiếp theo | Actor |
+|--------------------|---------|---------------------|-------|
+| `TRONG` | Tạo đơn / xếp bàn | `CO_KHACES` | Nhân viên (Phục vụ) |
+| `CO_KHACES` | Thu ngân xác nhận thanh toán | `DANG_DON` | Nhân viên (Thu ngân) — FEAT-05 |
+| `DANG_DON` | Nhân viên dọn dẹp xong | `TRONG` | Nhân viên (Phục vụ) |
+| `DA_DAT` | Xếp bàn cho khách đến | `CO_KHACES` | Nhân viên (Phục vụ) |
+| `TRONG` hoặc `DA_DAT` | Chuyển bảo trì | `BAO_TRI` | Nhân viên (Phục vụ) |
+| `BAO_TRI` | Kết thúc bảo trì | `TRONG` | Nhân viên (Phục vụ) |
 
 ---
 
 ## 14. Phân quyền
 
-| Endpoint | Mức quyền | Ghi chú |
-|----------|-----------|--------|
-| `GET /api/ban` | `staff` | Xem tất cả bàn |
-| `PATCH /api/ban/:maBan/status` | `staff` | Dọn bàn, bảo trì |
-| `GET /api/dat-ban` | `staff` | Xem tất cả booking |
-| `PATCH /api/dat-ban/:maDatBan/status` | `staff` | Duyệt, check-in, hủy |
-| `PATCH /api/dat-ban/:maDatBan/assign-tables` | `staff` | Gán bàn |
-| `GET /api/don-hang` | `staff` | Xem tất cả đơn |
-| `GET /api/don-hang/:maDonHang` | `staff` | Chi tiết đơn |
-| `POST /api/ban` | `admin` | Tạo bàn mới |
-| `PUT /api/ban/:maBan` | `admin` | Sửa bàn |
-| `DELETE /api/ban/:maBan` | `admin` | Xóa bàn |
-| `GET /api/ban/:maBan/qr` | `staff` | Xuất QR |
+| Vai trò | Quyền truy cập | Ghi chú |
+|---------|----------------|---------|
+| **Nhân viên (Phục vụ)** | Quản lý bàn, tạo đơn tại quầy, theo dõi đơn, chuyển trạng thái `DANG_CHUAN_BI` → `DANG_PHUC_VU` → `HOAN_THANH`, hủy đơn | Yêu cầu JWT `VaiTro = NHAN_VIEN`, `ChucNangPhu = PHUC_VU` |
+| **Nhân viên (Bếp)** | Xem đơn `DANG_CHUAN_BI`, chuyển trạng thái ChiTietDonHang | FEAT-04 |
+| **Nhân viên (Thu ngân)** | Thanh toán đơn `HOAN_THANH` | FEAT-05 |
+| **Admin** | Toàn bộ quyền + quản lý nhân viên, xem báo cáo | FEAT-06 |
 
 ---
 
 ## 15. Acceptance Criteria
 
-### AC-01: Xem sơ đồ bàn
-- [ ] Hiển thị đúng trạng thái từng bàn
-- [ ] Lọc theo trạng thái/khu vực
-- [ ] Click vào bàn → xem chi tiết
-
-### AC-02: Check-in đặt bàn
-- [ ] Check-in thành công → `DatBan = DA_NHAN_BAN`, `Ban = CO_KHACH`
-- [ ] Check-in booking đã hủy → 400
-
-### AC-03: Gán bàn
-- [ ] Gán thành công → `Ban = DA_DAT`
-- [ ] Gán bàn đã có khách → 400
-
-### AC-04: Dọn bàn
-- [ ] Dọn thành công → `Ban = TRONG`
-- [ ] Dọn bàn đang có khách → 400
-
-### AC-05: Phục vụ món
-- [ ] Cập nhật `ChiTietDonHang = DA_PHUC_VU`
-- [ ] Tất cả món xong → gợi ý `DonHang = HOAN_THANH`
-
-### AC-06: Quản lý bàn
-- [ ] Thêm bàn thành công
-- [ ] Sửa bàn thành công
-- [ ] Xóa bàn trống thành công
-- [ ] Xóa bàn đang có đơn → 400
+| ID | Criterion | Verification |
+|----|-----------|-------------|
+| AC-01 | Nhân viên đăng nhập → vào được `/noi-bo/don-hang`, xem danh sách đơn | Manual |
+| AC-02 | Bàn `DANG_DON` → nút "Dọn bàn" hiển thị → nhấn → bàn chuyển `TRONG` | Manual |
+| AC-03 | Bàn `DA_DAT` → nút "Xếp bàn" hiển thị → nhấn → bàn chuyển `CO_KHACES`, DatBan chuyển `DA_NHAN_BAN` | Manual |
+| AC-04 | Tạo đơn tại quầy với `MaBan` → DonHang tạo thành công `DANG_CHUAN_BI` | Manual |
+| AC-05 | Tạo đơn **không có `MaBan`** → trả 400 | Manual |
+| AC-06 | Đơn `DANG_CHUAN_BI` → nhấn "Bắt đầu phục vụ" → chuyển `DANG_PHUC_VU` | Manual |
+| AC-07 | Đơn `DANG_PHUC_VU` → nhấn "Hoàn thành" → chuyển `HOAN_THANH` | Manual |
+| AC-08 | Đơn `DANG_PHUC_VU` → KHÔNG cho phép chuyển trực tiếp về `DA_HUY` | Manual |
+| AC-09 | Nhân viên (Bếp) KHÔNG thể truy cập trang quản lý bàn | Manual: thử truy cập route |
+| AC-10 | Nhân viên (Thu ngân) KHÔNG thể tạo đơn tại quầy | Manual: thử tạo đơn |
+| AC-11 | Tạo đơn với MaMonAn hết hàng → trả 400, hiển thị lỗi rõ ràng | Manual |
+| AC-12 | Tất cả enum trạng thái phải khớp với FEAT-07 | Code review |
 
 ---
 
 ## 16. Checklist đối chiếu code hiện tại
 
-| # | Kiểm tra | File kiểm tra | Trạng thái |
-|---|----------|---------------|-----------|
-| 1 | `SoDoBanPage.jsx` tồn tại + route `/noi-bo/so-do-ban` | `frontend/src/pages/noiBo/` | ☐ |
-| 2 | `DatBanNoiBoPage.jsx` tồn tại + route `/noi-bo/dat-ban` | `frontend/src/pages/noiBo/` | ☐ |
-| 3 | `DonHangNoiBoPage.jsx` tồn tại + route `/noi-bo/don-hang` | `frontend/src/pages/noiBo/` | ☐ |
-| 4 | `QuanLyBanPage.jsx` tồn tại + route `/noi-bo/quan-ly-ban` | `frontend/src/pages/noiBo/` | ☐ |
-| 5 | `GET /api/ban` trả về danh sách bàn + trạng thái | `backend/nest-api/src/modules/ban/` | ☐ |
-| 6 | `PATCH /api/dat-ban/:maDatBan/status` kiểm tra `staff` | `backend/nest-api/src/modules/dat-ban/` | ☐ |
-| 7 | `PATCH /api/dat-ban/:maDatBan/assign-tables` kiểm tra `staff` | `backend/nest-api/src/modules/dat-ban/` | ☐ |
-| 8 | `PATCH /api/ban/:maBan/status` kiểm tra `staff` | `backend/nest-api/src/modules/ban/` | ☐ |
-| 9 | `POST /api/ban` kiểm tra `admin` | `backend/nest-api/src/modules/ban/` | ☐ |
-| 10 | `DELETE /api/ban/:maBan` kiểm tra `admin` + check active orders | `backend/nest-api/src/modules/ban/` | ☐ |
+### Routes
+
+| Route | Tồn tại? | Component | Ghi chú |
+|-------|----------|-----------|---------|
+| `/noi-bo/don-hang` | ✅ | `DonHangNoiBo` | Danh sách đơn hàng |
+| `/noi-bo/don-hang/:maDonHang` | ✅ | Route con của `/noi-bo/don-hang` | Chi tiết đơn |
+
+### API endpoints
+
+| Endpoint | Tồn tại? | Controller | Ghi chú |
+|----------|----------|-----------|---------|
+| `GET /api/ban` | ✅ | `ban.controller.ts` | |
+| `PUT /api/ban/:maBan/trang-thai` | ⚠️ | — | **Cần kiểm tra** endpoint cập nhật trạng thái |
+| `PUT /api/ban/:maBan/dat-ban/:maDatBan/xep-ban` | ⚠️ | — | **Cần kiểm tra** |
+| `POST /api/ban/:maBan/order` | ✅ | `don-hang.controller.ts` | Tạo đơn cho bàn |
+| `GET /api/don-hang` | ✅ | `don-hang.controller.ts` | Danh sách đơn (staff only) |
+| `PATCH /api/don-hang/:maDonHang/status` | ✅ | `don-hang.controller.ts` | Cập nhật trạng thái |
+| `PATCH /api/don-hang/chi-tiet/:maChiTiet/status` | ✅ | `don-hang.controller.ts` | Cập nhật trạng thái món |
+
+### Enum / State
+
+| Enum | Giá trị trong code | Giá trị trong spec | Khớp? |
+|------|-------------------|-------------------|-------|
+| `DonHang.TrangThai` | `DANG_CHUAN_BI, DANG_PHUC_VU, HOAN_THANH, DA_THANH_TOAN, DA_HUY` | `DANG_CHUAN_BI, DANG_PHUC_VU, HOAN_THANH, DA_THANH_TOAN, DA_HUY` | ✅ |
+| `ChiTietDonHang.TrangThai` | `DANG_CHUAN_BI, DANG_PHUC_VU, HOAN_THANH, DA_HUY` | `DANG_CHUAN_BI, DANG_PHUC_VU, HOAN_THANH, DA_HUY` | ✅ |
+| `Ban.TrangThai` | `TRONG, DA_DAT, CO_KHACES, DANG_DON, BAO_TRI` | `TRONG, DA_DAT, CO_KHACES, DANG_DON, BAO_TRI` | ✅ |
+
+### Trạng thái cấm
+
+| Trạng thái cấm | Xuất hiện trong code backend? | Kết quả |
+|----------------|------------------------------|---------|
+| `CHO_XU_LY` | ❌ | ✅ OK |
+| `CHO_CHE_BIEN` | ❌ | ✅ OK |
+| `DANG_CHUAN_BIEN` | ❌ | ✅ OK |
+| `DANG_CHE_BIEN` | ❌ | ✅ OK |
+| `SAN_SANG` | ❌ | ✅ OK |
+| `DA_PHUC_VU` | ❌ | ✅ OK |
+| `DA_DEN` | ❌ | ✅ OK |
+
+### Phân quyền
+
+| Kiểm tra | Kết quả | Ghi chú |
+|---------|---------|---------|
+| `@UseGuards(AuthGuard)` trên các route nhân viên | ⚠️ | Cần xác minh |
+| `VaiTro` check = `NHAN_VIEN` | ⚠️ | Cần xác minh |
+| `ChucNangPhu` check = `PHUC_VU` | ⚠️ | Cần xác minh — **có thể chưa implement phân quyền sub-role** |
+
+### Tích hợp với FEAT khác
+
+| FEAT | Mối liên hệ |
+|------|-------------|
+| FEAT-01 | QR ordering — khách tự đặt, không qua nhân viên |
+| FEAT-02 | DatBan — nhân viên xác nhận khi khách đến |
+| FEAT-04 | Bếp — xử lý ChiTietDonHang |
+| FEAT-05 | Thu ngân — thanh toán DonHang HOAN_THANH |
+| FEAT-06 | Admin — quản lý nhân viên, phân quyền |
+| FEAT-07 | State machines chuẩn |
+
+---
+
+*Ghi chú: Actor chính là "Nhân viên" với sub-role "Phục vụ". Routes cần xác minh — nhiều route có thể chưa triển khai riêng cho nhân viên, có thể nằm trong trang admin. Cần kiểm tra phân quyền sub-role (ChucNangPhu) trong code backend.*

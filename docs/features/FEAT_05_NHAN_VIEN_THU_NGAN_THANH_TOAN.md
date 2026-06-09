@@ -1,361 +1,477 @@
-# FEAT_05: Nhân viên — Thu ngân, thanh toán
+# FEAT-05: Nhân viên — Thu ngân: Thanh toán & hóa đơn
 
-> Mã feature: FEAT_05
-> Actor chính: **Nhân viên thu ngân** (đăng nhập nội bộ)
-> Phiên bản: 1.0 — 2026-06-09
+> **Phạm vi:** Nhân viên (sub-role: Thu ngân) xem đơn `HOAN_THANH`, áp dụng voucher, tính tổng, xác nhận thanh toán (tiền mặt/Chuyển khoản), in hóa đơn.  
+> **Liên quan:** FEAT-03 (phục vụ chuyển trạng thái), FEAT-04 (bếp hoàn thành), FEAT-06 (admin quản lý).
 
 ---
 
 ## 1. Mục tiêu
 
-Cho phép nhân viên thu ngân xem hóa đơn, áp voucher/điểm cho khách, xác nhận thanh toán, in tạm tính/hóa đơn, và xử lý hoàn tiền.
-
-Luồng này tương ứng với UC-NV-11 → UC-NV-13, UC-NV-15.
+- Thu ngân xem danh sách đơn hàng `HOAN_THANH` chờ thanh toán.
+- Áp dụng voucher giảm giá (nếu khách có).
+- Xác nhận thanh toán: tiền mặt hoặc chuyển khoản.
+- Sau khi thanh toán: `DonHang` → `DA_THANH_TOAN`, `Ban` → `DANG_DON`.
+- Thu ngân là người **cuối cùng** xác nhận thanh toán — không ai khác có quyền này.
 
 ---
 
 ## 2. Actor sử dụng
 
-| Actor | Quyền API | Ghi chú |
-|-------|-----------|---------|
-| Nhân viên thu ngân | `staff` | JWT `vaiTro='NhanVien'` hoặc `'Admin'` |
+| Actor | Vai trò | Ghi chú |
+|-------|---------|---------|
+| **Nhân viên** | Diễn viên chính | Sub-role: **Thu ngân** — thanh toán đơn, xác nhận thanh toán |
+
+> **Lưu ý:** Actor chính là "Nhân viên". Sub-role "Thu ngân" xác định quyền hạn cụ thể.  
+> Chỉ Thu ngân mới có quyền chuyển `DonHang` → `DA_THANH_TOAN`.
 
 ---
 
-## 3. Route / trang liên quan
+## 3. Route / Trang
 
-| Route | Mô tả | Component/Trang |
-|-------|-------|----------------|
-| `/noi-bo/don-hang` | Danh sách đơn (filter chờ thanh toán) | `DonHangNoiBoPage.jsx` |
-| `/noi-bo/don-hang/:maDonHang` | Chi tiết đơn + hóa đơn | `DonHangChiTietPage.jsx` |
-| `/noi-bo/thong-ke` | Thống kê doanh thu | `NoiBoThongKePage.jsx` |
+| Route | Trang | Yêu cầu đăng nhập | Role |
+|-------|-------|--------------------|------|
+| `/noi-bo/don-hang` | Danh sách đơn chờ thanh toán | ✅ | Nhân viên |
+
+> **Lưu ý:** Routes cần được xác minh trong code.
 
 ---
 
 ## 4. Danh sách màn hình
 
-### Màn hình 4.1: Danh sách đơn chờ thanh toán
-- Bảng đơn hàng filter trạng thái `SAN_SANG`, `DA_PHUC_VU`.
-- Mỗi đơn: mã đơn, bàn, tổng tiền, trạng thái, khách (nếu có).
-- Click vào đơn → xem chi tiết + xử lý thanh toán.
-
-### Màn hình 4.2: Chi tiết đơn + thanh toán
-- Danh sách món + trạng thái từng món.
-- Thông tin tạm tính: tổng tiền món, phí dịch vụ 5%, tổng tạm tính.
-- Phần voucher/điểm:
-  - Nhập mã voucher → validate → hiển thị số tiền giảm.
-  - Nhập số điểm muốn dùng → kiểm tra điểm khả dụng.
-  - Tổng thanh toán sau giảm.
-- Chọn phương thức thanh toán: Tiền mặt, Chuyển khoản, MoMo, VNPay, ZaloPay.
-- Nút "Xác nhận thanh toán".
-- Nút "In tạm tính" / "In hóa đơn".
-
-### Màn hình 4.3: Hoá đơn sau thanh toán
-- Mã hóa đơn, mã đơn, ngày xuất.
-- Danh sách món, tổng tiền, giảm giá, tổng thanh toán thực tế.
-- Phương thức thanh toán.
-- Nút "In hóa đơn" / "Xuất PDF".
+| STT | Màn hình | Mô tả |
+|-----|----------|-------|
+| 1 | **Danh sách đơn chờ thanh toán** | Danh sách đơn `HOAN_THANH`. Hiển thị: mã đơn, bàn, thời gian, tổng tiền, trạng thái. |
+| 2 | **Chi tiết đơn + thanh toán** | Danh sách món, tổng tiền, voucher (nếu có), tổng sau giảm, phương thức thanh toán, nút xác nhận. |
+| 3 | **Xác nhận thanh toán** | Dialog xác nhận: tổng tiền, phương thức, voucher. Nút "Xác nhận thanh toán". |
+| 4 | **Hóa đơn** | Hóa đơn thanh toán: thông tin nhà hàng, đơn, tổng, thanh toán, thời gian. Nút "In hóa đơn". |
 
 ---
 
 ## 5. Thành phần giao diện
 
-### Component `DanhSachDonChoThanhToan`
-- Bảng phân trang.
-- Filter: trạng thái (`SAN_SANG`, `DA_PHUC_VU`), bàn, ngày.
-- Badge màu trạng thái.
+### 5.1 Danh sách đơn chờ thanh toán
 
-### Component `ChiTietDonThanhToan`
-- Danh sách món + trạng thái.
-- Tổng tạm tính, phí dịch vụ.
-- Form voucher/điểm (xem Component `ApDungVoucherDiem`).
-- Chọn phương thức thanh toán (radio/button group).
-- Nút "Xác nhận thanh toán".
+| Thành phần | Mô tả |
+|------------|-------|
+| Header | "Thu ngân — Đơn chờ thanh toán" |
+| Badge số đơn | Số lượng đơn `HOAN_THANH` chờ |
+| Card đơn | Mã đơn, bàn, thời gian, số món, tổng tiền, nút "Thanh toán" |
+| Sort | Mặc định: thời gian tạo ASC |
+| Auto-refresh | Tự động refresh mỗi 10 giây |
+| Filter | Tất cả / Chờ thanh toán / Đã thanh toán / Hủy |
 
-### Component `ApDungVoucherDiem`
-- Input mã voucher + nút "Áp dụng".
-- Hiển thị kết quả: hợp lệ → số tiền giảm; không hợp lệ → lỗi.
-- Input số điểm muốn dùng.
-- Hiển thị tổng sau giảm.
+### 5.2 Chi tiết đơn + thanh toán
 
-### Component `HoaDon`
-- Xem trước hóa đơn (PDF/HTML).
-- Nút in hoặc tải về.
+| Thành phần | Mô tả |
+|------------|-------|
+| Thông tin đơn | Mã đơn, bàn, thời gian, nhân viên tạo đơn |
+| Danh sách món | Tên món, số lượng, đơn giá, thành tiền |
+| Tổng tiền (trước giảm) | Hiển thị tổng |
+| Chọn voucher | Select: voucher khả dụng của khách (nếu có MaKH). Hiển thị mã + giá trị giảm |
+| Tổng tiền (sau giảm) | Bold. Tổng - giá trị voucher. ≥ 0 |
+| Phương thức thanh toán | Radio: Tiền mặt / Chuyển khoản |
+| Nhập số tiền khách đưa | Number input. Chỉ hiện khi chọn "Tiền mặt". Tự tính tiền thừa |
+| Tiền thừa | Tự tính: Tiền khách đưa - Tổng sau giảm. Hiển thị khi tiền mặt |
+| QR chuyển khoản | Hiển thị QR code (nếu chọn chuyển khoản). Mã QR chứa thông tin chuyển khoản |
+| Nút "Xác nhận thanh toán" | Disabled nếu form invalid |
+
+### 5.3 Dialog xác nhận
+
+| Thành phần | Mô tả |
+|------------|-------|
+| Tổng tiền | Bold |
+| Phương thức | Tiền mặt / Chuyển khoản |
+| Voucher | Mã voucher (nếu có) |
+| Nút "Xác nhận" | Gọi API thanh toán |
+| Nút "Quay lại" | Đóng dialog |
+
+### 5.4 Hóa đơn
+
+| Thành phần | Mô tả |
+|------------|-------|
+| Header | Tên nhà hàng, địa chỉ, SĐT |
+| Mã đơn | Mã DonHang |
+| Danh sách món | Tên, SL, đơn giá, thành tiền |
+| Tổng tiền | |
+| Giảm giá (voucher) | Nếu có |
+| Tổng thanh toán | |
+| Phương thức | Tiền mặt / Chuyển khoản |
+| Thời gian thanh toán | |
+| Nút "In hóa đơn" | Print dialog |
+| Nút "Đóng" | Đóng hóa đơn |
 
 ---
 
 ## 6. Dữ liệu hiển thị
 
-### Chi tiết đơn (từ `GET /api/don-hang/:maDonHang`)
-```
+### 6.1 Danh sách đơn chờ thanh toán (GET `/api/don-hang/thu-ngan`)
+
+```typescript
+// Query params: page, limit, TrangThai
+// Response 200
 {
-  maDonHang: string,
-  maBan: string,
-  tenBan: string,
-  trangThai: string,
-  ngayTao: string,
-  tongTien: number,       // tổng tiền món
-  phiDichVu: number,      // 5% tạm tính
-  tamTinh: number,        // tongTien + phiDichVu
-  giamGia: number,        // số tiền giảm từ voucher
-  soDiem: number,         // điểm đã dùng
-  thanhTien: number,      // tamTinh - giamGia
-  khachHang: { maKH, tenKH, sdt, diemTichLuy } | null,
-  chiTiet: [
-    {
-      maMon: string,
-      tenMon: string,
-      soLuong: number,
-      donGia: number,
-      thanhTien: number,
-      trangThai: string
-    }
-  ]
+  data: DonHangThuNgan[];
+  total: number;
+}
+
+// DonHangThuNgan object
+{
+  MaDonHang: string;
+  MaBan: string;
+  TenBan: string;
+  MaKH?: string;          // Null nếu khách vãng lai
+  HoTenKhach?: string;
+  NgayTao: string;
+  TongTien: number;
+  TrangThai: "HOAN_THANH" | "DA_THANH_TOAN" | "DA_HUY";
 }
 ```
 
-### Hóa đơn (từ `GET /api/don-hang/:maDonHang` hoặc response sau thanh toán)
-```
+### 6.2 Áp dụng voucher (GET `/api/voucher/khach-hang/:maKH`)
+
+```typescript
+// Query params: MaDonHang (để check điều kiện đơn tối thiểu)
+// Response 200
 {
-  maHoaDon: string,
-  maDonHang: string,
-  ngayXuat: string,
-  tongTien: number,
-  giamGia: number,
-  thanhTien: number,
-  phuongThuc: string,
-  trangThai: string  // "THANH_CONG" | "THAT_BAI"
+  data: VoucherKhachHang[];
 }
+
+// VoucherKhachHang object
+{
+  MaVoucher: string;
+  MaKhuyenMai: string;
+  TenChuongTrinh: string;
+  GiaTriGiam: number;     // Số tiền giảm (đã tính)
+  DieuKienApDung: string; // "Đơn tối thiểu 200000đ"
+  NgayHetHan: string;
+  TrangThai: "KHADUNG" | "DA_SU_DUNG" | "HET_HAN";
+}
+```
+
+### 6.3 Xác nhận thanh toán (POST `/api/ban/:maBan/xac-nhan-thanh-toan`)
+
+```typescript
+// Request body
+{
+  MaDonHang: string;      // Bắt buộc
+  PhuongThucThanhToan: "TIEN_MAT" | "CHUYEN_KHOAN";
+  MaVoucher?: string;     // Nếu áp dụng voucher
+  SoTienKhachDua?: number; // Chỉ khi tiền mặt
+}
+
+// Response 201
+{
+  MaThanhToan: string;
+  MaDonHang: string;
+  PhuongThucThanhToan: "TIEN_MAT" | "CHUYEN_KHOAN";
+  SoTien: number;         // Tổng sau giảm
+  MaVoucher?: string;
+  GiaTriGiam?: number;
+  TrangThai: "THANH_CONG";
+  NgayThanhToan: string;  // ISO 8601
+  TienThua?: number;      // Chỉ khi tiền mặt
+}
+```
+
+### 6.4 Cập nhật trạng thái DonHang (tự động sau thanh toán)
+
+```typescript
+// Backend tự động cập nhật:
+// DonHang.TrangThai → DA_THANH_TOAN
+// Ban.TrangThai → DANG_DON
 ```
 
 ---
 
 ## 7. Form nhập liệu
 
-### Form áp voucher
-| Field | Kiểu | Bắt buộc | Validate |
-|-------|------|-----------|----------|
-| `maCode` | text | Không | `POST /api/ma-giam-gia/validate` |
+### 7.1 Chọn voucher
 
-### Form dùng điểm
-| Field | Kiểu | Bắt buộc | Validate |
-|-------|------|-----------|----------|
-| `soDiem` | number | Không | ≤ điểm khách đang có, bội số 100 (tùy quy tắc) |
+| Field | Kiểu | Validation | Ghi chú |
+|-------|------|-----------|---------|
+| Voucher | Select | Tùy chọn. Chỉ hiện voucher `KHADUNG` | Nếu khách không có voucher → bỏ trống |
 
-### Form xác nhận thanh toán
-| Field | Kiểu | Bắt buộc | Validate |
-|-------|------|-----------|----------|
-| `phuongThuc` | select | Có | `TienMat`, `ChuyenKhoan`, `MoMo`, `VNPay`, `ZaloPay` |
+### 7.2 Phương thức thanh toán
+
+| Field | Kiểu | Validation | Ghi chú |
+|-------|------|-----------|---------|
+| Phương thức | Radio | Bắt buộc. `TIEN_MAT` hoặc `CHUYEN_KHOAN` | Mặc định: `TIEN_MAT` |
+| Số tiền khách đưa | Number | ≥ Tổng sau giảm. Bắt buộc khi `TIEN_MAT` | Tự tính tiền thừa |
 
 ---
 
 ## 8. Nút thao tác
 
-| Nút | Vị trí | Hành động |
-|-----|--------|-----------|
-| "Áp dụng voucher" | Chi tiết đơn | `POST /api/ma-giam-gia/validate` → hiển thị giảm giá |
-| "Xác nhận thanh toán" | Chi tiết đơn | `PATCH /api/don-hang/:maDonHang/status` với `DA_THANH_TOAN` |
-| "In tạm tính" | Chi tiết đơn | `GET /api/don-hang/:maDonHang` → in bản tạm tính |
-| "In hóa đơn" | Hóa đơn | In bản PDF hóa đơn |
-| "Hoàn tiền" | Hóa đơn (admin) | `PATCH /api/don-hang/:maDonHang/status` với `DA_HOAN_TIEN` |
+| Nút | Vị trí | Hành động | Khi nào disabled |
+|-----|--------|----------|-----------------|
+| **Thanh toán** | Card đơn `HOAN_THANH` | Mở trang chi tiết + thanh toán | — |
+| **Xác nhận thanh toán** | Trang thanh toán | POST `/api/ban/:maBan/xac-nhan-thanh-toan` | Chưa chọn phương thức, tiền mặt nhưng chưa nhập số tiền, đang loading |
+| **Quay lại** | Dialog xác nhận | Đóng dialog | — |
+| **In hóa đơn** | Trang hóa đơn | Print dialog | — |
+| **Đóng** | Trang hóa đơn | Đóng, quay về danh sách | — |
 
 ---
 
 ## 9. API liên quan
 
-### `GET /api/don-hang` — staff
-- Danh sách đơn (filter `SAN_SANG`, `DA_PHUC_VU`).
+| Method | Endpoint | Quyền | Input | Output | Ghi chú |
+|--------|----------|-------|-------|--------|---------|
+| `GET` | `/api/don-hang/thu-ngan` | Nhân viên (Thu ngân) | Query: `page`, `limit`, `TrangThai` | `{ data: DonHangThuNgan[], total }` | Danh sách đơn chờ |
+| `GET` | `/api/don-hang/:maDonHang` | Nhân viên (Thu ngân) | `maDonHang` (path) | `DonHang` + `ChiTietDonHang` | Chi tiết đơn |
+| `GET` | `/api/voucher/khach-hang/:maKH` | Nhân viên (Thu ngân) | `maKH`, query: `MaDonHang` | `{ data: VoucherKhachHang[] }` | Voucher khả dụng |
+| `POST` | `/api/ban/:maBan/xac-nhan-thanh-toan` | Nhân viên | `ThanhToanDto` | `ThanhToan` (201) | Xác nhận thanh toán — **chỉ Thu ngân** |
+| `PATCH` | `/api/don-hang/:maDonHang/status` | Nhân viên | `{ TrangThai: "DA_THANH_TOAN" }` | `DonHang` (200) | Tự động sau thanh toán |
+| `PATCH` | `/api/ban/:maBan/trang-thai` | Nhân viên | `{ TrangThai: "DANG_DON" }` | `Ban` (200) | Tự động sau thanh toán |
 
-### `GET /api/don-hang/:maDonHang` — staff
-- Chi tiết đơn + hóa đơn.
-
-### `POST /api/ma-giam-gia/validate` — public
-- Kiểm tra voucher hợp lệ.
-- Request: `{ maCode }`
-- Response: `{ hopLe, soTienGiam, loaiMa, phamVi }`
-
-### `PATCH /api/don-hang/:maDonHang/status` — staff
-- Xác nhận thanh toán: `{ trangThai: 'DA_THANH_TOAN', phuongThuc, maCode?, soDiem? }`
-- Hoàn tiền: `{ trangThai: 'DA_HOAN_TIEN' }`
-- Side effects:
-  - `DA_THANH_TOAN`: Tạo `HoaDon` + `ThanhToan` (`THANH_CONG`). Cập nhật `DonHang.TrangThai`. Tích điểm cho khách (nếu có `MaKH`). Cập nhật `Ban.TrangThai` → `DANG_DON`.
-  - `DA_HOAN_TIEN`: Cập nhật `ThanhToan.TrangThai` → `DA_HOAN_TIEN`.
-
-### `POST /api/ban/:maBan/xac-nhan-thanh-toan` — staff
-- Thanh toán tại bàn (thu ngân đến bàn).
-- Request: `{ maDonHang, phuongThuc, maCode?, soDiem? }`
+> **Lưu ý:** `POST /api/ban/:maBan/xac-nhan-thanh-toan` là endpoint quan trọng nhất — **chỉ Thu ngân mới có quyền**.  
+> Backend tự cập nhật `DonHang.TrangThai → DA_THANH_TOAN` và `Ban.TrangThai → DANG_DON` sau khi thanh toán thành công.
 
 ---
 
 ## 10. Luồng xử lý chính
 
-### 10a. Xem danh sách đơn chờ thanh toán
 ```
-1. Thu ngân vào /noi-bo/don-hang
-2. Lọc trạng thái SAN_SANG hoặc DA_PHUC_VU
-3. GET /api/don-hang?trangThai=SAN_SANG,DA_PHUC_VU
-4. Hiển thị danh sách
-```
+1. Thu ngân đăng nhập (VaiTro: NHAN_VIEN, ChucNangPhu: THU_NGAN)
+   → Vào trang `/noi-bo/don-hang`
 
-### 10b. Xem chi tiết đơn
-```
-1. Click vào đơn cần thanh toán
-2. GET /api/don-hang/:maDonHang
-3. Hiển thị: danh sách món, tạm tính, phí dịch vụ
-```
+2. Hiển thị danh sách đơn `HOAN_THANH` chờ thanh toán
+   → Auto-refresh mỗi 10 giây
 
-### 10c. Áp voucher / điểm
-```
-1. Nhập mã voucher → POST /api/ma-giam-gia/validate
-2. Hợp lệ → hiển thị số tiền giảm
-3. Nhập số điểm muốn dùng → kiểm tra điểm khả dụng
-4. Hiển thị tổng thanh toán sau giảm
-```
+3. Thu ngân chọn đơn → xem chi tiết:
+   - Danh sách món + thành tiền
+   - Tổng tiền
+   - Thông tin khách (nếu có MaKH)
 
-### 10d. Xác nhận thanh toán
-```
-1. Thu ngân chọn phương thức thanh toán
-2. Bấm "Xác nhận thanh toán"
-3. PATCH /api/don-hang/:maDonHang/status {
-     trangThai: 'DA_THANH_TOAN',
-     phuongThuc: 'TienMat',
-     maCode: 'MA-GIAM-001',   // nếu có
-     soDiem: 100              // nếu có
+4. Nếu khách có MaKH:
+   a. Gọi GET /api/voucher/khach-hang/:maKH?MaDonHang=...
+   b. Hiển thị danh sách voucher khả dụng
+   c. Thu ngân chọn voucher (nếu có) → tổng tiền giảm
+
+5. Thu ngân chọn phương thức thanh toán:
+   a. Tiền mặt:
+      - Nhập số tiền khách đưa
+      - Tự tính tiền thừa
+      - Disabled nút "Xác nhận" nếu số tiền < tổng sau giảm
+   b. Chuyển khoản:
+      - Hiển thị QR code (mã QR chứa thông tin chuyển khoản)
+      - Chờ xác nhận đã nhận tiền
+
+6. Nhấn "Xác nhận thanh toán" → dialog xác nhận
+
+7. Nhấn "Xác nhận" trong dialog → POST `/api/ban/:maBan/xac-nhan-thanh-toan`
+   Body: {
+     MaDonHang: "DH001234",
+     PhuongThucThanhToan: "TIEN_MAT",
+     MaVoucher: "VC001" | null,
+     SoTienKhachDua: 500000
    }
-4. Backend:
-   - Tạo HoaDon (MaDonHang UNIQUE → 1 đơn 1 hóa đơn)
-   - Tạo ThanhToan (TrangThai='THANH_CONG')
-   - Cập nhật DonHang.TrangThai → DA_THANH_TOAN
-   - Tích điểm cho khách (nếu có MaKH)
-   - Cập nhật Voucher.SoLanDaDung++ (nếu dùng voucher)
-   - Trừ điểm trong KhachHang.DiemTichLuy (nếu dùng điểm)
-   - Cập nhật Ban.TrangThai → DANG_DON
-5. Hiển thị thông báo thành công + hóa đơn
-```
 
-### 10e. In tạm tính / hóa đơn
-```
-1. Thu ngân bấm "In tạm tính" hoặc "In hóa đơn"
-2. GET /api/don-hang/:maDonHang → lấy dữ liệu
-3. Hiển thị bản xem trước (PDF/HTML)
-4. Xác nhận in → gửi đến máy in hoặc tải PDF
+8. Backend xử lý:
+   a. Validate MaDonHang tồn tại, TrangThai = HOAN_THANH
+   b. Validate MaVoucher (nếu có): tồn tại, KHADUNG, điều kiện đơn tối thiểu
+   c. Tính tổng sau giảm
+   d. Tạo ThanhToan (TrangThai: THANH_CONG)
+   e. Cập nhật DonHang.TrangThai → DA_THANH_TOAN
+   f. Cập nhật Ban.TrangThai → DANG_DON
+   g. Nếu dùng voucher → cập nhật Voucher.TrangThai → DA_SU_DUNG
+   h. Trả 201 với thông tin thanh toán
+
+9. Hiển thị hóa đơn → nút "In hóa đơn"
 ```
 
 ---
 
 ## 11. Luồng thay thế
 
-### 11a. Thanh toán thất bại
+### 11.1 Khách vãng lai (không có MaKH)
+
 ```
-1. PATCH /api/don-hang/:maDonHang/status với THAT_BAI
-2. Đơn giữ nguyên trạng thái
-3. Thu ngân chọn lại phương thức hoặc thử lại
+1. DonHang.MaKH = null
+2. Không hiển thị phần chọn voucher
+3. Thu ngân tính tổng tiền, thanh toán tiền mặt
+4. Không lưu thông tin khách trên hóa đơn
 ```
 
-### 11b. Khách muốn thanh toán tại quầy
+### 11.2 Khách có voucher nhưng không dùng
+
 ```
-1. Thu ngân tra cứu đơn theo bàn hoặc mã đơn
-2. Xem chi tiết → áp voucher/điểm → xác nhận thanh toán
+1. Thu ngân bỏ qua phần voucher
+2. Thanh toán bình thường với tổng tiền gốc
+3. Voucher vẫn giữ trạng thái KHADUNG (chưa dùng)
 ```
 
-### 11c. Hoàn tiền sau thanh toán
+### 11.3 Thanh toán chuyển khoản — chờ xác nhận
+
 ```
-1. Admin chọn đơn đã DA_THANH_TOAN
-2. PATCH /api/don-hang/:maDonHang/status với DA_HOAN_TIEN
-3. Backend: Cập nhật ThanhToan.TrangThai → DA_HOAN_TIEN
-4. Không thay đổi Ban.TrangThai (bàn vẫn DANG_DON)
+1. Thu ngân chọn "Chuyển khoản" → hiển thị QR
+2. Khách quét QR → chuyển tiền
+3. Thu ngân xác nhận đã nhận tiền (nút "Xác nhận đã nhận")
+4. POST `/api/ban/:maBan/xac-nhan-thanh-toan` với PhuongThucThanhToan = CHUYEN_KHOAN
+5. Hệ thống xử lý như thanh toán tiền mặt
+```
+
+### 11.4 Hủy thanh toán (trường hợp đặc biệt)
+
+```
+1. Nếu đã tạo ThanhToan nhưng cần hủy:
+   - PATCH `/api/don-hang/:maDonHang/status` → `DA_HUY` (nếu cần)
+   - Hoặc liên hệ admin (FEAT-06)
+2. Hệ thống không có flow hủy thanh toán tự động
+3. Thu ngân cần liên hệ admin để xử lý ngoại lệ
 ```
 
 ---
 
 ## 12. Luồng lỗi
 
-| Mã lỗi | Tình huống | Hiển thị |
-|---------|-----------|----------|
-| `400` | Đơn đã thanh toán trước đó | "Đơn đã được thanh toán" |
-| `400` | Phương thức không hợp lệ | "Phương thức thanh toán không hợp lệ" |
-| `400` | Voucher hết hạn/hết lượt | "Mã giảm giá không hợp lệ" |
-| `400` | Điểm không đủ | "Số điểm không khả dụng" |
-| `400` | Đơn không tồn tại | "Không tìm thấy đơn hàng" |
-| `403` | Voucher không đúng chủ | "Mã không thuộc về khách này" |
-| `404` | Đơn không tồn tại | "Không tìm thấy đơn hàng" |
+| Mã lỗi | Thông báo | Hành động |
+|---------|----------|----------|
+| 400 - Đơn chưa sẵn sàng | "Đơn này chưa hoàn thành. Không thể thanh toán." | Reload danh sách |
+| 400 - Voucher không hợp lệ | "Voucher không khả dụng hoặc đã hết hạn." | Bỏ chọn voucher |
+| 400 - Voucher không đạt điều kiện | "Đơn hàng chưa đạt điều kiện tối thiểu của voucher." | Chọn voucher khác hoặc bỏ |
+| 400 - Số tiền不足 | "Số tiền khách đưa không đủ." | Nhập lại số tiền |
+| 401 - Token hết hạn | "Phiên đã hết hạn." | Redirect đăng nhập |
+| 403 - Không có quyền | "Bạn không có quyền thanh toán." | — |
+| 404 - Không tìm thấy | "Không tìm thấy đơn." | Reload danh sách |
+| 409 - Đơn đã thanh toán | "Đơn này đã được thanh toán." | Reload danh sách |
+| 500 - Lỗi server | "Đã xảy ra lỗi." | Retry |
 
 ---
 
 ## 13. Trạng thái thay đổi
 
-### Khi xác nhận thanh toán
-| Entity | Field | Giá trị cũ | Giá trị mới |
-|--------|-------|-----------|-------------|
-| `DonHang` | `TrangThai` | `SAN_SANG` / `DA_PHUC_VU` | `DA_THANH_TOAN` |
-| `HoaDon` | — | — | INSERT mới (MaHoaDon, TongTien, GiamGia, ThanhTien) |
-| `ThanhToan` | `TrangThai` | — | `THANH_CONG` |
-| `Ban` | `TrangThai` | `CO_KHACH` | `DANG_DON` |
-| `KhachHang` | `DiemTichLuy` | (nếu có MaKH) | `+= Math.floor(TongTien / TI_LE_TICH_DIEM)` |
-| `MaGiamGia` | `SoLanDaDung` | (nếu dùng voucher) | `+= 1` |
+### 13.1 DonHang
 
-### Khi hoàn tiền
-| Entity | Field | Giá trị cũ | Giá trị mới |
-|--------|-------|-----------|-------------|
-| `DonHang` | `TrangThai` | `DA_THANH_TOAN` | `DA_HOAN_TIEN` |
-| `ThanhToan` | `TrangThai` | `THANH_CONG` | `DA_HOAN_TIEN` |
+| Trạng thái hiện tại | Trigger | Trạng thái tiếp theo | Actor |
+|--------------------|---------|---------------------|-------|
+| `HOAN_THANH` | Thu ngân xác nhận thanh toán | `DA_THANH_TOAN` | Nhân viên (Thu ngân) |
+| `DANG_CHUAN_BI` | Hủy đơn | `DA_HUY` | Nhân viên (Phục vụ) / Admin |
+
+> **CHỈ** Thu ngân mới có quyền chuyển `HOAN_THANH` → `DA_THANH_TOAN`.  
+> Không ai khác (Nhân viên Phục vụ, Bếp, Admin) có quyền này.
+
+### 13.2 Ban
+
+| Trạng thái hiện tại | Trigger | Trạng thái tiếp theo | Ghi chú |
+|--------------------|---------|---------------------|---------|
+| `CO_KHACH` | Thu ngân xác nhận thanh toán | `DANG_DON` | Bàn cần dọn dẹp |
+| `DANG_DON` | Nhân viên Phục vụ dọn xong | `TRONG` | Bàn sẵn sàng |
+
+### 13.3 ThanhToan
+
+```
+[khởi tạo] ──POST /api/ban/:maBan/xac-nhan-thanh-toan──▶ THANH_CONG
+                                       │
+                    ┌──────────────────┤
+                    ▼                  ▼
+              THAT_BAI           DA_HOAN_TIEN
+           (lỗi thanh toán)     (hoàn tiền sau khi đã thanh toán)
+```
+
+| Trạng thái hiện tại | Trigger | Trạng thái tiếp theo | Ghi chú |
+|--------------------|---------|---------------------|---------|
+| *(khởi tạo)* | `POST /api/ban/:maBan/xac-nhan-thanh-toan` | `THANH_CONG` | Thanh toán thành công |
+| `THANH_CONG` | Hoàn tiền (admin) | `DA_HOAN_TIEN` | Trường hợp ngoại lệ |
+
+### 13.4 Voucher
+
+| Trạng thái hiện tại | Trigger | Trạng thái tiếp theo | Ghi chú |
+|--------------------|---------|---------------------|---------|
+| `KHADUNG` | Khách dùng voucher khi thanh toán | `DA_SU_DUNG` | Tự động sau POST `/api/ban/:maBan/xac-nhan-thanh-toan` |
 
 ---
 
 ## 14. Phân quyền
 
-| Endpoint | Mức quyền | Ghi chú |
-|----------|-----------|--------|
-| `GET /api/don-hang` | `staff` | Xem tất cả đơn |
-| `GET /api/don-hang/:maDonHang` | `staff` | Chi tiết đơn |
-| `PATCH /api/don-hang/:maDonHang/status` | `staff` | Xác nhận thanh toán / hoàn tiền |
-| `POST /api/ban/:maBan/xac-nhan-thanh-toan` | `staff` | Thanh toán tại bàn |
-| `POST /api/ma-giam-gia/validate` | `public` | Kiểm tra voucher |
+| Vai trò | Quyền truy cập | Ghi chú |
+|---------|----------------|---------|
+| **Nhân viên (Thu ngân)** | Toàn bộ luồng: xem đơn, voucher, thanh toán, in hóa đơn | JWT `VaiTro = NHAN_VIEN`, `ChucNangPhu = THU_NGAN` |
+| **Nhân viên (Phục vụ)** | KHÔNG có quyền thanh toán | FEAT-03 |
+| **Nhân viên (Bếp)** | KHÔNG có quyền thanh toán | FEAT-04 |
+| **Admin** | Xem tất cả thanh toán, quản lý voucher, hoàn tiền | FEAT-06 |
+
+> **Quan trọng:** Quyền thanh toán là **duy nhất** cho Thu ngân.  
+> Endpoint `POST /api/ban/:maBan/xac-nhan-thanh-toan` phải check quyền Thu ngân.
 
 ---
 
 ## 15. Acceptance Criteria
 
-### AC-01: Xem danh sách đơn chờ thanh toán
-- [ ] Hiển thị đúng đơn `SAN_SANG` / `DA_PHUC_VU`
-- [ ] Có filter theo bàn/ngày
-
-### AC-02: Áp voucher
-- [ ] Voucher hợp lệ → hiển thị số tiền giảm
-- [ ] Voucher hết hạn/hết lượt → lỗi rõ ràng
-- [ ] Voucher `CUSTOMER` của người khác → 403
-
-### AC-03: Dùng điểm
-- [ ] Nhập số điểm → kiểm tra điểm khả dụng
-- [ ] Số điểm > điểm hiện tại → lỗi
-- [ ] Tổng thanh toán sau giảm đúng
-
-### AC-04: Xác nhận thanh toán
-- [ ] Chọn phương thức → xác nhận → `DonHang = DA_THANH_TOAN`
-- [ ] Tạo `HoaDon` + `ThanhToan THANH_CONG`
-- [ ] Tích điểm nếu khách có `MaKH`
-- [ ] Cập nhật voucher `SoLanDaDung++`
-- [ ] `Ban → DANG_DON`
-
-### AC-05: Hoàn tiền
-- [ ] `DonHang = DA_HOAN_TIEN`, `ThanhToan = DA_HOAN_TIEN`
-- [ ] Chỉ admin mới hoàn tiền được
-
-### AC-06: In hóa đơn
-- [ ] In tạm tính thành công → PDF đúng chi tiết
-- [ ] In hóa đơn sau thanh toán → PDF đúng tổng tiền, voucher, điểm
+| ID | Criterion | Verification |
+|----|-----------|-------------|
+| AC-01 | Thu ngân đăng nhập → vào `/noi-bo/don-hang`, xem danh sách đơn `HOAN_THANH` | Manual |
+| AC-02 | Đơn `HOAN_THANH` → hiển thị nút "Thanh toán" | Manual |
+| AC-03 | Chọn tiền mặt → nhập số tiền khách đưa → tự tính tiền thừa | Manual |
+| AC-04 | Nhập số tiền不足 → nút "Xác nhận" disabled | Manual |
+| AC-05 | Chọn chuyển khoản → hiển thị QR code | Manual |
+| AC-06 | Áp dụng voucher → tổng tiền giảm đúng | Manual |
+| AC-07 | Voucher không đạt điều kiện → lỗi "Đơn chưa đạt tối thiểu" | Manual |
+| AC-08 | Xác nhận thanh toán → `DonHang` → `DA_THANH_TOAN` | Manual |
+| AC-09 | Sau thanh toán → `Ban` → `DANG_DON` | Manual |
+| AC-10 | Hóa đơn hiển thị đúng thông tin: danh sách món, tổng, giảm giá, thanh toán | Manual |
+| AC-11 | Nhân viên Phục vụ KHÔNG có quyền truy cập `/noi-bo/don-hang` (thanh toán) | Manual |
+| AC-12 | Nhân viên Bếp KHÔNG có quyền thanh toán | Manual |
+| AC-13 | Trạng thái `SAN_SANG`, `DA_PHUC_VU` KHÔNG xuất hiện trong code | Code review |
 
 ---
 
 ## 16. Checklist đối chiếu code hiện tại
 
-| # | Kiểm tra | File kiểm tra | Trạng thái |
-|---|----------|---------------|-----------|
-| 1 | `DonHangNoiBoPage.jsx` có filter trạng thái `SAN_SANG/DA_PHUC_VU` | `frontend/src/pages/noiBo/` | ☐ |
-| 2 | `DonHangChiTietPage.jsx` có form voucher/điểm + nút thanh toán | `frontend/src/pages/noiBo/` | ☐ |
-| 3 | `PATCH /api/don-hang/:maDonHang/status` tạo `HoaDon` + `ThanhToan` | `backend/nest-api/src/modules/don-hang/` | ☐ |
-| 4 | Tích điểm khi `DA_THANH_TOAN` + có `MaKH` | `backend/nest-api/src/modules/don-hang/` | ☐ |
-| 5 | `Ban.TrangThai → DANG_DON` sau `DA_THANH_TOAN` | `backend/nest-api/src/modules/don-hang/` | ☐ |
-| 6 | `HoaDon.MaDonHang` UNIQUE (1 đơn 1 hóa đơn) | `backend/nest-api/src/modules/don-hang/` | ☐ |
-| 7 | Voucher validate đúng (`CUSTOMER/LOYALTY/VIP` enforce ownership) | `backend/nest-api/src/modules/ma-giam-gia/` | ☐ |
-| 8 | `ThanhToan.TrangThai` dùng ENUM Việt | `backend/nest-api/src/common/constants.ts` | ☐ |
+### Routes
+
+| Route | Tồn tại? | Component | Ghi chú |
+|-------|----------|-----------|---------|
+| `/noi-bo/don-hang` | ✅ | `DonHangNoiBo` | Danh sách đơn — frontend hiển thị đơn `HOAN_THANH` cho thu ngân |
+
+### API endpoints
+
+| Endpoint | Tồn tại? | Controller | Ghi chú |
+|----------|----------|-----------|---------|
+| `GET /api/don-hang` | ✅ | `don-hang.controller.ts` | Danh sách đơn — frontend lọc `HOAN_THANH` cho thu ngân |
+| `POST /api/ban/:maBan/xac-nhan-thanh-toan` | ✅ | `ban.controller.ts` | Xác nhận thanh toán — cần check quyền Thu ngân |
+
+### Enum / State — **QUAN TRỌNG**
+
+| Trạng thái cấm | Xuất hiện trong code? | File | Ghi chú |
+|----------------|----------------------|------|---------|
+| `CHO_XU_LY` | ❌ | — | ✅ OK |
+| `DANG_CHE_BIEN` | ❌ | — | ✅ OK |
+| **`SAN_SANG`** | ❌ | — | ✅ OK — **phải dùng `HOAN_THANH`** |
+| **`DA_PHUC_VU`** | ❌ | — | ✅ OK — **dùng cho ChiTietDonHang, KHÔNG dùng cho DonHang** |
+| `DA_DEN` | ❌ | — | ✅ OK |
+
+### Kiểm tra code cụ thể
+
+```bash
+# Trạng thái cũ trong backend
+rg "SAN_SANG" backend/nest-api/src/modules/ --no-heading
+rg "DA_PHUC_VU" backend/nest-api/src/modules/ --no-heading
+
+# Trạng thái cũ trong frontend
+rg "SAN_SANG" frontend/src/ --no-heading
+rg "DA_PHUC_VU" frontend/src/ --no-heading
+```
+
+### Phân quyền
+
+| Kiểm tra | Kết quả | Ghi chú |
+|---------|---------|---------|
+| `@UseGuards(AuthGuard)` trên route thu ngân | ⚠️ | Cần xác minh |
+| `VaiTro` check = `NHAN_VIEN` | ⚠️ | Cần xác minh |
+| `ChucNangPhu` check = `THU_NGAN` | ⚠️ | **Cần kiểm tra** |
+| `POST /api/ban/:maBan/xac-nhan-thanh-toan` check quyền Thu ngân | ⚠️ | **Quan trọng — kiểm tra** |
+
+### Tích hợp với FEAT khác
+
+| FEAT | Mối liên hệ |
+|------|-------------|
+| FEAT-01 | QR ordering → tạo DonHang → khi HOAN_THANH → Thu ngân thanh toán |
+| FEAT-02 | DatBan → khách có thể có voucher |
+| FEAT-03 | Phục vụ chuyển `DANG_PHUC_VU` → `HOAN_THANH` → đơn chờ thanh toán |
+| FEAT-04 | Bếp hoàn thành → ChiTietDonHang `HOAN_THANH` → DonHang `HOAN_THANH` |
+| FEAT-06 | Admin quản lý voucher, xem báo cáo thanh toán |
+| FEAT-07 | State machines chuẩn |
+
+---
+
+*Ghi chú: Thu ngân là người cuối cùng xác nhận thanh toán. `POST /api/ban/:maBan/xac-nhan-thanh-toan` PHẢI check quyền Thu ngân. Sau thanh toán: DonHang → DA_THANH_TOAN, Ban → DANG_DON. Trạng thái `SAN_SANG` và `DA_PHUC_VU` KHÔNG dùng cho DonHang — chỉ dùng cho ChiTietDonHang.*
