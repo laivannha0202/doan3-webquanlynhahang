@@ -31,7 +31,10 @@ export class TaiBanService {
     return this.donHangPaymentStatusService.yeuCauThanhToanTaiBan(maBan);
   }
 
-  xacNhanThanhToanTaiBan(maBan: string) {
-    return this.donHangPaymentStatusService.xacNhanThanhToanTaiBan(maBan);
+  xacNhanThanhToanTaiBan(maBan: string, nguoiDung?: any) {
+    return this.donHangPaymentStatusService.xacNhanThanhToanTaiBan(
+      maBan,
+      nguoiDung,
+    );
   }
 }

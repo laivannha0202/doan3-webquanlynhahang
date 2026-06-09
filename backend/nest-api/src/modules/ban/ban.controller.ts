@@ -14,7 +14,10 @@ import { Throttle } from '@nestjs/throttler';
 import { BanService } from './ban.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
+import { ThuNganGuard } from '../../common/guards/thu-ngan.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
+import { ThuNgan } from '../../common/decorators/thu-ngan.decorator';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Public } from '../../common/decorators/public.decorator';
 import { BanGhi } from '../../common/types';
 
@@ -94,9 +97,13 @@ export class BanController {
     return this.banService.yeuCauThanhToanTaiBan(maBan);
   }
 
-  @Roles('Admin', 'NhanVien')
+  @ThuNgan()
+  @UseGuards(ThuNganGuard)
   @Post(':maBan/xac-nhan-thanh-toan')
-  xacNhanThanhToanTaiBan(@Param('maBan') maBan: string) {
-    return this.banService.xacNhanThanhToanTaiBan(maBan);
+  xacNhanThanhToanTaiBan(
+    @Param('maBan') maBan: string,
+    @CurrentUser() nguoiDung: any,
+  ) {
+    return this.banService.xacNhanThanhToanTaiBan(maBan, nguoiDung);
   }
 }

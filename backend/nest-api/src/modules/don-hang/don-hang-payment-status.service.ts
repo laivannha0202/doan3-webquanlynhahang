@@ -116,11 +116,18 @@ export class DonHangPaymentStatusService {
       );
 
       if (laTrangThaiDonHangKetThuc(trangThai) && don.MaBan) {
-        await this.giaiPhongBanNeuKhongConRangBuoc(
-          ketNoi,
-          don.MaBan,
-          maDonHang,
-        );
+        if (trangThai === 'DA_THANH_TOAN') {
+          await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
+            TRANG_THAI_BAN.DANG_DON,
+            don.MaBan,
+          ]);
+        } else {
+          await this.giaiPhongBanNeuKhongConRangBuoc(
+            ketNoi,
+            don.MaBan,
+            maDonHang,
+          );
+        }
       }
 
       const trangThaiCongDiem = new Set([
@@ -253,7 +260,10 @@ export class DonHangPaymentStatusService {
         'UPDATE DonHang SET TrangThai = ? WHERE MaDonHang = ?',
         ['DA_THANH_TOAN', donHang.MaDonHang],
       );
-      await this.giaiPhongBanNeuKhongConRangBuoc(ketNoi, ma, donHang.MaDonHang);
+      await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
+        TRANG_THAI_BAN.DANG_DON,
+        ma,
+      ]);
 
       if (donHang.MaKH) {
         await this.diemTichLuyService.tinhDiemTuDonHang(

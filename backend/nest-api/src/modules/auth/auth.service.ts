@@ -47,11 +47,12 @@ export class AuthService {
     }
   }
 
-  private taoJwt(nguoiDung: BanGhi) {
+  private taoJwt(nguoiDung: BanGhi, chucVu?: string) {
     return this.jwtService.sign({
       maND: nguoiDung.MaND,
       email: nguoiDung.Email,
       vaiTro: nguoiDung.VaiTro,
+      ...(chucVu ? { chucVu } : {}),
     });
   }
 
@@ -248,9 +249,10 @@ export class AuthService {
       );
     }
 
+    const nhanVien = await this.layNhanVienTheoMaNd(nguoiDung.MaND);
     const khachHang = await layKhachHangTheoMaNd(this.mysql, nguoiDung.MaND);
     const user = this.chuyenNguoiDungSangResponse(nguoiDung, khachHang);
-    const accessToken = this.taoJwt(nguoiDung);
+    const accessToken = this.taoJwt(nguoiDung, nhanVien?.ChucVu);
 
     return taoPhanHoi({ user, accessToken }, 'Đăng nhập thành công');
   }
@@ -310,9 +312,10 @@ export class AuthService {
       throw new UnauthorizedException('Tài khoản không còn hoạt động.');
     }
 
+    const nhanVien = await this.layNhanVienTheoMaNd(giaiMa.maND);
     const khachHang = await layKhachHangTheoMaNd(this.mysql, nguoiDung.MaND);
     const user = this.chuyenNguoiDungSangResponse(nguoiDung, khachHang);
-    const accessToken = this.taoJwt(nguoiDung);
+    const accessToken = this.taoJwt(nguoiDung, nhanVien?.ChucVu);
     const refreshTokenMoi = this.taoRefreshToken(nguoiDung);
 
     return taoPhanHoi(
@@ -329,9 +332,11 @@ export class AuthService {
       throw new NotFoundException('Không tìm thấy người dùng.');
     }
 
+    const nhanVien = await this.layNhanVienTheoMaNd(String(thongTinToken.maND));
     const khachHang = await layKhachHangTheoMaNd(this.mysql, nguoiDung.MaND);
+    const response = this.chuyenNguoiDungSangResponse(nguoiDung, khachHang);
     return taoPhanHoi(
-      this.chuyenNguoiDungSangResponse(nguoiDung, khachHang),
+      { ...response, chucVu: nhanVien?.ChucVu || '' },
       'Lấy thông tin thành công',
     );
   }

@@ -52,7 +52,7 @@ export class BanService {
     return this.taiBanService.yeuCauThanhToanTaiBan(maBan);
   }
 
-  xacNhanThanhToanTaiBan(maBan: string) {
-    return this.taiBanService.xacNhanThanhToanTaiBan(maBan);
+  xacNhanThanhToanTaiBan(maBan: string, nguoiDung?: any) {
+    return this.taiBanService.xacNhanThanhToanTaiBan(maBan, nguoiDung);
   }
 }

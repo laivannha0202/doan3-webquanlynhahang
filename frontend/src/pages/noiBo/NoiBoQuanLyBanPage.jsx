@@ -137,6 +137,13 @@ function NoiBoQuanLyBanPage() {
       await xacNhanThanhToanTaiBanApi(ban.code)
       setOrderDangXem(null)
       await taiLai()
+    } catch (error) {
+      const thongBao = error?.message || 'Không thể xác nhận thanh toán.'
+      if (String(thongBao).includes('403') || String(thongBao).includes('Forbidden') || String(thongBao).includes('thu ngan') || String(thongBao).includes('xác nhận thanh toán')) {
+        message.warning('Chỉ thu ngân hoặc quản lý được xác nhận thanh toán.')
+      } else {
+        message.error(thongBao)
+      }
     } finally {
       setDangXuLy('')
     }
