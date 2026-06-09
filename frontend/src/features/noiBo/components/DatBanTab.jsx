@@ -61,7 +61,7 @@ const KIEU_MUC_FORM_GON = { marginBottom: 12 }
 
 const TRANG_THAI_DAT_BAN = Object.freeze({
   DA_XAC_NHAN: 'DA_XAC_NHAN',
-  CAN_GOI_LAI: 'CAN_GOI_LAI',
+  CHO_XAC_NHAN: 'CHO_XAC_NHAN',
   TU_CHOI_HET_CHO: 'TU_CHOI_HET_CHO',
 })
 
@@ -85,7 +85,7 @@ const QUICK_FILTERS = [
   { key: 'pending', label: 'Chờ xác nhận' },
 ]
 
-const PENDING_STATUS_SET = new Set([...CAC_TRANG_THAI_DAT_BAN_CHO_XAC_NHAN, 'PENDING', 'Pending'])
+const PENDING_STATUS_SET = new Set([...CAC_TRANG_THAI_DAT_BAN_CHO_XAC_NHAN])
 
 const CREATE_STATUS_OPTIONS = CAC_TRANG_THAI_TAO_DAT_BAN_NOI_BO.filter((status) => Boolean(HOST_NHAN_TRANG_THAI_DAT_BAN[status]))
 
@@ -459,7 +459,7 @@ function TheBookingDatBan({ booking, onEdit, onAssign, onConfirmAction, onQuickS
                   <Button type="primary" size="small" icon={<CheckCircleOutlined />} onClick={() => onQuickStatusChange(booking, TRANG_THAI_DAT_BAN.DA_XAC_NHAN)}>
                     Duyệt booking
                   </Button>
-                  <Button size="small" icon={<PhoneOutlined />} onClick={() => onQuickStatusChange(booking, TRANG_THAI_DAT_BAN.CAN_GOI_LAI)}>
+                  <Button size="small" icon={<PhoneOutlined />} onClick={() => onQuickStatusChange(booking, TRANG_THAI_DAT_BAN.CHO_XAC_NHAN)}>
                     Cần gọi lại
                   </Button>
                   <Button size="small" danger icon={<StopOutlined />} onClick={() => onQuickStatusChange(booking, TRANG_THAI_DAT_BAN.TU_CHOI_HET_CHO)}>

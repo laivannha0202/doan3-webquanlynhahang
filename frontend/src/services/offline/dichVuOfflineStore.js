@@ -564,7 +564,7 @@ export const taoHoacCapNhatDonHangOffline = (orderInput, options = {}) => {
       maNV: orderInput.maNV || orderInput.MaNV || mucHienTai.maNV || '',
       maDatBan: orderInput.maDatBan || orderInput.MaDatBan || mucHienTai.maDatBan || '',
       loaiDon: orderInput.loaiDon || orderInput.LoaiDon || mucHienTai.loaiDon || 'TAI_BAN',
-      trangThai: orderInput.trangThai || orderInput.TrangThai || orderInput.status || mucHienTai.trangThai || 'Pending',
+      trangThai: orderInput.trangThai || orderInput.TrangThai || orderInput.status || mucHienTai.trangThai || 'DANG_CHUAN_BI',
       tongTien,
       total: tongTien,
       ngayTao: orderInput.ngayTao || orderInput.NgayTao || orderInput.orderDate || mucHienTai.ngayTao || new Date().toISOString(),
@@ -659,7 +659,7 @@ export const taoHoacCapNhatDonHangOffline = (orderInput, options = {}) => {
 export const capNhatTrangThaiDonHangOffline = (maDonHang, trangThai) => taoHoacCapNhatDonHangOffline({ trangThai, status: trangThai }, { maDonHang })
 
 export const layDonHangCoTheDanhGiaOffline = (maKH) => docDuLieuOffline((state) => state.donHang
-  .filter((order) => String(order.maKH || '') === String(maKH || '') && String(order.trangThai || '') === 'Paid')
+  .filter((order) => String(order.maKH || '') === String(maKH || '') && String(order.trangThai || '') === 'DA_THANH_TOAN')
   .map((order) => ({
     maDonHang: order.maDonHang,
     chiTiet: deepClone(order.items || []).map((item) => ({
@@ -791,9 +791,9 @@ export const taoHoacCapNhatDatBanOffline = ({ booking, maDatBan }) => {
       email: booking.emailDatBan || booking.email || mucHienTai.emailDatBan || mucHienTai.email || '',
       emailDatBan: booking.emailDatBan || booking.email || mucHienTai.emailDatBan || mucHienTai.email || '',
       EmailDatBan: booking.emailDatBan || booking.email || mucHienTai.EmailDatBan || mucHienTai.emailDatBan || '',
-      status: booking.trangThai || booking.status || mucHienTai.trangThai || mucHienTai.status || 'Pending',
-      trangThai: booking.trangThai || booking.status || mucHienTai.trangThai || mucHienTai.status || 'Pending',
-      TrangThai: booking.trangThai || booking.status || mucHienTai.TrangThai || mucHienTai.trangThai || 'Pending',
+      status: booking.trangThai || booking.status || mucHienTai.trangThai || mucHienTai.status || 'CHO_XAC_NHAN',
+      trangThai: booking.trangThai || booking.status || mucHienTai.trangThai || mucHienTai.status || 'CHO_XAC_NHAN',
+      TrangThai: booking.trangThai || booking.status || mucHienTai.TrangThai || mucHienTai.trangThai || 'CHO_XAC_NHAN',
       danhSachMaBanDaGan,
       danhSachBanDaGan,
       maBan: danhSachMaBanDaGan[0] || '',
@@ -846,7 +846,7 @@ export const taoHoacCapNhatDatBanOffline = ({ booking, maDatBan }) => {
       rawStatus: baseData.status,
       status: baseData.status,
       statusLabel: baseData.status,
-      statusTone: baseData.status === 'Confirmed' ? 'success' : baseData.status === 'Cancelled' ? 'danger' : 'warning',
+      statusTone: baseData.status === 'DA_XAC_NHAN' || baseData.status === 'DA_NHAN_BAN' ? 'success' : baseData.status === 'DA_HUY' || baseData.status === 'KHONG_DEN' ? 'danger' : 'warning',
     }
 
     draft.heThong.lichSuDatBanTheoKhachHang = {

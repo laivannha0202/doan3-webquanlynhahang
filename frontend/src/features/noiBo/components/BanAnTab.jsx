@@ -147,9 +147,9 @@ const chuanHoaTrangThaiChoPos = (trangThai = '') => {
   const chuanHoa = chuanHoaTrangThaiBan(trangThai)
 
   if (chuanHoa === 'TRONG') return 'AVAILABLE'
-  if (chuanHoa === 'GIU_CHO') return 'HELD'
+  if (chuanHoa === 'DA_DAT') return 'HELD'
   if (chuanHoa === 'CO_KHACH') return 'OCCUPIED'
-  if (chuanHoa === 'CAN_DON') return 'DIRTY'
+  if (chuanHoa === 'BAO_TRI') return 'DIRTY'
 
   return 'DIRTY'
 }

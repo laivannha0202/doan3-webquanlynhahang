@@ -55,38 +55,26 @@ export const NHAN_GOI_Y_KHU_VUC_DAT_BAN = {
 }
 
 export const NHAN_TRANG_THAI_DAT_BAN = {
-  YEU_CAU_DAT_BAN: '🟡 Yêu cầu đặt bàn',
-  GIU_CHO_TAM: '🟠 Đã giữ chỗ tạm',
+  CHO_XAC_NHAN: '🟡 Yêu cầu đặt bàn',
   DA_XAC_NHAN: '🟢 Đặt bàn thành công',
-  CAN_GOI_LAI: '📞 Cần host gọi lại',
   TU_CHOI_HET_CHO: '🔴 Từ chối / hết chỗ',
 }
 
 export const HOST_NHAN_TRANG_THAI_DAT_BAN = {
-  YEU_CAU_DAT_BAN: 'Yêu cầu đặt bàn',
-  Pending: 'Chờ xác nhận',
-  GIU_CHO_TAM: 'Đã giữ chỗ tạm',
-  DA_XAC_NHAN: 'Đã xác nhận',
-  Confirmed: 'Đã xác nhận',
-  CAN_GOI_LAI: 'Cần gọi lại',
-  TU_CHOI_HET_CHO: 'Từ chối / hết chỗ',
   CHO_XAC_NHAN: 'Chờ xác nhận',
-  DA_GHI_NHAN: 'Đã ghi nhận',
-  DA_CHECK_IN: 'Đã check-in',
-  DA_XEP_BAN: 'Đã vào bàn',
-  DA_HOAN_THANH: 'Đã hoàn thành',
+  DA_XAC_NHAN: 'Đã xác nhận',
+  DA_NHAN_BAN: 'Đã nhận bàn',
+  HOAN_THANH: 'Đã hoàn thành',
   DA_HUY: 'Đã hủy',
   KHONG_DEN: 'Không đến',
+  TU_CHOI_HET_CHO: 'Từ chối / hết chỗ',
 }
 
 export const CAC_THAO_TAC_TRANG_THAI_DAT_BAN_HOST = [
-  'YEU_CAU_DAT_BAN',
-  'GIU_CHO_TAM',
+  'CHO_XAC_NHAN',
   'DA_XAC_NHAN',
-  'CAN_GOI_LAI',
-  'DA_CHECK_IN',
-  'DA_XEP_BAN',
-  'DA_HOAN_THANH',
+  'DA_NHAN_BAN',
+  'HOAN_THANH',
   'DA_HUY',
   'KHONG_DEN',
   'TU_CHOI_HET_CHO',
@@ -95,5 +83,4 @@ export const CAC_THAO_TAC_TRANG_THAI_DAT_BAN_HOST = [
 export const CAC_TRANG_THAI_TAO_DAT_BAN_NOI_BO = [
   'CHO_XAC_NHAN',
   'DA_XAC_NHAN',
-  'CAN_GOI_LAI',
 ]

@@ -1,17 +1,7 @@
 export const CAC_TRANG_THAI_DAT_BAN_DANG_MO = new Set([
-  'PENDING',
-  'Pending',
-  'CONFIRMED',
-  'Confirmed',
-  'SEATED',
-  'Seated',
   'CHO_XAC_NHAN',
   'DA_XAC_NHAN',
-  'DA_GAN_BAN',
-  'KHACH_SAP_DEN',
-  'DA_CHECK_IN',
-  'DA_XEP_BAN',
-  'DA_GHI_NHAN',
+  'DA_NHAN_BAN',
   'DANG_PHUC_VU',
 ])
 

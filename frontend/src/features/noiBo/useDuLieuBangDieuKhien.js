@@ -229,7 +229,7 @@ export const useDuLieuBangDieuKhien = () => {
   }, [danhDauKhongDen, taiLaiDuLieu])
 
   const xuLyDanhDauBanBan = useCallback(async (tableId) => {
-    await capNhatTrangThaiBanApi(tableId, 'CAN_DON')
+    await capNhatTrangThaiBanApi(tableId, 'BAO_TRI')
     await taiLaiDuLieu()
   }, [taiLaiDuLieu])
 

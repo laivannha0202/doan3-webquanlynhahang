@@ -161,7 +161,7 @@ const timOrderDangMoTheoBan = (maBan) => {
   }
 
   const candidate = timDonHangOfflineTheoMa(ban.activeOrderCode || '')
-  if (candidate && !['Paid', 'Completed', 'Cancelled'].includes(candidate.trangThai)) {
+  if (candidate && !['DA_THANH_TOAN', 'HOAN_THANH', 'DA_HUY'].includes(candidate.trangThai)) {
     return candidate
   }
 
@@ -288,7 +288,7 @@ export const guiOrderTaiBanApi = async (maBan, danhSachMon) => {
         orderCode: maDonHang,
         maKH: '',
         loaiDon: 'TAI_BAN',
-        trangThai: 'Preparing',
+        trangThai: 'DANG_CHUAN_BI',
         tongTien,
         ngayTao: new Date().toISOString(),
         customer: { fullName: '', phone: '', email: '', address: '' },
@@ -368,7 +368,7 @@ export const xacNhanThanhToanTaiBanApi = async (maBan) => {
 
       const donHang = draft.donHang.find((item) => String(item.maDonHang || '') === String(ban.activeOrderCode || ''))
       if (donHang) {
-        donHang.trangThai = 'Paid'
+        donHang.trangThai = 'DA_THANH_TOAN'
       }
 
       ban.status = 'TRONG'

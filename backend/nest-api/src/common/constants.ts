@@ -52,11 +52,10 @@ export const TRANG_THAI_BAN = {
 export const TRANG_THAI_DAT_BAN = {
   CHO_XAC_NHAN: 'CHO_XAC_NHAN',
   DA_XAC_NHAN: 'DA_XAC_NHAN',
-  DA_DEN: 'DA_DEN',
+  DA_NHAN_BAN: 'DA_NHAN_BAN',
   HOAN_THANH: 'HOAN_THANH',
-  DA_HUY: 'DA_HUY',
   KHONG_DEN: 'KHONG_DEN',
-  HET_HAN: 'HET_HAN',
+  DA_HUY: 'DA_HUY',
 } as const;
 
 export const TRANG_THAI_BAN_KHONG_THE_DAT = [
@@ -76,60 +75,49 @@ export function chuanHoaTrangThaiBan(trangThai: string): string {
   return TRANG_THAI_BAN.BAO_TRI;
 }
 
-// ========== Trạng thái đơn hàng (theo Q1: ENUM Việt) ==========
+// ========== Trạng thái đơn hàng (FEAT-07) ==========
 
 export const TRANG_THAI_DON_HANG = {
-  CHO_XU_LY: 'CHO_XU_LY',
-  DA_XAC_NHAN: 'DA_XAC_NHAN',
-  DANG_CHE_BIEN: 'DANG_CHE_BIEN',
-  SAN_SANG: 'SAN_SANG',
-  DA_PHUC_VU: 'DA_PHUC_VU',
+  DANG_CHUAN_BI: 'DANG_CHUAN_BI',
+  DANG_PHUC_VU: 'DANG_PHUC_VU',
   HOAN_THANH: 'HOAN_THANH',
-  DA_HUY: 'DA_HUY',
   DA_THANH_TOAN: 'DA_THANH_TOAN',
-  DA_HOAN_TIEN: 'DA_HOAN_TIEN',
+  DA_HUY: 'DA_HUY',
 } as const;
 
-export const TRANG_THAI_DON_HANG_DANG_MO = new Set([
-  TRANG_THAI_DON_HANG.CHO_XU_LY,
-  TRANG_THAI_DON_HANG.DA_XAC_NHAN,
-  TRANG_THAI_DON_HANG.DANG_CHE_BIEN,
-  TRANG_THAI_DON_HANG.SAN_SANG,
-  TRANG_THAI_DON_HANG.DA_PHUC_VU,
+export const TRANG_THAI_DON_HANG_DANG_MO = new Set<string>([
+  TRANG_THAI_DON_HANG.DANG_CHUAN_BI,
+  TRANG_THAI_DON_HANG.DANG_PHUC_VU,
 ]);
 
-export const TRANG_THAI_DON_HANG_KET_THUC = new Set([
+export const TRANG_THAI_DON_HANG_KET_THUC = new Set<string>([
   TRANG_THAI_DON_HANG.HOAN_THANH,
   TRANG_THAI_DON_HANG.DA_THANH_TOAN,
-  TRANG_THAI_DON_HANG.DA_HOAN_TIEN,
   TRANG_THAI_DON_HANG.DA_HUY,
 ]);
 
 // ========== Trạng thái đặt bàn (theo Q1: ENUM Việt) ==========
 
-export const TRANG_THAI_DAT_BAN_GIU_BAN = new Set([
+export const TRANG_THAI_DAT_BAN_GIU_BAN = new Set<string>([
   TRANG_THAI_DAT_BAN.CHO_XAC_NHAN,
   TRANG_THAI_DAT_BAN.DA_XAC_NHAN,
 ]);
 
-export const TRANG_THAI_DAT_BAN_SU_DUNG_BAN = new Set([
-  TRANG_THAI_DAT_BAN.DA_DEN,
+export const TRANG_THAI_DAT_BAN_SU_DUNG_BAN = new Set<string>([
+  TRANG_THAI_DAT_BAN.DA_NHAN_BAN,
 ]);
 
-export const TRANG_THAI_DAT_BAN_KET_THUC = new Set([
+export const TRANG_THAI_DAT_BAN_KET_THUC = new Set<string>([
   TRANG_THAI_DAT_BAN.HOAN_THANH,
   TRANG_THAI_DAT_BAN.DA_HUY,
   TRANG_THAI_DAT_BAN.KHONG_DEN,
-  TRANG_THAI_DAT_BAN.HET_HAN,
 ]);
 
 // ========== Trạng thái chi tiết đơn hàng (theo Q1: ENUM Việt) ==========
 
 export const TRANG_THAI_CHI_TIET_DON_HANG = {
-  CHO_CHE_BIEN: 'CHO_CHE_BIEN',
-  DANG_CHE_BIEN: 'DANG_CHE_BIEN',
-  SAN_SANG: 'SAN_SANG',
-  DA_PHUC_VU: 'DA_PHUC_VU',
+  DANG_CHUAN_BI: 'DANG_CHUAN_BI',
+  DANG_PHUC_VU: 'DANG_PHUC_VU',
   HOAN_THANH: 'HOAN_THANH',
   DA_HUY: 'DA_HUY',
 } as const;
@@ -137,7 +125,6 @@ export const TRANG_THAI_CHI_TIET_DON_HANG = {
 // ========== Trạng thái thanh toán (theo Q1: ENUM Việt) ==========
 
 export const TRANG_THAI_THANH_TOAN = {
-  CHO_THANH_TOAN: 'CHO_THANH_TOAN',
   THANH_CONG: 'THANH_CONG',
   THAT_BAI: 'THAT_BAI',
   DA_HOAN_TIEN: 'DA_HOAN_TIEN',

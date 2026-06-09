@@ -203,7 +203,7 @@ const tinhTinhTrangKhungGio = ({ date, time, tables = [], bookings = [] }) => {
     : 0
 
   const soDatBanCungKhungGio = Array.isArray(bookings)
-    ? bookings.filter((booking) => booking?.date === date && booking?.time === time && booking?.status !== 'Cancelled' && booking?.status !== 'DA_HUY' && booking?.status !== 'KHONG_DEN' && booking?.status !== 'NoShow' && booking?.status !== 'Completed' && booking?.status !== 'Expired' && booking?.status !== 'DA_HOAN_THANH' && booking?.status !== 'TU_CHOI_HET_CHO').length
+    ? bookings.filter((booking) => booking?.date === date && booking?.time === time && booking?.status !== 'DA_HUY' && booking?.status !== 'KHONG_DEN' && booking?.status !== 'HOAN_THANH' && booking?.status !== 'TU_CHOI_HET_CHO').length
     : 0
 
   const soBanConLai = Math.max(0, tongBanSanSang - soDatBanCungKhungGio)
@@ -777,7 +777,7 @@ const handleSubmit = async () => {
     try {
       const confirmationPayload = {
         bookingCode: taoMaTam(),
-        status: 'Pending',
+        status: 'CHO_XAC_NHAN',
         bookingId: undefined,
       }
 

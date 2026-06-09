@@ -11,7 +11,7 @@ function NoiBoDonHangPage() {
   } = useOutletContext()
 
   const donChoXuLy = useMemo(
-    () => danhSachDonHangDaSapXep.filter((order) => ['Pending', 'Confirmed', 'Preparing', 'Ready', 'Served'].includes(order.status)).length,
+    () => danhSachDonHangDaSapXep.filter((order) => ['DANG_CHUAN_BI', 'DANG_PHUC_VU'].includes(order.status)).length,
     [danhSachDonHangDaSapXep],
   )
 

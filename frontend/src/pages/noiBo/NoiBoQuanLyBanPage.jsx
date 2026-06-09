@@ -11,9 +11,9 @@ import { dinhDangTienTeVietNam } from '../../utils/tienTe'
 const DANH_SACH_KHU_VUC = DANH_SACH_TEN_KHU_VUC_BAN
 const NHAN_TRANG_THAI = {
   TRONG: { label: 'TRỐNG', color: 'green' },
-  GIU_CHO: { label: 'ĐÃ ĐẶT', color: 'orange' },
+  DA_DAT: { label: 'ĐÃ ĐẶT', color: 'orange' },
   CO_KHACH: { label: 'ĐANG PHỤC VỤ', color: 'red' },
-  CAN_DON: { label: 'BẢO TRÌ', color: 'default' },
+  BAO_TRI: { label: 'BẢO TRÌ', color: 'default' },
 }
 
 const trangThaiNoiBo = (trangThai) => chuanHoaTrangThaiBan(trangThai)
@@ -54,9 +54,9 @@ function NoiBoQuanLyBanPage() {
   const thongKe = useMemo(() => ({
     tong: danhSachBan.length,
     trong: danhSachBan.filter((ban) => trangThaiNoiBo(ban.status) === 'TRONG').length,
-    giuCho: danhSachBan.filter((ban) => trangThaiNoiBo(ban.status) === 'GIU_CHO').length,
+    giuCho: danhSachBan.filter((ban) => trangThaiNoiBo(ban.status) === 'DA_DAT').length,
     coKhach: danhSachBan.filter((ban) => trangThaiNoiBo(ban.status) === 'CO_KHACH').length,
-    canDon: danhSachBan.filter((ban) => trangThaiNoiBo(ban.status) === 'CAN_DON').length,
+    canDon: danhSachBan.filter((ban) => trangThaiNoiBo(ban.status) === 'BAO_TRI').length,
   }), [danhSachBan])
 
   const danhSachHienThi = useMemo(() => danhSachBan.filter((ban) => {
@@ -208,7 +208,7 @@ function NoiBoQuanLyBanPage() {
 
       <Card title="Quản lý bàn" extra={<Button type="primary" icon={<PlusOutlined />} onClick={moModalThem}>Thêm bàn</Button>}>
         <Space wrap style={{ marginBottom: 16 }}>
-          <Segmented options={[{ label: 'Tất cả', value: 'ALL' }, { label: 'Trống', value: 'TRONG' }, { label: 'Đã đặt', value: 'GIU_CHO' }, { label: 'Đang phục vụ', value: 'CO_KHACH' }, { label: 'Bảo trì', value: 'CAN_DON' }]} value={boLocTrangThai} onChange={setBoLocTrangThai} />
+          <Segmented options={[{ label: 'Tất cả', value: 'ALL' }, { label: 'Trống', value: 'TRONG' }, { label: 'Đã đặt', value: 'DA_DAT' }, { label: 'Đang phục vụ', value: 'CO_KHACH' }, { label: 'Bảo trì', value: 'BAO_TRI' }]} value={boLocTrangThai} onChange={setBoLocTrangThai} />
           <Select value={boLocKhuVuc} onChange={setBoLocKhuVuc} style={{ minWidth: 180 }} options={['Tất cả', ...DANH_SACH_KHU_VUC].map((muc) => ({ label: muc, value: muc }))} />
         </Space>
         <Table rowKey="code" loading={dangTai} columns={cotBan} dataSource={danhSachHienThi} pagination={{ pageSize: 8 }} scroll={{ x: 920 }} />

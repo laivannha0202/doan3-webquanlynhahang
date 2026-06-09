@@ -12,7 +12,7 @@ describe('DatBanQueryService', () => {
               NgayDat: '2026-05-20',
               GioDat: '12:00:00',
               SoNguoi: 2,
-              TrangThai: 'Pending',
+              TrangThai: 'CHO_XAC_NHAN',
               ChiTietMonAn: null,
             },
           ]);
@@ -72,7 +72,7 @@ describe('DatBanQueryService', () => {
               NgayDat: '2026-05-24',
               GioDat: '18:30:00',
               SoNguoi: 3,
-              TrangThai: 'Confirmed',
+              TrangThai: 'DA_XAC_NHAN',
               ChiTietMonAn: JSON.stringify([
                 { maMon: 'M003', soLuong: 1 },
                 { maMon: 'M008', soLuong: 2 },
@@ -128,14 +128,14 @@ describe('DatBanQueryService', () => {
             TenBan: 'Bàn 1',
             SoBan: 1,
             SoChoNgoi: 4,
-            TrangThai: 'Reserved',
+            TrangThai: 'DA_DAT',
           },
           {
             MaBan: 'B002',
             TenBan: 'Bàn 2',
             SoBan: 2,
             SoChoNgoi: 4,
-            TrangThai: 'Available',
+            TrangThai: 'TRONG',
           },
         ])
         .mockResolvedValueOnce([]),
@@ -150,7 +150,7 @@ describe('DatBanQueryService', () => {
 
     expect((response.data as any).tongBanConTrong).toBe(1);
     expect((response.data as any).danhSachBan).toEqual([
-      expect.objectContaining({ maBan: 'B002', trangThai: 'Available' }),
+      expect.objectContaining({ maBan: 'B002', trangThai: 'TRONG' }),
     ]);
   });
 
@@ -164,14 +164,14 @@ describe('DatBanQueryService', () => {
               TenBan: 'Bàn 1',
               SoBan: 1,
               SoChoNgoi: 4,
-              TrangThai: 'Available',
+              TrangThai: 'TRONG',
             },
             {
               MaBan: 'B002',
               TenBan: 'Bàn 2',
               SoBan: 2,
               SoChoNgoi: 4,
-              TrangThai: 'Available',
+              TrangThai: 'TRONG',
             },
           ];
         }
@@ -188,7 +188,7 @@ describe('DatBanQueryService', () => {
               NgayDat: '2026-05-21',
               GioDat: '12:00:00',
               GioKetThuc: '13:30:00',
-              TrangThai: 'Expired',
+              TrangThai: 'KHONG_DEN',
             },
           ];
         }

@@ -55,7 +55,7 @@ export class ThongKeService {
       JOIN DanhMuc dm ON dm.MaDanhMuc = td.MaDanhMuc
       JOIN DonHang dh ON dh.MaDonHang = ct.MaDonHang
       JOIN HoaDon hd ON hd.MaDonHang = dh.MaDonHang
-      WHERE dh.TrangThai NOT IN ('Cancelled')
+      WHERE dh.TrangThai NOT IN ('DA_HUY')
       ${dateFilter}
       GROUP BY td.MaMon, td.TenMon, dm.TenDanhMuc
       ORDER BY TongSoLuong DESC
@@ -94,12 +94,12 @@ export class ThongKeService {
         `SELECT COUNT(*) AS soBanBan
          FROM Ban
          WHERE TrangThai = ?`,
-        [TRANG_THAI_BAN.DANG_SU_DUNG],
+        [TRANG_THAI_BAN.CO_KHACH],
       ),
       this.mysql.truyVan(
         `SELECT COUNT(*) AS soDonCho
          FROM DonHang
-         WHERE TrangThai IN ('Pending', 'Preparing')`,
+          WHERE TrangThai IN ('DANG_CHUAN_BI', 'DANG_PHUC_VU')`,
       ),
     ]);
 
@@ -132,7 +132,7 @@ export class ThongKeService {
       SELECT COUNT(*) AS tongBooking
       FROM DatBan
       WHERE NgayDat >= ? AND NgayDat < ?
-      AND TrangThai NOT IN ('Cancelled', 'NoShow')
+      AND TrangThai NOT IN ('DA_HUY', 'KHONG_DEN')
     `,
       [layDauNgayVN(tuNgay), layDauNgayTiepTheoVN(denNgay)],
     );

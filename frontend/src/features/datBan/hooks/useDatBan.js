@@ -164,12 +164,12 @@ export const useDatBan = () => {
   )
 
   const danhDauDaCheckIn = useCallback(
-    async (bookingId) => capNhatTrangThaiDatBan(bookingId, 'DA_CHECK_IN', 'Không thể check-in đặt bàn.'),
+    async (bookingId) => capNhatTrangThaiDatBan(bookingId, 'DA_NHAN_BAN', 'Không thể check-in đặt bàn.'),
     [capNhatTrangThaiDatBan],
   )
 
   const danhDauHoanThanh = useCallback(
-    async (bookingId) => capNhatTrangThaiDatBan(bookingId, 'DA_HOAN_THANH', 'Không thể hoàn thành booking.'),
+    async (bookingId) => capNhatTrangThaiDatBan(bookingId, 'HOAN_THANH', 'Không thể hoàn thành booking.'),
     [capNhatTrangThaiDatBan],
   )
 

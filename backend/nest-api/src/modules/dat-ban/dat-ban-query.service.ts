@@ -333,9 +333,9 @@ export class DatBanQueryService {
       .filter((ban) => !tapBanDaDuocDung.has(String(ban.MaBan || '').trim()))
       .filter(
         (ban) =>
-          String(ban.TrangThai || '') !== TRANG_THAI_BAN.DANG_SU_DUNG &&
-          String(ban.TrangThai || '') !== TRANG_THAI_BAN.GIU_CHO &&
-          String(ban.TrangThai || '') !== TRANG_THAI_BAN.BAN,
+          String(ban.TrangThai || '') !== TRANG_THAI_BAN.CO_KHACH &&
+          String(ban.TrangThai || '') !== TRANG_THAI_BAN.DA_DAT &&
+          String(ban.TrangThai || '') !== TRANG_THAI_BAN.BAO_TRI,
       )
       .filter((ban) => {
         if (!khuVuc || khuVuc === 'KHONG_UU_TIEN') return true;

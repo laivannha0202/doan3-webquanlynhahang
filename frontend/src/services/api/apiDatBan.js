@@ -136,7 +136,7 @@ export const layKhaDungDatBanApi = async ({ ngayDat, gioDat, soNguoi = 0, khuVuc
       const khopKhuVuc = khuVuc === 'KHONG_UU_TIEN' || chuanHoaMaKhuVucBan(ban.areaId || ban.rawAreaText || '') === chuanHoaMaKhuVucBan(khuVuc)
       const khopSoNguoi = Number(ban.capacity || 0) >= Number(soNguoi || 0)
       return khopKhuVuc && khopSoNguoi && banKhaDungDat(ban.status)
-    }).length - danhSachDatBan.filter((booking) => String(booking.date || booking.ngayDat || '') === ngayDaChuanHoa && String(booking.time || booking.gioDat || '') === String(gioDat || '').trim() && !['Cancelled', 'DA_HUY', 'KHONG_DEN', 'Completed', 'Expired', 'NoShow', 'DA_HOAN_THANH', 'TU_CHOI_HET_CHO'].includes(String(booking.status || booking.trangThai || ''))).length
+    }).length - danhSachDatBan.filter((booking) => String(booking.date || booking.ngayDat || '') === ngayDaChuanHoa && String(booking.time || booking.gioDat || '') === String(gioDat || '').trim() && !['DA_HUY', 'KHONG_DEN', 'HOAN_THANH', 'TU_CHOI_HET_CHO'].includes(String(booking.status || booking.trangThai || ''))).length
     const tongPhuHop = Math.max(0, tongBanPhuHop)
     const mucKhaDung = tongPhuHop <= 0 ? 'FULL' : tongPhuHop <= 2 ? 'LIMITED' : 'AVAILABLE'
 
@@ -195,8 +195,8 @@ export const ganBanChoDatBanApi = async (id, danhSachIdBan = []) => {
 
 export const huyDatBanApi = async (id) => {
   if (!coSuDungMayChu()) {
-    return tachVaChuanHoa(tachPhanHoiApi(taoPhanHoiOffline(capNhatTrangThaiDatBanOffline(id, 'Cancelled'), 'Huy dat ban thanh cong')))
+    return tachVaChuanHoa(tachPhanHoiApi(taoPhanHoiOffline(capNhatTrangThaiDatBanOffline(id, 'DA_HUY'), 'Huy dat ban thanh cong')))
   }
 
-  return tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.patch(`/dat-ban/${id}/status`, { trangThai: 'Cancelled' })))
+  return tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.patch(`/dat-ban/${id}/status`, { trangThai: 'DA_HUY' })))
 }

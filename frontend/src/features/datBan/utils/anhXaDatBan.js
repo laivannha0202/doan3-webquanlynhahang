@@ -5,21 +5,13 @@ export const dinhDangNgayGioDatBan = (booking) => `${dinhDangNgay(booking.date)}
 
 const anhXaTrangThaiDatBan = (status) => {
   if (!status) return '🟡 Yêu cầu đặt bàn'
-  if (status === 'Pending') return '🟡 Yêu cầu đặt bàn'
-  if (status === 'Confirmed') return '🟢 Đã xác nhận'
-  if (status === 'Cancelled') return '🔴 Đã hủy'
-  if (status === 'NoShow') return '⚫ Không đến'
-  if (status === 'Completed') return '⚪ Đã hoàn thành'
-  if (status === 'CHO_XAC_NHAN' || status === 'YEU_CAU_DAT_BAN') return '🟡 Yêu cầu đặt bàn'
-  if (status === 'GIU_CHO_TAM') return '🟠 Đã giữ chỗ tạm'
+  if (status === 'CHO_XAC_NHAN') return '🟡 Yêu cầu đặt bàn'
   if (status === 'DA_XAC_NHAN') return '🟢 Đã xác nhận'
-  if (status === 'CAN_GOI_LAI') return '📞 Cần gọi lại'
-  if (status === 'DA_CHECK_IN') return '🟣 Đã check-in'
-  if (status === 'DA_XEP_BAN') return '🍽️ Đã vào bàn'
-  if (status === 'TU_CHOI_HET_CHO') return '🔴 Từ chối / hết chỗ'
+  if (status === 'DA_NHAN_BAN') return '🟣 Đã nhận bàn'
+  if (status === 'HOAN_THANH') return '⚪ Đã hoàn thành'
   if (status === 'DA_HUY') return '🔴 Đã hủy'
   if (status === 'KHONG_DEN') return '⚫ Không đến'
-  if (status === 'DA_HOAN_THANH') return '⚪ Đã hoàn thành'
+  if (status === 'TU_CHOI_HET_CHO') return '🔴 Từ chối / hết chỗ'
   return status
 }
 
@@ -40,7 +32,7 @@ export const chuanHoaDatBan = (booking) => {
     return null
   }
 
-  const normalizedStatus = String(booking.status || booking.trangThai || 'Pending').trim() || 'Pending'
+  const normalizedStatus = String(booking.status || booking.trangThai || 'CHO_XAC_NHAN').trim() || 'CHO_XAC_NHAN'
   const danhSachMaBanDaGan = chuanHoaDanhSachIdBanDaGan(booking.danhSachMaBanDaGan)
 
   return {
@@ -108,6 +100,6 @@ export const anhXaMucDatBan = (booking) => ({
   rawStatus: booking.status || 'CHO_XAC_NHAN',
   status: anhXaTrangThaiDatBan(booking.status),
   statusLabel: anhXaTrangThaiDatBan(booking.status).replace(/^[^\s]+\s/, ''),
-  statusTone: booking.status === 'Confirmed' ? 'success' : booking.status === 'Cancelled' ? 'danger' : booking.status === 'Completed' ? 'neutral' : 'warning',
+  statusTone: booking.status === 'DA_XAC_NHAN' || booking.status === 'DA_NHAN_BAN' ? 'success' : booking.status === 'DA_HUY' || booking.status === 'KHONG_DEN' || booking.status === 'TU_CHOI_HET_CHO' ? 'danger' : booking.status === 'HOAN_THANH' ? 'neutral' : 'warning',
   menuItems: booking.menuItems || booking.chiTietMonAn || [],
 })

@@ -145,7 +145,7 @@ export class DatBanCommandService {
       maDatBan,
       chiTiet,
       nguonTao: 'DatBan',
-      trangThai: 'Pending',
+      trangThai: 'CHO_XAC_NHAN',
       capNhatTrangThaiBan: false,
       soDiem: 0,
       nguoiDung: nguoiDung || {},
@@ -207,7 +207,7 @@ export class DatBanCommandService {
         body.gioKetThuc || null,
         Number(body.soNguoi || 0),
         body.ghiChu || null,
-        'Pending',
+        'CHO_XAC_NHAN',
         body.khuVucUuTien ? chuanHoaMaKhuVucBan(body.khuVucUuTien) : null,
         body.ghiChuNoiBo || null,
         body.chiTietMonAn ? JSON.stringify(body.chiTietMonAn) : null,
@@ -236,7 +236,7 @@ export class DatBanCommandService {
           Email: khachHang?.Email || body.emailDatBan || '',
           NgayTao: new Date().toISOString(),
           NgayCapNhat: new Date().toISOString(),
-          TrangThai: 'Pending',
+          TrangThai: 'CHO_XAC_NHAN',
           NguonTao: nguonTao,
         },
       ),
@@ -381,7 +381,7 @@ export class DatBanCommandService {
 
       if (laTrangThaiDatBanSuDungBan(trangThaiDaChuanHoa)) {
         await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
-          TRANG_THAI_BAN.DANG_SU_DUNG,
+          TRANG_THAI_BAN.CO_KHACH,
           maBan,
         ]);
         return;
@@ -389,7 +389,7 @@ export class DatBanCommandService {
 
       if (laTrangThaiDatBanGiuBan(trangThaiDaChuanHoa)) {
         await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
-          TRANG_THAI_BAN.GIU_CHO,
+          TRANG_THAI_BAN.DA_DAT,
           maBan,
         ]);
         return;
@@ -461,7 +461,7 @@ export class DatBanCommandService {
       );
     }
 
-    if (String(banHopLe.TrangThai || '') === TRANG_THAI_BAN.BAN) {
+    if (String(banHopLe.TrangThai || '') === TRANG_THAI_BAN.BAO_TRI) {
       throw new BadRequestException(
         `Bàn ${banHopLe.MaBan} đang bảo trì, không thể gán cho booking.`,
       );
@@ -469,8 +469,8 @@ export class DatBanCommandService {
 
     if (
       maBan !== maBanHienTai &&
-      (String(banHopLe.TrangThai || '') === TRANG_THAI_BAN.DANG_SU_DUNG ||
-        String(banHopLe.TrangThai || '') === TRANG_THAI_BAN.GIU_CHO)
+      (String(banHopLe.TrangThai || '') === TRANG_THAI_BAN.CO_KHACH ||
+        String(banHopLe.TrangThai || '') === TRANG_THAI_BAN.DA_DAT)
     ) {
       throw new BadRequestException(
         `Bàn ${banHopLe.MaBan} đang có khách hoặc đã được đặt, không thể gán cho booking.`,
@@ -508,7 +508,7 @@ export class DatBanCommandService {
       }
 
       await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
-        TRANG_THAI_BAN.GIU_CHO,
+        TRANG_THAI_BAN.DA_DAT,
         maBan,
       ]);
       await ketNoi.execute(

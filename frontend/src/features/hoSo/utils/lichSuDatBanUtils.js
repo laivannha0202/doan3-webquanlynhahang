@@ -1,6 +1,6 @@
 import { TRANG_THAI_DON_SAP_TOI, TRANG_THAI_LICH_SU } from '../../noiBo/hangSo'
 
-export const TRANG_THAI_KET_THUC = new Set(['COMPLETED', 'DA_HOAN_THANH', 'CANCELLED', 'DA_HUY', 'EXPIRED', 'KHONG_DEN', 'TU_CHOI_HET_CHO', 'NO_SHOW'])
+export const TRANG_THAI_KET_THUC = new Set(['HOAN_THANH', 'DA_HUY', 'KHONG_DEN', 'TU_CHOI_HET_CHO'])
 
 export const BADGE_TONE = {
   WARNING: 'warning',
@@ -11,36 +11,25 @@ export const BADGE_TONE = {
 }
 
 export const NHAN_TRANG_THAI_KHACH_HANG = {
-  PENDING: { label: 'Yêu cầu đặt bàn', tone: BADGE_TONE.WARNING },
-  YEU_CAU_DAT_BAN: { label: 'Yêu cầu đặt bàn', tone: BADGE_TONE.WARNING },
-  GIU_CHO_TAM: { label: 'Đã giữ chỗ tạm', tone: BADGE_TONE.WARNING },
-  DA_XAC_NHAN: { label: 'Đã xác nhận', tone: BADGE_TONE.SUCCESS },
-  CONFIRMED: { label: 'Đã xác nhận', tone: BADGE_TONE.SUCCESS },
-  CAN_GOI_LAI: { label: 'Cần host gọi lại', tone: BADGE_TONE.WARNING },
   CHO_XAC_NHAN: { label: 'Yêu cầu đặt bàn', tone: BADGE_TONE.WARNING },
-  DA_GHI_NHAN: { label: 'Đã ghi nhận', tone: BADGE_TONE.INFO },
-  DA_CHECK_IN: { label: 'Đã check-in', tone: BADGE_TONE.SUCCESS },
-  DA_XEP_BAN: { label: 'Đã xếp bàn', tone: BADGE_TONE.SUCCESS },
-  COMPLETED: { label: 'Đã hoàn thành', tone: BADGE_TONE.INFO },
-  DA_HOAN_THANH: { label: 'Đã hoàn thành', tone: BADGE_TONE.INFO },
-  CANCELLED: { label: 'Đã huỷ', tone: BADGE_TONE.NEUTRAL },
+  DA_XAC_NHAN: { label: 'Đã xác nhận', tone: BADGE_TONE.SUCCESS },
+  DA_NHAN_BAN: { label: 'Đã nhận bàn', tone: BADGE_TONE.SUCCESS },
+  HOAN_THANH: { label: 'Đã hoàn thành', tone: BADGE_TONE.INFO },
   DA_HUY: { label: 'Đã huỷ', tone: BADGE_TONE.NEUTRAL },
   TU_CHOI_HET_CHO: { label: 'Từ chối / hết chỗ', tone: BADGE_TONE.DANGER },
-  EXPIRED: { label: 'Quá hạn', tone: BADGE_TONE.DANGER },
-  NO_SHOW: { label: 'Không đến', tone: BADGE_TONE.DANGER },
   KHONG_DEN: { label: 'Không đến', tone: BADGE_TONE.DANGER },
 }
 
 const chuanHoaTrangThai = (status) => {
   if (!status) return ''
   const s = String(status).trim()
-  if (['Pending', 'YEU_CAU_DAT_BAN', 'CHO_XAC_NHAN'].includes(s)) return 'PENDING'
-  if (['Confirmed', 'DA_XAC_NHAN'].includes(s)) return 'CONFIRMED'
-  if (['Completed', 'DA_HOAN_THANH'].includes(s)) return 'COMPLETED'
-  if (['Cancelled', 'DA_HUY', 'TU_CHOI_HET_CHO'].includes(s)) return 'CANCELLED'
-  if (['NO_SHOW', 'KHONG_DEN'].includes(s)) return 'NO_SHOW'
-  if (['GIU_CHO_TAM', 'DA_GHI_NHAN', 'DA_CHECK_IN', 'DA_XEP_BAN'].includes(s)) return 'CONFIRMED'
-  if (['CAN_GOI_LAI'].includes(s)) return 'PENDING'
+  if (['Pending', 'YEU_CAU_DAT_BAN', 'CHO_XAC_NHAN'].includes(s)) return 'CHO_XAC_NHAN'
+  if (['Confirmed', 'DA_XAC_NHAN'].includes(s)) return 'DA_XAC_NHAN'
+  if (['Completed', 'DA_HOAN_THANH'].includes(s)) return 'HOAN_THANH'
+  if (['Cancelled', 'DA_HUY', 'TU_CHOI_HET_CHO'].includes(s)) return 'DA_HUY'
+  if (['NO_SHOW', 'KHONG_DEN'].includes(s)) return 'KHONG_DEN'
+  if (['GIU_CHO_TAM', 'DA_GHI_NHAN', 'DA_CHECK_IN', 'DA_XEP_BAN'].includes(s)) return 'DA_XAC_NHAN'
+  if (['CAN_GOI_LAI'].includes(s)) return 'CHO_XAC_NHAN'
   return s
 }
 
@@ -90,7 +79,7 @@ export const tinhTrangThaiHienThi = (booking, hienTai) => {
   const isTerminal = TRANG_THAI_KET_THUC.has(normalized)
 
   if (!isTerminal && isPast) {
-    return { status: 'EXPIRED', isExpired: true }
+    return { status: 'KHONG_DEN', isExpired: true }
   }
 
   return { status: normalized, isExpired: false }

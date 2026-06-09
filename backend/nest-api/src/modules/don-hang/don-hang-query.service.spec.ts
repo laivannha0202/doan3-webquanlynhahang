@@ -12,7 +12,7 @@ describe('DonHangQueryService', () => {
             MaBan: 'B006',
             MaDatBan: 'DB021',
             TongTien: 182000,
-            TrangThai: 'Pending',
+            TrangThai: 'DANG_CHUAN_BI',
           },
         ])
         .mockResolvedValueOnce([

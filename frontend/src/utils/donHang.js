@@ -7,58 +7,38 @@ export const NHAN_LOAI_DON_HANG = Object.freeze({
 })
 
 export const NHAN_TRANG_THAI_DON_HANG = Object.freeze({
-  Pending: 'Mới tạo',
-  Confirmed: 'Đã xác nhận',
-  Preparing: 'Đang chuẩn bị',
-  Ready: 'Chờ thanh toán',
-  Served: 'Đang phục vụ',
-  Serving: 'Đang phục vụ',
-  Paid: 'Đã thanh toán',
-  Completed: 'Hoàn tất',
-  Cancelled: 'Đã hủy',
+  DANG_CHUAN_BI: 'Đang chuẩn bị',
+  DANG_PHUC_VU: 'Đang phục vụ',
+  HOAN_THANH: 'Hoàn tất',
+  DA_THANH_TOAN: 'Đã thanh toán',
+  DA_HUY: 'Đã hủy',
 })
 
 export const SAC_THAI_TRANG_THAI_DON_HANG = Object.freeze({
-  Pending: 'warning',
-  Confirmed: 'warning',
-  Preparing: 'warning',
-  Ready: 'warning',
-  Served: 'warning',
-  Serving: 'warning',
-  Paid: 'success',
-  Completed: 'success',
-  Cancelled: 'danger',
+  DANG_CHUAN_BI: 'warning',
+  DANG_PHUC_VU: 'warning',
+  HOAN_THANH: 'success',
+  DA_THANH_TOAN: 'success',
+  DA_HUY: 'danger',
 })
 
 const BUOC_TIEN_TRINH_DON_HANG_THEO_TRANG_THAI = Object.freeze({
-  Pending: 1,
-  Confirmed: 2,
-  Preparing: 3,
-  Ready: 4,
-  Served: 5,
-  Serving: 5,
-  Paid: 6,
-  Completed: 7,
-  Cancelled: 0,
+  DANG_CHUAN_BI: 1,
+  DANG_PHUC_VU: 2,
+  HOAN_THANH: 3,
+  DA_THANH_TOAN: 4,
+  DA_HUY: 0,
 })
 
 const TRANG_THAI_DON_HANG_DANG_HOAT_DONG = new Set([
-  'Pending',
-  'Confirmed',
-  'Preparing',
-  'Ready',
-  'Served',
-  'Serving',
-  'CHO_XU_LY',
-  'DANG_CHE_BIEN',
-  'SAN_SANG',
+  'DANG_CHUAN_BI',
   'DANG_PHUC_VU',
 ])
 
 const TRANG_THAI_DON_HANG_KET_THUC = new Set([
-  'Paid',
-  'Completed',
-  'Cancelled',
+  'HOAN_THANH',
+  'DA_THANH_TOAN',
+  'DA_HUY',
 ])
 
 export const NHAN_PHUONG_THUC_THANH_TOAN = Object.freeze({
@@ -122,7 +102,7 @@ export const laySacThaiDonHang = (trangThai) => SAC_THAI_TRANG_THAI_DON_HANG[tra
 
 export const layBuocTienTrinhDonHang = (trangThai) => BUOC_TIEN_TRINH_DON_HANG_THEO_TRANG_THAI[trangThai] ?? 0
 
-export const laTrangThaiDonHangDaHuy = (trangThai) => chuanHoaVanBan(trangThai) === 'Cancelled'
+export const laTrangThaiDonHangDaHuy = (trangThai) => chuanHoaVanBan(trangThai) === 'DA_HUY'
 
 export const laTrangThaiDonHangKetThuc = (trangThai) => TRANG_THAI_DON_HANG_KET_THUC.has(chuanHoaVanBan(trangThai))
 

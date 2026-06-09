@@ -67,14 +67,14 @@ const BookingCard = ({ booking, onCancelBooking, onRebook, hienThiNutHuy, hienTh
   const { status: displayStatus, isExpired } = tinhTrangThaiHienThi(booking, new Date())
   const statusHienThi = booking.hienThiTrangThai || displayStatus
   const daHetHan = booking.isExpired !== undefined ? booking.isExpired : isExpired
-  const { label: statusLabel, tone: statusTone } = layNhanTrangThai(daHetHan ? 'EXPIRED' : statusHienThi)
+  const { label: statusLabel, tone: statusTone } = layNhanTrangThai(daHetHan ? 'KHONG_DEN' : statusHienThi)
   const finalStatusLabel = daHetHan ? 'Quá hạn' : statusLabel
 
   const danhSachMon = booking.menuItems || booking.chiTietMonAn || []
   const coMonAn = Array.isArray(danhSachMon) && danhSachMon.length > 0
   const tongTien = danhSachMon.reduce((sum, mon) => sum + layThanhTienMon(mon), 0)
 
-  const coTheHuy = hienThiNutHuy && !daHetHan && ['PENDING', 'CONFIRMED', 'YEU_CAU_DAT_BAN', 'GIU_CHO_TAM', 'DA_XAC_NHAN'].includes(statusHienThi)
+  const coTheHuy = hienThiNutHuy && !daHetHan && ['CHO_XAC_NHAN', 'DA_XAC_NHAN'].includes(statusHienThi)
 
   return (
     <div className="ho-so-history-card">

@@ -32,36 +32,21 @@ import {
 } from '../../services/api/apiKhachHang'
 
 const TRANG_THAI_DATBAN_MAP = {
-  YEU_CAU_DAT_BAN: { color: 'gold', label: 'Yêu cầu đặt bàn' },
-  GIU_CHO_TAM: { color: 'orange', label: 'Đã giữ chỗ tạm' },
-  DA_XAC_NHAN: { color: 'green', label: 'Đặt bàn thành công' },
-  CAN_GOI_LAI: { color: 'red', label: 'Cần gọi lại' },
-  TU_CHOI_HET_CHO: { color: 'red', label: 'Từ chối / hết chỗ' },
-  Pending: { color: 'gold', label: 'Chờ xác nhận' },
-  Confirmed: { color: 'green', label: 'Đã xác nhận' },
   CHO_XAC_NHAN: { color: 'gold', label: 'Chờ xác nhận' },
-  DA_GHI_NHAN: { color: 'blue', label: 'Đã ghi nhận' },
-  DA_CHECK_IN: { color: 'cyan', label: 'Đã check-in' },
-  DA_XEP_BAN: { color: 'purple', label: 'Đã xếp bàn' },
-  DA_HOAN_THANH: { color: 'green', label: 'Đã hoàn thành' },
+  DA_XAC_NHAN: { color: 'green', label: 'Đã xác nhận' },
+  DA_NHAN_BAN: { color: 'cyan', label: 'Đã nhận bàn' },
+  HOAN_THANH: { color: 'green', label: 'Đã hoàn thành' },
   DA_HUY: { color: 'default', label: 'Đã hủy' },
   KHONG_DEN: { color: 'default', label: 'Không đến' },
-  Seated: { color: 'cyan', label: 'Đang ngồi' },
+  TU_CHOI_HET_CHO: { color: 'red', label: 'Từ chối / hết chỗ' },
 }
 
 const TRANG_THAI_DONHANG_MAP = {
-  MOI_TAO: { color: 'blue', label: 'Mới tạo' },
-  DA_XAC_NHAN: { color: 'cyan', label: 'Đã xác nhận' },
   DANG_CHUAN_BI: { color: 'orange', label: 'Đang chuẩn bị' },
-  SAN_SANG: { color: 'gold', label: 'Sẵn sàng' },
   DANG_PHUC_VU: { color: 'green', label: 'Đang phục vụ' },
   HOAN_THANH: { color: 'default', label: 'Hoàn thành' },
+  DA_THANH_TOAN: { color: 'blue', label: 'Đã thanh toán' },
   DA_HUY: { color: 'red', label: 'Đã hủy' },
-  Seated: { color: 'cyan', label: 'Đang ngồi' },
-  Served: { color: 'green', label: 'Đã phục vụ' },
-  Paid: { color: 'blue', label: 'Đã thanh toán' },
-  Completed: { color: 'blue', label: 'Hoàn tất' },
-  Cancelled: { color: 'default', label: 'Đã hủy' },
 }
 
 const { Text } = Typography

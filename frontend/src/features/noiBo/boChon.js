@@ -11,36 +11,38 @@ import {
 import { laySacThaiDonHang } from './dinhDang'
 
 export const laDatBanVip = (datBan) => datBan.seatingArea === 'PHONG_VIP'
-const laTrangThaiChoXuLy = (trangThai) => CAC_TRANG_THAI_DAT_BAN_CHO_XAC_NHAN.has(trangThai) || trangThai === 'Pending'
-const laTrangThaiDaXacNhan = (trangThai) => CAC_TRANG_THAI_DAT_BAN_DA_XAC_NHAN.has(trangThai) || trangThai === 'Confirmed'
+const laTrangThaiChoXuLy = (trangThai) => {
+  const daChuanHoa = chuanHoaTrangThaiDatBan(trangThai)
+  return CAC_TRANG_THAI_DAT_BAN_CHO_XAC_NHAN.has(daChuanHoa)
+}
+const laTrangThaiDaXacNhan = (trangThai) => {
+  const daChuanHoa = chuanHoaTrangThaiDatBan(trangThai)
+  return CAC_TRANG_THAI_DAT_BAN_DA_XAC_NHAN.has(daChuanHoa)
+}
 
 export const canXacNhanThuCong = (datBan) => laTrangThaiChoXuLy(datBan.status) || laDatBanVip(datBan)
 
 export const layGhiChuUuTienDatBan = (datBan) => {
   if (laDatBanVip(datBan)) return 'Ưu tiên xác nhận thủ công do yêu cầu VIP hoặc khu riêng.'
-  if (datBan.status === 'CAN_GOI_LAI') return 'Cần gọi lại để chốt tình trạng chỗ trống hoặc điều kiện phục vụ.'
   if (!Array.isArray(datBan.danhSachMaBanDaGan) || datBan.danhSachMaBanDaGan.length === 0) return 'Booking chưa được gán bàn cụ thể.'
   if (datBan.seatingArea === 'BAN_CONG') return 'Kiểm tra thời tiết trước khi chốt vị trí ngoài trời.'
   return ''
 }
 
 const CAC_TRANG_THAI_DAT_BAN_KET_THUC = new Set([
-  'COMPLETED',
-  'DA_HOAN_THANH',
-  'CANCELLED',
+  'HOAN_THANH',
   'DA_HUY',
   'KHONG_DEN',
-  'NO_SHOW',
   'TU_CHOI_HET_CHO',
 ])
 
 export const daGanBan = (datBan) => Array.isArray(datBan?.danhSachMaBanDaGan) && datBan?.danhSachMaBanDaGan.length > 0
-export const laDatBanDaCheckIn = (datBan) => datBan.status === 'DA_CHECK_IN' || datBan.status === 'DA_XEP_BAN'
+export const laDatBanDaCheckIn = (datBan) => datBan.status === 'DA_NHAN_BAN'
 export const laTrangThaiDatBanKetThuc = (datBan) => CAC_TRANG_THAI_DAT_BAN_KET_THUC.has(chuanHoaTrangThaiDatBan(datBan?.status))
 
 export const coTheGanBanChoDatBan = (datBan) => !laTrangThaiDatBanKetThuc(datBan)
 export const coTheCheckInDatBan = (datBan) => daGanBan(datBan) && !laDatBanDaCheckIn(datBan) && !laTrangThaiDatBanKetThuc(datBan)
-export const coTheHoanThanhDatBan = (datBan) => datBan?.status === 'DA_CHECK_IN' || datBan?.status === 'DA_XEP_BAN'
+export const coTheHoanThanhDatBan = (datBan) => datBan?.status === 'DA_NHAN_BAN'
 export const coTheDanhDauKhongDen = (datBan) => !laDatBanDaCheckIn(datBan) && !laTrangThaiDatBanKetThuc(datBan)
 
 export const phanTichNgayGioDatBan = (ngay, gio) => {
@@ -148,11 +150,11 @@ export const layTomTatBan = (danhSachBan) => {
       boDem[khuVuc].occupied += 1
     }
 
-    if (trangThai === 'GIU_CHO') {
+    if (trangThai === 'DA_DAT') {
       boDem[khuVuc].held += 1
     }
 
-    if (trangThai === 'CAN_DON') {
+    if (trangThai === 'BAO_TRI') {
       boDem[khuVuc].dirty += 1
     }
 
@@ -187,9 +189,9 @@ export const layTomTatBan = (danhSachBan) => {
 export const layTomTatTonKhoBan = (danhSachBan) => ({
   total: danhSachBan.length,
   available: danhSachBan.filter((banAn) => chuanHoaTrangThaiBan(banAn.status) === 'TRONG').length,
-  held: danhSachBan.filter((banAn) => chuanHoaTrangThaiBan(banAn.status) === 'GIU_CHO').length,
+  held: danhSachBan.filter((banAn) => chuanHoaTrangThaiBan(banAn.status) === 'DA_DAT').length,
   occupied: danhSachBan.filter((banAn) => chuanHoaTrangThaiBan(banAn.status) === 'CO_KHACH').length,
-  dirty: danhSachBan.filter((banAn) => chuanHoaTrangThaiBan(banAn.status) === 'CAN_DON').length,
+  dirty: danhSachBan.filter((banAn) => chuanHoaTrangThaiBan(banAn.status) === 'BAO_TRI').length,
 })
 
 export const layTomTatTaiKhoan = (danhSachTaiKhoan) => ({
@@ -205,7 +207,7 @@ export const layNhanBoLocTongQuan = (boLocNgay, boLocCa) => {
   return `${nhanNgay} · ${nhanCa}`
 }
 
-export const laDatBanDaHoanThanh = (datBan) => ['COMPLETED', 'DA_HOAN_THANH'].includes(chuanHoaTrangThaiDatBan(datBan.status))
+export const laDatBanDaHoanThanh = (datBan) => chuanHoaTrangThaiDatBan(datBan.status) === 'HOAN_THANH'
 export const laDatBanSapDienRa = (datBan, hienTai) => {
   const thoiDiemDatBan = phanTichNgayGioDatBan(datBan.date, datBan.time)
   if (!thoiDiemDatBan) return false

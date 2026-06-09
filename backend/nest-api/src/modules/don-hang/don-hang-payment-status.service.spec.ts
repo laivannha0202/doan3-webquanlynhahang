@@ -7,7 +7,7 @@ describe('DonHangPaymentStatusService', () => {
         if (query.includes('TrangThai IN')) {
           return [];
         }
-        return [{ MaDonHang: 'DH_TEST', MaBan: 'B003', TrangThai: 'Completed' }];
+        return [{ MaDonHang: 'DH_TEST', MaBan: 'B003', TrangThai: 'HOAN_THANH' }];
       }),
     };
     const donHangQueryService = {
@@ -29,7 +29,7 @@ describe('DonHangPaymentStatusService', () => {
   it('giu ban dang occupied khi yeu cau thanh toan tai ban', async () => {
     const mysql = {
       truyVan: jest.fn().mockResolvedValue([
-        { MaDonHang: 'DH_TEST', MaBan: 'B003', MaKH: 'KH001', TongTien: 180000, TrangThai: 'Preparing' },
+        { MaDonHang: 'DH_TEST', MaBan: 'B003', MaKH: 'KH001', TongTien: 180000, TrangThai: 'DANG_CHUAN_BI' },
       ]),
       thucThi: jest.fn().mockResolvedValue(undefined),
     };
@@ -51,7 +51,7 @@ describe('DonHangPaymentStatusService', () => {
 
     expect(mysql.thucThi).toHaveBeenCalledWith(
       'UPDATE Ban SET TrangThai = ? WHERE MaBan = ?',
-      ['Occupied', 'B003'],
+      ['CO_KHACH', 'B003'],
     );
   });
 
@@ -65,14 +65,14 @@ describe('DonHangPaymentStatusService', () => {
     const mysql = {
       truyVan: jest
         .fn()
-        .mockResolvedValue([{ MaDonHang: 'DH_TEST', MaBan: 'B003', MaKH: 'KH001', TongTien: 180000, TrangThai: 'Preparing' }]),
+        .mockResolvedValue([{ MaDonHang: 'DH_TEST', MaBan: 'B003', MaKH: 'KH001', TongTien: 180000, TrangThai: 'DANG_CHUAN_BI' }]),
       giaoDich: jest.fn(async (callback) => callback(connection)),
     };
     const donHangQueryService = {
       layChiTietDonHangKhongKiemTraQuyen: jest.fn(async (_maDonHang, ketNoi) => ({
         success: true,
         data: {
-          donHang: { trangThai: ketNoi ? 'Completed' : 'Preparing' },
+          donHang: { trangThai: ketNoi ? 'HOAN_THANH' : 'DANG_CHUAN_BI' },
         },
         message: 'ok',
         meta: null,
@@ -86,13 +86,13 @@ describe('DonHangPaymentStatusService', () => {
 
     const ketQua = await service.capNhatTrangThaiDonHang(
       'DH_TEST',
-      'Completed',
+      'HOAN_THANH',
     );
 
-    expect((ketQua.data as any).donHang.trangThai).toBe('Completed');
+    expect((ketQua.data as any).donHang.trangThai).toBe('HOAN_THANH');
     expect(execute).toHaveBeenCalledWith(
       'UPDATE Ban SET TrangThai = ? WHERE MaBan = ?',
-      ['Available', 'B003'],
+      ['TRONG', 'B003'],
     );
     expect(tinhDiemTuDonHang).toHaveBeenCalledWith(
       'KH001',
@@ -113,14 +113,14 @@ describe('DonHangPaymentStatusService', () => {
     const mysql = {
       truyVan: jest
         .fn()
-        .mockResolvedValue([{ MaDonHang: 'DH_TEST', MaBan: 'B003', MaKH: 'KH001', TongTien: 180000, TrangThai: 'Preparing' }]),
+        .mockResolvedValue([{ MaDonHang: 'DH_TEST', MaBan: 'B003', MaKH: 'KH001', TongTien: 180000, TrangThai: 'DANG_CHUAN_BI' }]),
       giaoDich: jest.fn(async (callback) => callback(connection)),
     };
     const donHangQueryService = {
       layChiTietDonHangKhongKiemTraQuyen: jest.fn(async (_maDonHang, ketNoi) => ({
         success: true,
         data: {
-          donHang: { trangThai: ketNoi ? 'Paid' : 'Preparing' },
+          donHang: { trangThai: ketNoi ? 'DA_THANH_TOAN' : 'DANG_CHUAN_BI' },
         },
         message: 'ok',
         meta: null,
@@ -134,7 +134,7 @@ describe('DonHangPaymentStatusService', () => {
 
     await service.capNhatTrangThaiDonHang(
       'DH_TEST',
-      'Paid',
+      'DA_THANH_TOAN',
       { maND: 'ND010' },
     );
 
@@ -157,14 +157,14 @@ describe('DonHangPaymentStatusService', () => {
     const mysql = {
       truyVan: jest
         .fn()
-        .mockResolvedValue([{ MaDonHang: 'DH_TEST', MaBan: 'B003', MaKH: 'KH001', TongTien: 180000, TrangThai: 'Preparing' }]),
+        .mockResolvedValue([{ MaDonHang: 'DH_TEST', MaBan: 'B003', MaKH: 'KH001', TongTien: 180000, TrangThai: 'DANG_CHUAN_BI' }]),
       giaoDich: jest.fn(async (callback) => callback(connection)),
     };
     const donHangQueryService = {
       layChiTietDonHangKhongKiemTraQuyen: jest.fn(async () => ({
         success: true,
         data: {
-          donHang: { trangThai: 'Preparing' },
+          donHang: { trangThai: 'DANG_CHUAN_BI' },
         },
         message: 'ok',
         meta: null,
@@ -176,7 +176,7 @@ describe('DonHangPaymentStatusService', () => {
       { tinhDiemTuDonHang } as any,
     );
 
-    await service.capNhatTrangThaiDonHang('DH_TEST', 'Preparing');
+    await service.capNhatTrangThaiDonHang('DH_TEST', 'DANG_CHUAN_BI');
 
     expect(tinhDiemTuDonHang).not.toHaveBeenCalled();
   });

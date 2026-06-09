@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS Ban (
     SoChoNgoi   INT NOT NULL,
     ViTri       VARCHAR(100),
     GhiChu      VARCHAR(255),
-    TrangThai   ENUM('Available','Occupied','Reserved','Maintenance') NOT NULL DEFAULT 'Available',
+    TrangThai   ENUM('TRONG','DA_DAT','CO_KHACH','DANG_DON','BAO_TRI') NOT NULL DEFAULT 'TRONG',
     NgayTao     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     NgayCapNhat DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT UQ_Ban_SoBan UNIQUE (SoBan)
@@ -138,7 +138,7 @@ CREATE TABLE IF NOT EXISTS DatBan (
     KhuVucUuTien   VARCHAR(50),
     GhiChuNoiBo    VARCHAR(500),
     NguonTao       ENUM('WEB','NOI_BO') NOT NULL DEFAULT 'WEB',
-    TrangThai      ENUM('Pending','Confirmed','Seated','Completed','Cancelled','NoShow','Expired','YEU_CAU_DAT_BAN','GIU_CHO_TAM','DA_XAC_NHAN','DA_GAN_BAN','CAN_GOI_LAI','TU_CHOI_HET_CHO','CHO_XAC_NHAN','DA_GHI_NHAN','DA_CHECK_IN','DA_XEP_BAN','DANG_PHUC_VU','DA_NHAN_BAN','DA_HOAN_THANH','DA_HUY','KHONG_DEN') NOT NULL DEFAULT 'Pending',
+    TrangThai      ENUM('CHO_XAC_NHAN','DA_XAC_NHAN','DA_NHAN_BAN','HOAN_THANH','KHONG_DEN','DA_HUY','TU_CHOI_HET_CHO') NOT NULL DEFAULT 'CHO_XAC_NHAN',
     NgayTao        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     NgayCapNhat    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT FK_DatBan_KhachHang
@@ -160,7 +160,7 @@ CREATE TABLE IF NOT EXISTS DonHang (
     MaDatBan    VARCHAR(50),
     LoaiDon     ENUM('TAI_BAN') NOT NULL DEFAULT 'TAI_BAN',
     TongTien    DECIMAL(15,2) NOT NULL DEFAULT 0,
-    TrangThai   ENUM('Pending','Confirmed','Preparing','Ready','Served','Serving','Paid','Cancelled','Completed','CHO_XU_LY','DANG_CHE_BIEN','SAN_SANG','DANG_PHUC_VU','DA_THANH_TOAN','DA_HUY') NOT NULL DEFAULT 'Pending',
+    TrangThai   ENUM('DANG_CHUAN_BI','DANG_PHUC_VU','HOAN_THANH','DA_THANH_TOAN','DA_HUY') NOT NULL DEFAULT 'DANG_CHUAN_BI',
     NguonTao    ENUM('TaiQuay','QRCode','DatBan','Online') NOT NULL DEFAULT 'TaiQuay',
     GhiChu      VARCHAR(500),
     NgayTao     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -186,7 +186,7 @@ CREATE TABLE IF NOT EXISTS ChiTietDonHang (
     DonGia      DECIMAL(15,2) NOT NULL,
     ThanhTien   DECIMAL(15,2) NOT NULL,
     GhiChu      VARCHAR(255),
-    TrangThai   ENUM('Pending','Preparing','Ready','Served','Done','Cancelled') NOT NULL DEFAULT 'Pending',
+    TrangThai   ENUM('DANG_CHUAN_BI','DANG_PHUC_VU','HOAN_THANH','DA_HUY') NOT NULL DEFAULT 'DANG_CHUAN_BI',
     NgayTao     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT FK_ChiTietDonHang_DonHang
         FOREIGN KEY (MaDonHang) REFERENCES DonHang(MaDonHang) ON DELETE CASCADE,
@@ -229,7 +229,7 @@ CREATE TABLE IF NOT EXISTS ThanhToan (
     PhuongThuc  ENUM('TienMat','ChuyenKhoan','TheNganHang','MoMo','ZaloPay','VNPay') NOT NULL,
     SoTien      DECIMAL(15,2) NOT NULL,
     MaGiaoDich  VARCHAR(100),
-    TrangThai   ENUM('Pending','Success','Failed','Refunded') NOT NULL DEFAULT 'Pending',
+    TrangThai   ENUM('THANH_CONG','THAT_BAI','DA_HOAN_TIEN') NOT NULL DEFAULT 'THANH_CONG',
     ThoiGian    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT FK_ThanhToan_HoaDon
         FOREIGN KEY (MaHoaDon) REFERENCES HoaDon(MaHoaDon) ON DELETE CASCADE
@@ -349,7 +349,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- ============================================================
 -- VIEWS
 -- ============================================================
--- Lưu ý: view nay tinh doanh thu theo HoaDon va chỉ lọc ThanhToan = 'Success'.
+-- Lưu ý: view nay tinh doanh thu theo HoaDon va chỉ lọc ThanhToan = 'THANH_CONG'.
 -- Nếu 1 hóa đơn có nhiều ThanhToan thành công, số liệu có thể bị đếm trùng.
 -- Schema hien tai không ep UNIQUE(MaHoaDon) trong ThanhToan, nen day la canh bao khi doc KPI.
 CREATE OR REPLACE VIEW V_DoanhThuNgay AS
@@ -362,11 +362,11 @@ SELECT
 FROM HoaDon hd
 JOIN ThanhToan tt
     ON tt.MaHoaDon = hd.MaHoaDon
-   AND tt.TrangThai = 'Success'
+   AND tt.TrangThai = 'THANH_CONG'
 GROUP BY DATE(hd.NgayXuat);
 
--- Lưu ý: view này đếm món bán chạy theo đơn hàng không bị Cancelled.
--- Day không phai KPI doanh thu chi tai cac don da Paid/Completed; chi la tong hop luot mua mon cho don con hieu luc.
+-- Lưu ý: view này đếm món bán chạy theo đơn hàng không bị DA_HUY.
+-- Day không phai KPI doanh thu chi tai cac don da DA_THANH_TOAN/HOAN_THANH; chi la tong hop luot mua mon cho don con hieu luc.
 CREATE OR REPLACE VIEW V_MonBanChay AS
 SELECT
     td.MaMon,
@@ -381,7 +381,7 @@ JOIN DanhMuc dm
     ON dm.MaDanhMuc = td.MaDanhMuc
 JOIN DonHang dh
     ON dh.MaDonHang = ct.MaDonHang
-   AND dh.TrangThai <> 'Cancelled'
+   AND dh.TrangThai <> 'DA_HUY'
 GROUP BY td.MaMon, td.TenMon, dm.TenDanhMuc
 ORDER BY TongSoLuong DESC;
 
@@ -403,7 +403,7 @@ LEFT JOIN DonHang dh
         SELECT dh2.MaDonHang
         FROM DonHang dh2
         WHERE dh2.MaBan = b.MaBan
-          AND dh2.TrangThai NOT IN ('Paid', 'Cancelled')
+          AND dh2.TrangThai NOT IN ('DA_THANH_TOAN', 'DA_HUY')
         ORDER BY dh2.NgayTao DESC
         LIMIT 1
     );

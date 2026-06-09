@@ -181,7 +181,7 @@ export class DonHangQueryService {
        FROM DonHang d
        LEFT JOIN DanhGia dg ON dg.MaDonHang = d.MaDonHang AND dg.MaKH = d.MaKH
        WHERE d.MaKH = ?
-         AND d.TrangThai IN ('Completed', 'Paid', 'Served')
+          AND d.TrangThai IN ('HOAN_THANH', 'DA_THANH_TOAN', 'DANG_PHUC_VU')
          AND dg.MaDanhGia IS NULL
        ORDER BY d.NgayTao DESC`,
       [khachHang.MaKH],

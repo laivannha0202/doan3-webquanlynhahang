@@ -65,7 +65,7 @@ describe('DatBanCommandService', () => {
       maDatBan: 'DB_TEST_ORDER',
       chiTiet: [{ maMon: 'M001', soLuong: 2, ghiChu: 'Ít cay' }],
       nguonTao: 'DatBan',
-      trangThai: 'Pending',
+      trangThai: 'CHO_XAC_NHAN',
       capNhatTrangThaiBan: false,
       soDiem: 0,
       nguoiDung: { vaiTro: 'Admin' },
@@ -166,11 +166,11 @@ describe('DatBanCommandService', () => {
 
     expect(execute).toHaveBeenCalledWith(
       'UPDATE Ban SET TrangThai = ? WHERE MaBan = ?',
-      ['Available', 'B035'],
+      ['TRONG', 'B035'],
     );
     expect(execute).toHaveBeenCalledWith(
       'UPDATE Ban SET TrangThai = ? WHERE MaBan = ?',
-      ['Reserved', 'B053'],
+      ['DA_DAT', 'B053'],
     );
     expect(execute).toHaveBeenCalledWith(
       'UPDATE DatBan SET MaBan = ?, TrangThai = ? WHERE MaDatBan = ?',
@@ -190,7 +190,7 @@ describe('DatBanCommandService', () => {
             MaDatBan: 'DB001',
             MaBan: 'B035',
             SoNguoi: 4,
-            TrangThai: 'Pending',
+            TrangThai: 'CHO_XAC_NHAN',
           },
         ])
         .mockResolvedValueOnce([]),
@@ -203,11 +203,11 @@ describe('DatBanCommandService', () => {
       { taoDonHang: jest.fn() } as any,
     );
 
-    await service.capNhatTrangThaiDatBan('DB001', 'Cancelled');
+    await service.capNhatTrangThaiDatBan('DB001', 'DA_HUY');
 
     expect(execute).toHaveBeenCalledWith(
       'UPDATE Ban SET TrangThai = ? WHERE MaBan = ?',
-      ['Available', 'B035'],
+      ['TRONG', 'B035'],
     );
   });
 });

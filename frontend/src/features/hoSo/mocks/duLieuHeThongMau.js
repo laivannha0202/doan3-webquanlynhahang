@@ -1,7 +1,7 @@
 import { DANH_SACH_PHIEU_GIAM_GIA_GOI_Y } from '../../gioHang/constants/phieuGiamGia'
 import { TRANG_THAI_BAN } from '../../../constants/trangThaiBan'
 
-const taoMonDonHang = ({ maChiTiet, maMon, tenMon, soLuong, donGia, thanhTien, ghiChu = '', trangThai = 'Pending' }) => Object.freeze({
+const taoMonDonHang = ({ maChiTiet, maMon, tenMon, soLuong, donGia, thanhTien, ghiChu = '', trangThai = 'DANG_CHUAN_BI' }) => Object.freeze({
   id: maChiTiet,
   maChiTiet,
   menuItemId: maMon,
@@ -85,9 +85,9 @@ const MON_DH002 = Object.freeze([
 ])
 
 const MON_DH003 = Object.freeze([
-  taoMonDonHang({ maChiTiet: 'CT008', maMon: 'M004', tenMon: 'Pho Bo Dac Biet', soLuong: 1, donGia: 75000, thanhTien: 75000, ghiChu: 'Them tieu', trangThai: 'Preparing' }),
-  taoMonDonHang({ maChiTiet: 'CT009', maMon: 'M008', tenMon: 'Ca Phe Sua Da', soLuong: 2, donGia: 25000, thanhTien: 50000, ghiChu: 'Bot duong', trangThai: 'Preparing' }),
-  taoMonDonHang({ maChiTiet: 'CT010', maMon: 'M010', tenMon: 'Nuoc Ep Cam', soLuong: 1, donGia: 30000, thanhTien: 30000, trangThai: 'Pending' }),
+  taoMonDonHang({ maChiTiet: 'CT008', maMon: 'M004', tenMon: 'Pho Bo Dac Biet', soLuong: 1, donGia: 75000, thanhTien: 75000, ghiChu: 'Them tieu', trangThai: 'DANG_CHUAN_BI' }),
+  taoMonDonHang({ maChiTiet: 'CT009', maMon: 'M008', tenMon: 'Ca Phe Sua Da', soLuong: 2, donGia: 25000, thanhTien: 50000, ghiChu: 'Bot duong', trangThai: 'DANG_CHUAN_BI' }),
+  taoMonDonHang({ maChiTiet: 'CT010', maMon: 'M010', tenMon: 'Nuoc Ep Cam', soLuong: 1, donGia: 30000, thanhTien: 30000, trangThai: 'DANG_CHUAN_BI' }),
 ])
 
 export const THONG_TIN_DANG_NHAP_MAU = Object.freeze({
@@ -278,7 +278,7 @@ export const DANH_SACH_DAT_BAN_MAU = Object.freeze([
     name: 'Tran Van Khach',
     phone: '0912345678',
     email: 'khach1@gmail.com',
-    status: 'Confirmed',
+    status: 'DA_XAC_NHAN',
     source: 'DatBan',
     createdAt: '2026-08-10T17:00:00',
     updatedAt: '2026-08-10T17:30:00',
@@ -299,7 +299,7 @@ export const LICH_SU_DAT_BAN_MAU_THEO_KHACH_HANG = Object.freeze({
       dateTime: '10/08/2026 18:00',
       guests: 4,
       seatingArea: 'Khu riêng',
-      rawStatus: 'Confirmed',
+      rawStatus: 'DA_XAC_NHAN',
       status: '🟢 Đã xác nhận',
       statusLabel: 'Đã xác nhận',
       statusTone: 'success',
@@ -317,8 +317,8 @@ const DON_HANG_DH001 = Object.freeze({
   orderDate: '2026-08-10T18:00:00',
   ngayTao: '2026-08-10T18:00:00',
   loaiDon: 'TAI_BAN',
-  status: 'Paid',
-  trangThai: 'Paid',
+  status: 'DA_THANH_TOAN',
+  trangThai: 'DA_THANH_TOAN',
   total: 215000,
   tongTien: 215000,
   subtotal: 225000,
@@ -365,8 +365,8 @@ const DON_HANG_DH002 = Object.freeze({
   orderDate: '2026-08-10T18:30:00',
   ngayTao: '2026-08-10T18:30:00',
   loaiDon: 'TAI_BAN',
-  status: 'Ready',
-  trangThai: 'Ready',
+  status: 'DANG_PHUC_VU',
+  trangThai: 'DANG_PHUC_VU',
   total: 140000,
   tongTien: 140000,
   subtotal: 140000,
@@ -380,7 +380,7 @@ const DON_HANG_DH002 = Object.freeze({
   }),
   voucher: Object.freeze({}),
   paymentMethod: 'TienMat',
-  paymentStatus: 'Pending',
+  paymentStatus: 'THANH_CONG',
   note: 'Khach goi mon tai ban sau gio tan lam',
   ghiChu: 'Khach goi mon tai ban sau gio tan lam',
   tableNumber: 'B001',
@@ -407,8 +407,8 @@ const DON_HANG_DH003 = Object.freeze({
   orderDate: '2026-08-10T19:15:00',
   ngayTao: '2026-08-10T19:15:00',
   loaiDon: 'TAI_BAN',
-  status: 'Confirmed',
-  trangThai: 'Confirmed',
+  status: 'DA_XAC_NHAN',
+  trangThai: 'DA_XAC_NHAN',
   total: 180000,
   tongTien: 180000,
   subtotal: 155000,
@@ -428,7 +428,7 @@ const DON_HANG_DH003 = Object.freeze({
     giamGia: 50000,
   }),
   paymentMethod: 'MoMo',
-  paymentStatus: 'Pending',
+  paymentStatus: 'THANH_CONG',
   note: 'Khach goi mon tai ban, bao nhan vien truoc khi phuc vu',
   ghiChu: 'Khach goi mon tai ban, bao nhan vien truoc khi phuc vu',
   tableNumber: 'B002',
@@ -527,7 +527,7 @@ export const DANH_SACH_THANH_TOAN_MAU = Object.freeze([
     phuongThuc: 'TienMat',
     soTien: 154000,
     maGiaoDich: '',
-    trangThai: 'Pending',
+    trangThai: 'DANG_CHUAN_BI',
     thoiGian: '2026-08-10T18:45:00',
   }),
   Object.freeze({
@@ -536,7 +536,7 @@ export const DANH_SACH_THANH_TOAN_MAU = Object.freeze([
     phuongThuc: 'MoMo',
     soTien: 143000,
     maGiaoDich: 'MOMO_DH003_001',
-    trangThai: 'Pending',
+    trangThai: 'DANG_CHUAN_BI',
     thoiGian: '2026-08-10T19:35:00',
   }),
 ])
@@ -544,14 +544,14 @@ export const DANH_SACH_THANH_TOAN_MAU = Object.freeze([
 export const LICH_SU_TRANG_THAI_DON_HANG_MAU = Object.freeze({
   DH001: Object.freeze([]),
   DH002: Object.freeze([
-    Object.freeze({ maLichSu: 'LS007', maDonHang: 'DH002', trangThaiCu: '', trangThaiMoi: 'Pending', ghiChu: 'Tao don goi mon tai ban', nguoiThucHien: 'System', thoiGian: '2026-08-10T18:30:00' }),
-    Object.freeze({ maLichSu: 'LS008', maDonHang: 'DH002', trangThaiCu: 'Pending', trangThaiMoi: 'Confirmed', ghiChu: 'Nhan vien xac nhan mon voi khach tai ban', nguoiThucHien: 'NV003', thoiGian: '2026-08-10T18:32:00' }),
-    Object.freeze({ maLichSu: 'LS009', maDonHang: 'DH002', trangThaiCu: 'Confirmed', trangThaiMoi: 'Preparing', ghiChu: 'Bep tiep nhan don', nguoiThucHien: 'NV003', thoiGian: '2026-08-10T18:34:00' }),
-    Object.freeze({ maLichSu: 'LS010', maDonHang: 'DH002', trangThaiCu: 'Preparing', trangThaiMoi: 'Ready', ghiChu: 'Mon san sang phuc vu tai ban', nguoiThucHien: 'NV003', thoiGian: '2026-08-10T18:38:00' }),
+    Object.freeze({ maLichSu: 'LS007', maDonHang: 'DH002', trangThaiCu: '', trangThaiMoi: 'DANG_CHUAN_BI', ghiChu: 'Tao don goi mon tai ban', nguoiThucHien: 'System', thoiGian: '2026-08-10T18:30:00' }),
+    Object.freeze({ maLichSu: 'LS008', maDonHang: 'DH002', trangThaiCu: 'DANG_CHUAN_BI', trangThaiMoi: 'DA_XAC_NHAN', ghiChu: 'Nhan vien xac nhan mon voi khach tai ban', nguoiThucHien: 'NV003', thoiGian: '2026-08-10T18:32:00' }),
+    Object.freeze({ maLichSu: 'LS009', maDonHang: 'DH002', trangThaiCu: 'DA_XAC_NHAN', trangThaiMoi: 'DANG_CHUAN_BI', ghiChu: 'Bep tiep nhan don', nguoiThucHien: 'NV003', thoiGian: '2026-08-10T18:34:00' }),
+    Object.freeze({ maLichSu: 'LS010', maDonHang: 'DH002', trangThaiCu: 'DANG_CHUAN_BI', trangThaiMoi: 'DANG_PHUC_VU', ghiChu: 'Mon san sang phuc vu tai ban', nguoiThucHien: 'NV003', thoiGian: '2026-08-10T18:38:00' }),
   ]),
   DH003: Object.freeze([
-    Object.freeze({ maLichSu: 'LS011', maDonHang: 'DH003', trangThaiCu: '', trangThaiMoi: 'Pending', ghiChu: 'Tao don goi mon tai ban', nguoiThucHien: 'System', thoiGian: '2026-08-10T19:15:00' }),
-    Object.freeze({ maLichSu: 'LS012', maDonHang: 'DH003', trangThaiCu: 'Pending', trangThaiMoi: 'Confirmed', ghiChu: 'Xac nhan mon voi khach tai ban', nguoiThucHien: 'NV002', thoiGian: '2026-08-10T19:20:00' }),
+    Object.freeze({ maLichSu: 'LS011', maDonHang: 'DH003', trangThaiCu: '', trangThaiMoi: 'DANG_CHUAN_BI', ghiChu: 'Tao don goi mon tai ban', nguoiThucHien: 'System', thoiGian: '2026-08-10T19:15:00' }),
+    Object.freeze({ maLichSu: 'LS012', maDonHang: 'DH003', trangThaiCu: 'DANG_CHUAN_BI', trangThaiMoi: 'DA_XAC_NHAN', ghiChu: 'Xac nhan mon voi khach tai ban', nguoiThucHien: 'NV002', thoiGian: '2026-08-10T19:20:00' }),
   ]),
 })
 

@@ -71,7 +71,7 @@ export class DonHangCreateOrderService {
     const maDatBan = payload.maDatBan || null;
     const nguonTao = payload.nguonTao || 'Online';
     const loaiDonHang = 'TAI_BAN';
-    const trangThai = payload.trangThai || 'Pending';
+    const trangThai = payload.trangThai || 'DANG_CHUAN_BI';
     const capNhatTrangThaiBan = payload.capNhatTrangThaiBan !== false;
     const soDiem = Number(payload.soDiem || 0);
 
@@ -185,7 +185,7 @@ export class DonHangCreateOrderService {
             muc.donGia,
             muc.thanhTien,
             muc.ghiChu || null,
-            'Pending',
+            'DANG_CHUAN_BI',
           ],
           ketNoi,
         );
@@ -197,14 +197,14 @@ export class DonHangCreateOrderService {
           DonGia: muc.donGia,
           ThanhTien: muc.thanhTien,
           GhiChu: muc.ghiChu || '',
-          TrangThai: 'Pending',
+          TrangThai: 'DANG_CHUAN_BI',
         });
       }
 
       if (maBan && capNhatTrangThaiBan) {
         await this.thucThi(
           'UPDATE Ban SET TrangThai = ? WHERE MaBan = ?',
-          [TRANG_THAI_BAN.DANG_SU_DUNG, maBan],
+          [TRANG_THAI_BAN.CO_KHACH, maBan],
           ketNoi,
         );
       }

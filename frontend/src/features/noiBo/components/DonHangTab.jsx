@@ -38,34 +38,27 @@ const { useBreakpoint } = Grid
 
 const BO_LOC_DON_HANG = [
   { key: 'all', label: 'Tất cả' },
-  { key: 'pending', label: 'Chờ xử lý', statuses: ['Pending', 'Confirmed'] },
-  { key: 'preparing', label: 'Đang chuẩn bị', statuses: ['Preparing'] },
-  { key: 'payment', label: 'Chờ thanh toán', statuses: ['Ready'] },
-  { key: 'served', label: 'Đang phục vụ', statuses: ['Served'] },
-  { key: 'paid', label: 'Đã thanh toán', statuses: ['Paid', 'Completed'] },
-  { key: 'cancelled', label: 'Đã hủy', statuses: ['Cancelled'] },
+  { key: 'pending', label: 'Đang chuẩn bị', statuses: ['DANG_CHUAN_BI'] },
+  { key: 'served', label: 'Đang phục vụ', statuses: ['DANG_PHUC_VU'] },
+  { key: 'paid', label: 'Đã thanh toán', statuses: ['DA_THANH_TOAN'] },
+  { key: 'completed', label: 'Hoàn thành', statuses: ['HOAN_THANH'] },
+  { key: 'cancelled', label: 'Đã hủy', statuses: ['DA_HUY'] },
 ]
 
 const TUY_CHON_TRANG_THAI = [
-  { value: 'Pending', label: 'Mới tạo' },
-  { value: 'Confirmed', label: 'Đã xác nhận' },
-  { value: 'Preparing', label: 'Đang chuẩn bị' },
-  { value: 'Ready', label: 'Chờ thanh toán' },
-  { value: 'Served', label: 'Đang phục vụ' },
-  { value: 'Paid', label: 'Đã thanh toán' },
-  { value: 'Completed', label: 'Hoàn tất' },
-  { value: 'Cancelled', label: 'Đã hủy' },
+  { value: 'DANG_CHUAN_BI', label: 'Đang chuẩn bị' },
+  { value: 'DANG_PHUC_VU', label: 'Đang phục vụ' },
+  { value: 'DA_THANH_TOAN', label: 'Đã thanh toán' },
+  { value: 'HOAN_THANH', label: 'Hoàn thành' },
+  { value: 'DA_HUY', label: 'Đã hủy' },
 ]
 
 const KIEU_THE_TRANG_THAI = {
-  Pending: { tone: 'pending', badge: 'badge-pending', hint: 'Cần xác nhận và ưu tiên điều phối bếp.' },
-  Confirmed: { tone: 'pending', badge: 'badge-pending', hint: 'Đơn đã chốt, chờ bếp nhận lệnh.' },
-  Preparing: { tone: 'preparing', badge: 'badge-preparing', hint: 'Bếp đang xử lý, ưu tiên theo dõi thời gian ra món.' },
-  Ready: { tone: 'preparing', badge: 'badge-preparing', hint: 'Khách đã yêu cầu thanh toán, cần mang bill và thu tiền.' },
-  Served: { tone: 'served', badge: 'badge-served', hint: 'Đơn đang phục vụ tại bàn, sẵn sàng chốt thanh toán.' },
-  Paid: { tone: 'paid', badge: 'badge-paid', hint: 'Đơn đã thanh toán và chốt doanh thu.' },
-  Completed: { tone: 'paid', badge: 'badge-paid', hint: 'Đơn đã hoàn tất và không còn giữ bàn.' },
-  Cancelled: { tone: 'cancelled', badge: 'badge-cancelled', hint: 'Đơn đã hủy, chỉ giữ lại để tra cứu.' },
+  DANG_CHUAN_BI: { tone: 'preparing', badge: 'badge-preparing', hint: 'Đơn đang được bếp chuẩn bị.' },
+  DANG_PHUC_VU: { tone: 'served', badge: 'badge-served', hint: 'Đơn đang phục vụ tại bàn.' },
+  DA_THANH_TOAN: { tone: 'paid', badge: 'badge-paid', hint: 'Đơn đã thanh toán, chốt doanh thu.' },
+  HOAN_THANH: { tone: 'paid', badge: 'badge-paid', hint: 'Đơn đã hoàn tất, không còn giữ bàn.' },
+  DA_HUY: { tone: 'cancelled', badge: 'badge-cancelled', hint: 'Đơn đã hủy, chỉ giữ lại để tra cứu.' },
 }
 
 const tinhSoLuongTheoBoLoc = (orders) => BO_LOC_DON_HANG.reduce((acc, filter) => {
@@ -98,7 +91,7 @@ const layMauLoaiDon = () => 'purple'
 
 const dinhDangMaDonHang = (order) => order.orderCode || order.code || `DH-${order.id}`
 
-const layKieuTheTrangThai = (status) => KIEU_THE_TRANG_THAI[status] || KIEU_THE_TRANG_THAI.Pending
+const layKieuTheTrangThai = (status) => KIEU_THE_TRANG_THAI[status] || KIEU_THE_TRANG_THAI.DANG_CHUAN_BI
 
 const taoCotBangMon = () => [
   {
@@ -359,7 +352,7 @@ function BangChiTietDonHang({
           <Button size="middle" icon={<PrinterOutlined />} onClick={onPrint} disabled={!coTheIn || dangLuuTrangThai}>
             In hóa đơn
           </Button>
-          <Button size="middle" onClick={onQuickPay} loading={dangLuuTrangThai} disabled={order.status === 'Paid' || order.status === 'Completed' || order.status === 'Cancelled'}>
+          <Button size="middle" onClick={onQuickPay} loading={dangLuuTrangThai} disabled={order.status === 'DA_THANH_TOAN' || order.status === 'HOAN_THANH' || order.status === 'DA_HUY'}>
             Thanh toán
           </Button>
         </div>
@@ -486,7 +479,7 @@ function DonHangTab({ orders, tomTatDonHang, donChoXuLy, layChiTietDonHang, onUp
   }
 
   const xuLyThanhToanNhanh = async () => {
-    await guiCapNhatTrangThai('Paid')
+    await guiCapNhatTrangThai('DA_THANH_TOAN')
   }
 
   return (

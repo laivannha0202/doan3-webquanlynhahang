@@ -87,7 +87,7 @@ describe('KhachHangService', () => {
               NgayDat: '2026-05-25',
               GioDat: '18:00:00',
               SoNguoi: 4,
-              TrangThaiDatBan: 'Pending',
+              TrangThaiDatBan: 'CHO_XAC_NHAN',
               TenBan: 'Bàn 1',
             },
           ];
@@ -99,7 +99,7 @@ describe('KhachHangService', () => {
               MaDonHang: 'DH001',
               NgayDonHang: '2026-05-25T09:00:00+07:00',
               TongTien: 180000,
-              TrangThaiDonHang: 'Paid',
+              TrangThaiDonHang: 'DA_THANH_TOAN',
               TenBan: 'Bàn 1',
             },
           ];
@@ -186,7 +186,7 @@ describe('KhachHangService', () => {
               NgayDat: '2026-05-25',
               GioDat: '18:00:00',
               SoNguoi: 4,
-              TrangThaiDatBan: 'Pending',
+              TrangThaiDatBan: 'CHO_XAC_NHAN',
               TenBan: 'Bàn 1',
             },
           ];

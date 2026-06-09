@@ -18,19 +18,9 @@ import {
 } from '../../common/constants';
 
 const TRANG_THAI_DON_HANG_HOP_LE = new Set([
-  'Pending',
-  'Confirmed',
-  'Preparing',
-  'Ready',
-  'Served',
-  'Serving',
-  'Paid',
-  'Cancelled',
-  'Completed',
-  'CHO_XU_LY',
-  'DANG_CHE_BIEN',
-  'SAN_SANG',
+  'DANG_CHUAN_BI',
   'DANG_PHUC_VU',
+  'HOAN_THANH',
   'DA_THANH_TOAN',
   'DA_HUY',
 ]);
@@ -134,13 +124,10 @@ export class DonHangPaymentStatusService {
       }
 
       const trangThaiCongDiem = new Set([
-        'Paid',
-        'Completed',
         'DA_THANH_TOAN',
-        'DA_HOAN_THANH',
+        'HOAN_THANH',
       ]);
       const trangThaiHoanDiem = new Set([
-        'Cancelled',
         'DA_HUY',
       ]);
 
@@ -216,7 +203,7 @@ export class DonHangPaymentStatusService {
 
           await ketNoi.execute(
             'INSERT INTO ThanhToan (MaThanhToan, MaHoaDon, PhuongThuc, SoTien, TrangThai, ThoiGian) VALUES (?, ?, ?, ?, ?, NOW())',
-            [taoMa('TT'), maHoaDon, 'TienMat', thanhToan, 'Success'],
+            [taoMa('TT'), maHoaDon, 'TienMat', thanhToan, 'THANH_CONG'],
           );
         }
       }
@@ -237,10 +224,10 @@ export class DonHangPaymentStatusService {
     }
     await this.mysql.thucThi(
       'UPDATE DonHang SET TrangThai = ? WHERE MaDonHang = ?',
-      ['Ready', donHangDangMo.MaDonHang],
+      ['DANG_PHUC_VU', donHangDangMo.MaDonHang],
     );
     await this.mysql.thucThi('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
-      TRANG_THAI_BAN.DANG_SU_DUNG,
+      TRANG_THAI_BAN.CO_KHACH,
       ma,
     ]);
     return this.donHangQueryService.layChiTietDonHangKhongKiemTraQuyen(
@@ -264,7 +251,7 @@ export class DonHangPaymentStatusService {
 
       await ketNoi.execute(
         'UPDATE DonHang SET TrangThai = ? WHERE MaDonHang = ?',
-        ['Paid', donHang.MaDonHang],
+        ['DA_THANH_TOAN', donHang.MaDonHang],
       );
       await this.giaiPhongBanNeuKhongConRangBuoc(ketNoi, ma, donHang.MaDonHang);
 
@@ -303,7 +290,7 @@ export class DonHangPaymentStatusService {
 
       await ketNoi.execute(
         'INSERT INTO ThanhToan (MaThanhToan, MaHoaDon, PhuongThuc, SoTien, TrangThai, ThoiGian) VALUES (?, ?, ?, ?, ?, NOW())',
-        [taoMa('TT'), maHoaDon, 'TienMat', thanhToan, 'Success'],
+        [taoMa('TT'), maHoaDon, 'TienMat', thanhToan, 'THANH_CONG'],
       );
 
       return this.donHangQueryService.layChiTietDonHangKhongKiemTraQuyen(
@@ -317,10 +304,10 @@ export class DonHangPaymentStatusService {
     maChiTiet: string,
     trangThai: string,
   ) {
-    const trangThaiHopLe = new Set(['Preparing', 'Ready', 'Served']);
+    const trangThaiHopLe = new Set(['DANG_CHUAN_BI', 'DANG_PHUC_VU', 'HOAN_THANH']);
     if (!trangThaiHopLe.has(trangThai)) {
       throw new BadRequestException(
-        `Trạng thái '${trangThai}' không hợp lệ. Chỉ chấp nhận: Preparing, Ready, Served.`,
+        `Trạng thái '${trangThai}' không hợp lệ. Chỉ chấp nhận: DANG_CHUAN_BI, DANG_PHUC_VU, HOAN_THANH.`,
       );
     }
 
@@ -340,22 +327,22 @@ export class DonHangPaymentStatusService {
         throw new NotFoundException('Không tìm thấy chi tiết đơn hàng.');
       }
 
-      const tatCaDeuReady = tatCa.every(
-        (ct: any) => ct.TrangThai === 'Ready' || ct.TrangThai === 'Served',
+      const tatCaDeuHoanThanh = tatCa.every(
+        (ct: any) => ct.TrangThai === 'HOAN_THANH' || ct.TrangThai === 'DANG_PHUC_VU',
       );
-      const coMonDangLam = tatCa.some(
-        (ct: any) => ct.TrangThai === 'Preparing',
+      const coMonDangPhucVu = tatCa.some(
+        (ct: any) => ct.TrangThai === 'DANG_CHUAN_BI',
       );
 
-      if (tatCaDeuReady) {
+      if (tatCaDeuHoanThanh) {
         await ketNoi.execute(
           'UPDATE DonHang SET TrangThai = ? WHERE MaDonHang = ?',
-          ['Ready', maDonHang],
+          ['DANG_PHUC_VU', maDonHang],
         );
-      } else if (coMonDangLam) {
+      } else if (coMonDangPhucVu) {
         await ketNoi.execute(
           'UPDATE DonHang SET TrangThai = ? WHERE MaDonHang = ?',
-          ['Preparing', maDonHang],
+          ['DANG_CHUAN_BI', maDonHang],
         );
       }
 
