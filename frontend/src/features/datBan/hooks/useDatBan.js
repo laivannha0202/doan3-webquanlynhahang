@@ -96,7 +96,7 @@ export const useDatBan = () => {
     xoaBanNhapTamDatBan(STORAGE_KEYS.BAN_NHAP_TAM_DAT_BAN)
     phatSuKienThayDoiDuLieuDatBan()
     return createdBooking
-  }, [])
+  }, [nguoiDungHienTai?.maKH])
 
   const taoDatBanNoiBo = useCallback(async (duLieuGuiDi) => {
     try {

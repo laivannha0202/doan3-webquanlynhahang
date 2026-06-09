@@ -172,31 +172,59 @@ export class DatBanCommandService {
   }
 
   async taoDatBan(nguoiDung: any, body: BanGhi) {
-    if (body.maKH) {
-      await this.kiemTraQuyenKhachHang(nguoiDung, String(body.maKH || ''));
-    }
-
-    const [khachHang] = body.maKH
-      ? await this.mysql.truyVan(
-          `SELECT kh.*, nd.Email
-           FROM KhachHang kh
-           LEFT JOIN NguoiDung nd ON nd.MaND = kh.MaND
-           WHERE kh.MaKH = ?
-           LIMIT 1`,
-          [body.maKH],
-        )
-      : [null];
-
     const maDatBan = String(body.maDatBan || '').trim() || taoMa('DB');
     const vaiTro = String(nguoiDung?.vaiTro || nguoiDung?.role || '').trim();
-    const nguonTao = ['Admin', 'NhanVien'].includes(vaiTro) ? 'NOI_BO' : 'WEB';
+    const laNhanVien = ['Admin', 'NhanVien'].includes(vaiTro);
+    const nguonTao = laNhanVien ? 'NOI_BO' : 'WEB';
+
+    let maKH = body.maKH || null;
+    let khachHang = null;
+
+    if (nguonTao === 'WEB') {
+      // Customer booking: resolve MaKH from JWT identity (mandatory)
+      if (!nguoiDung?.maND) {
+        throw new ForbiddenException(
+          'Không tìm thấy thông tin khách hàng từ phiên đăng nhập.',
+        );
+      }
+
+      khachHang = await layKhachHangTheoMaNd(
+        this.mysql,
+        String(nguoiDung.maND),
+      );
+      if (!khachHang) {
+        throw new ForbiddenException(
+          'Không tìm thấy thông tin khách hàng từ phiên đăng nhập.',
+        );
+      }
+
+      maKH = String(khachHang.MaKH || '');
+
+      // Validate: customer can only book for themselves
+      if (body.maKH && body.maKH !== maKH) {
+        throw new ForbiddenException(
+          'Bạn không có quyền đặt bàn cho khách hàng khác.',
+        );
+      }
+    } else if (body.maKH) {
+      // Staff/Admin booking for a customer: validate and fetch customer info
+      await this.kiemTraQuyenKhachHang(nguoiDung, String(body.maKH || ''));
+      [khachHang] = await this.mysql.truyVan(
+        `SELECT kh.*, nd.Email
+         FROM KhachHang kh
+         LEFT JOIN NguoiDung nd ON nd.MaND = kh.MaND
+         WHERE kh.MaKH = ?
+         LIMIT 1`,
+        [body.maKH],
+      );
+    }
 
     await this.mysql.thucThi(
       `INSERT INTO DatBan (MaDatBan, MaKH, MaBan, MaNV, TenKhachDatBan, SDTDatBan, EmailDatBan, NgayDat, GioDat, GioKetThuc, SoNguoi, GhiChu, TrangThai, KhuVucUuTien, GhiChuNoiBo, ChiTietMonAn, NguonTao)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         maDatBan,
-        body.maKH || null,
+        maKH || null,
         body.maBan || null,
         body.maNV || null,
         body.tenKhachDatBan || khachHang?.TenKH || null,
@@ -467,13 +495,9 @@ export class DatBanCommandService {
       );
     }
 
-    if (
-      maBan !== maBanHienTai &&
-      (String(banHopLe.TrangThai || '') === TRANG_THAI_BAN.CO_KHACH ||
-        String(banHopLe.TrangThai || '') === TRANG_THAI_BAN.DA_DAT)
-    ) {
+    if (maBan !== maBanHienTai && String(banHopLe.TrangThai || '') !== TRANG_THAI_BAN.TRONG) {
       throw new BadRequestException(
-        `Bàn ${banHopLe.MaBan} đang có khách hoặc đã được đặt, không thể gán cho booking.`,
+        'Chỉ có thể gán bàn đang trống cho đặt bàn.',
       );
     }
 

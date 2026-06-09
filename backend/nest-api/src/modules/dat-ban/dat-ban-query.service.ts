@@ -332,10 +332,7 @@ export class DatBanQueryService {
     const danhSachBanKhaDung = danhSachBan
       .filter((ban) => !tapBanDaDuocDung.has(String(ban.MaBan || '').trim()))
       .filter(
-        (ban) =>
-          String(ban.TrangThai || '') !== TRANG_THAI_BAN.CO_KHACH &&
-          String(ban.TrangThai || '') !== TRANG_THAI_BAN.DA_DAT &&
-          String(ban.TrangThai || '') !== TRANG_THAI_BAN.BAO_TRI,
+        (ban) => String(ban.TrangThai || '') === TRANG_THAI_BAN.TRONG,
       )
       .filter((ban) => {
         if (!khuVuc || khuVuc === 'KHONG_UU_TIEN') return true;

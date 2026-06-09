@@ -140,7 +140,7 @@ describe('DatBanCommandService', () => {
             MaBan: 'B053',
             TenBan: 'Bàn 53',
             SoChoNgoi: 6,
-            TrangThai: 'Available',
+            TrangThai: 'TRONG',
           },
         ])
         .mockResolvedValueOnce([

@@ -90,7 +90,7 @@ const chuanHoaDatBanPayload = (payload = {}, tuyChon = {}) => {
 
   return {
     ...(maDatBan ? { maDatBan } : {}),
-    maKH: payload.maKH || payload.customerCode || 'KH001',
+    maKH: payload.maKH || payload.customerCode || null,
     maBan: payload.maBan || payload.tableCode || payload.tableNumber || null,
     maNV: payload.maNV || payload.staffCode || 'NV002',
     tenKhachDatBan: payload.tenKhachDatBan || payload.name || '',
