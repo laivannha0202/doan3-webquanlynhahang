@@ -238,7 +238,7 @@ function BanAnTabCoDien({ phamViLabel, tomTatBan, tables, tomTatTonKhoBan, xuLyD
             </div>
 
             <div className="noi-bo-mon-item-actions">
-              {table.status === 'DIRTY' ? (
+              {table.status === 'DANG_DON' ? (
                 <button type="button" className="noi-bo-quick-btn noi-bo-quick-nut-chinh" onClick={() => xuLyDanhDauBanSanSang(table.id)}>
                   Sẵn sàng lại
                 </button>

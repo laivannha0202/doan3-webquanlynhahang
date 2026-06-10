@@ -2,7 +2,6 @@ export const CAC_TRANG_THAI_DAT_BAN_DANG_MO = new Set([
   'CHO_XAC_NHAN',
   'DA_XAC_NHAN',
   'DA_NHAN_BAN',
-  'DANG_PHUC_VU',
 ])
 
 export const laDatBanSapGanBan = (datBan, hienTai = new Date()) => {

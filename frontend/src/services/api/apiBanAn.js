@@ -70,10 +70,9 @@ export const layDanhSachBanApi = async () => {
 }
 
 const mapTrangThaiBanApi = (status) => {
-  if (status === 'TRONG') return 'TRONG'
-  if (status === 'CO_KHACH') return 'CO_KHACH'
-  if (status === 'CHO_THANH_TOAN') return 'CHO_THANH_TOAN'
-  return status
+  // Map enum chuẩn Việt → API (pass-through, chỉ validate hợp lệ)
+  const ENUM_CHUAN = new Set(['TRONG', 'DA_DAT', 'CO_KHACH', 'DANG_DON', 'BAO_TRI'])
+  return ENUM_CHUAN.has(status) ? status : 'BAO_TRI'
 }
 
 export const capNhatTrangThaiBanApi = async (id, status) => {
