@@ -34,7 +34,9 @@ export class DonHangPaymentStatusService {
   ) {}
 
   private layNguoiThucHien(nguoiDung?: any) {
-    return String(nguoiDung?.maND || nguoiDung?.MaND || 'SYSTEM').trim() || 'SYSTEM';
+    return (
+      String(nguoiDung?.maND || nguoiDung?.MaND || 'SYSTEM').trim() || 'SYSTEM'
+    );
   }
 
   private async timMaBan(giaTri: string): Promise<string | null> {
@@ -137,13 +139,8 @@ export class DonHangPaymentStatusService {
         }
       }
 
-      const trangThaiCongDiem = new Set([
-        'DA_THANH_TOAN',
-        'HOAN_THANH',
-      ]);
-      const trangThaiHoanDiem = new Set([
-        'DA_HUY',
-      ]);
+      const trangThaiCongDiem = new Set(['DA_THANH_TOAN', 'HOAN_THANH']);
+      const trangThaiHoanDiem = new Set(['DA_HUY']);
 
       if (trangThaiCongDiem.has(trangThai) && don.MaKH) {
         await this.diemTichLuyService.tinhDiemTuDonHang(
@@ -157,10 +154,11 @@ export class DonHangPaymentStatusService {
       }
 
       if (trangThaiHoanDiem.has(trangThai) && don.MaKH) {
-        const giaoDichHoan = await this.diemTichLuyService.layGiaoDichDiemTheoDonHang(
-          maDonHang,
-          'DIEU_CHINH',
-        );
+        const giaoDichHoan =
+          await this.diemTichLuyService.layGiaoDichDiemTheoDonHang(
+            maDonHang,
+            'DIEU_CHINH',
+          );
         if (giaoDichHoan) {
           return this.donHangQueryService.layChiTietDonHangKhongKiemTraQuyen(
             maDonHang,
@@ -168,10 +166,11 @@ export class DonHangPaymentStatusService {
           );
         }
 
-        const giaoDichCong = await this.diemTichLuyService.layGiaoDichDiemTheoDonHang(
-          maDonHang,
-          'CONG',
-        );
+        const giaoDichCong =
+          await this.diemTichLuyService.layGiaoDichDiemTheoDonHang(
+            maDonHang,
+            'CONG',
+          );
         const soDiemDaCong = Math.abs(Number(giaoDichCong?.soDiem || 0));
         if (soDiemDaCong > 0) {
           await this.diemTichLuyService.congDiemHuyDon(
@@ -260,7 +259,9 @@ export class DonHangPaymentStatusService {
     return this.mysql.giaoDich(async (ketNoi) => {
       const donHang = await this.layDonHangDangMoTaiBan(ma, ketNoi);
       if (!donHang) {
-        throw new NotFoundException('Bàn chưa có order để xác nhận thanh toán.');
+        throw new NotFoundException(
+          'Bàn chưa có order để xác nhận thanh toán.',
+        );
       }
 
       await ketNoi.execute(
@@ -321,7 +322,12 @@ export class DonHangPaymentStatusService {
     maChiTiet: string,
     trangThai: string,
   ) {
-    const trangThaiHopLe = new Set(['DANG_CHUAN_BI', 'DANG_PHUC_VU', 'HOAN_THANH', 'DA_HUY']);
+    const trangThaiHopLe = new Set([
+      'DANG_CHUAN_BI',
+      'DANG_PHUC_VU',
+      'HOAN_THANH',
+      'DA_HUY',
+    ]);
     if (!trangThaiHopLe.has(trangThai)) {
       throw new BadRequestException(
         `Trạng thái '${trangThai}' không hợp lệ. Chỉ chấp nhận: DANG_CHUAN_BI, DANG_PHUC_VU, HOAN_THANH, DA_HUY.`,
@@ -344,24 +350,38 @@ export class DonHangPaymentStatusService {
         throw new NotFoundException('Không tìm thấy chi tiết đơn hàng.');
       }
 
-      const tatCaDeuHoanThanh = tatCa.every(
-        (ct: any) => ct.TrangThai === 'HOAN_THANH' || ct.TrangThai === 'DANG_PHUC_VU',
+      const tatCaDeuDaHuy = tatCa.every((ct: any) => ct.TrangThai === 'DA_HUY');
+      const coMonHoanThanh = tatCa.some(
+        (ct: any) => ct.TrangThai === 'HOAN_THANH',
       );
       const coMonDangPhucVu = tatCa.some(
+        (ct: any) => ct.TrangThai === 'DANG_PHUC_VU',
+      );
+      const coMonDangChuanBi = tatCa.some(
         (ct: any) => ct.TrangThai === 'DANG_CHUAN_BI',
       );
+      const tatCaDaKetThuc = !coMonDangPhucVu && !coMonDangChuanBi;
 
-      if (tatCa.every((ct: any) => ct.TrangThai === 'DA_HUY')) {
+      if (tatCaDeuDaHuy) {
+        // Rule 1: Tất cả ChiTietDonHang = DA_HUY → DonHang = DA_HUY
         await ketNoi.execute(
           'UPDATE DonHang SET TrangThai = ? WHERE MaDonHang = ?',
           ['DA_HUY', maDonHang],
         );
-      } else if (tatCa.every((ct: any) => ct.TrangThai === 'HOAN_THANH' || ct.TrangThai === 'DANG_PHUC_VU')) {
+      } else if (tatCaDaKetThuc && coMonHoanThanh) {
+        // Rule 2: Tất cả đã kết thúc (HOAN_THANH/DA_HUY), có ít nhất 1 HOAN_THANH → HOAN_THANH
+        await ketNoi.execute(
+          'UPDATE DonHang SET TrangThai = ? WHERE MaDonHang = ?',
+          ['HOAN_THANH', maDonHang],
+        );
+      } else if (coMonDangPhucVu || coMonHoanThanh) {
+        // Rule 3: Còn món DANG_PHUC_VU, hoặc có HOAN_THANH nhưng vẫn còn món chưa xong → DANG_PHUC_VU
         await ketNoi.execute(
           'UPDATE DonHang SET TrangThai = ? WHERE MaDonHang = ?',
           ['DANG_PHUC_VU', maDonHang],
         );
-      } else if (tatCa.some((ct: any) => ct.TrangThai === 'DANG_CHUAN_BI')) {
+      } else {
+        // Rule 4: Chỉ còn DANG_CHUAN_BI (hoặc kèm DA_HUY) → DANG_CHUAN_BI
         await ketNoi.execute(
           'UPDATE DonHang SET TrangThai = ? WHERE MaDonHang = ?',
           ['DANG_CHUAN_BI', maDonHang],
