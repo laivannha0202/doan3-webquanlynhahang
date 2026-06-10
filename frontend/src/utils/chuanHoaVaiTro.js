@@ -9,6 +9,7 @@
 
 const VAI_TRO_MAP = {
   Admin: 'admin',
+  QuanLy: 'admin',
   NhanVien: 'staff',
   KhachHang: 'customer',
 }

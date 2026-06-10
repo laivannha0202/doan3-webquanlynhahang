@@ -42,7 +42,7 @@ const phatSuKienThayDoiNguoiDung = () => {
 }
 
 const chuanHoaVaiTro = (vaiTro) => {
-  if (vaiTro === 'Admin' || vaiTro === 'admin') return VAI_TRO_XAC_THUC.QUAN_TRI
+  if (vaiTro === 'Admin' || vaiTro === 'admin' || vaiTro === 'QuanLy' || vaiTro === 'quanly') return VAI_TRO_XAC_THUC.QUAN_TRI
   if (vaiTro === 'NhanVien' || vaiTro === 'staff') return VAI_TRO_XAC_THUC.NHAN_VIEN
   if (vaiTro === 'KhachHang' || vaiTro === 'customer') return VAI_TRO_XAC_THUC.KHACH_HANG
   if (vaiTro === VAI_TRO_XAC_THUC.QUAN_TRI) return VAI_TRO_XAC_THUC.QUAN_TRI
