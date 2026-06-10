@@ -115,6 +115,13 @@ export class DonHangPaymentStatusService {
         [trangThai, maDonHang],
       );
 
+      if (trangThai === 'DA_HUY') {
+        await ketNoi.execute(
+          'UPDATE ChiTietDonHang SET TrangThai = ? WHERE MaDonHang = ?',
+          ['DA_HUY', maDonHang],
+        );
+      }
+
       if (laTrangThaiDonHangKetThuc(trangThai) && don.MaBan) {
         if (trangThai === 'DA_THANH_TOAN') {
           await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
@@ -314,10 +321,10 @@ export class DonHangPaymentStatusService {
     maChiTiet: string,
     trangThai: string,
   ) {
-    const trangThaiHopLe = new Set(['DANG_CHUAN_BI', 'DANG_PHUC_VU', 'HOAN_THANH']);
+    const trangThaiHopLe = new Set(['DANG_CHUAN_BI', 'DANG_PHUC_VU', 'HOAN_THANH', 'DA_HUY']);
     if (!trangThaiHopLe.has(trangThai)) {
       throw new BadRequestException(
-        `Trạng thái '${trangThai}' không hợp lệ. Chỉ chấp nhận: DANG_CHUAN_BI, DANG_PHUC_VU, HOAN_THANH.`,
+        `Trạng thái '${trangThai}' không hợp lệ. Chỉ chấp nhận: DANG_CHUAN_BI, DANG_PHUC_VU, HOAN_THANH, DA_HUY.`,
       );
     }
 
@@ -344,12 +351,17 @@ export class DonHangPaymentStatusService {
         (ct: any) => ct.TrangThai === 'DANG_CHUAN_BI',
       );
 
-      if (tatCaDeuHoanThanh) {
+      if (tatCa.every((ct: any) => ct.TrangThai === 'DA_HUY')) {
+        await ketNoi.execute(
+          'UPDATE DonHang SET TrangThai = ? WHERE MaDonHang = ?',
+          ['DA_HUY', maDonHang],
+        );
+      } else if (tatCa.every((ct: any) => ct.TrangThai === 'HOAN_THANH' || ct.TrangThai === 'DANG_PHUC_VU')) {
         await ketNoi.execute(
           'UPDATE DonHang SET TrangThai = ? WHERE MaDonHang = ?',
           ['DANG_PHUC_VU', maDonHang],
         );
-      } else if (coMonDangPhucVu) {
+      } else if (tatCa.some((ct: any) => ct.TrangThai === 'DANG_CHUAN_BI')) {
         await ketNoi.execute(
           'UPDATE DonHang SET TrangThai = ? WHERE MaDonHang = ?',
           ['DANG_CHUAN_BI', maDonHang],
