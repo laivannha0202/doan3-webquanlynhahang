@@ -82,9 +82,9 @@ export const useNoiBoData = () => {
       },
       {
         key: 'dirty-tables',
-        title: 'Bàn cần dọn',
+        title: 'Bàn cần xử lý',
         value: duLieuNoiBo.tomTatTonKhoBan.dirty,
-        detail: duLieuNoiBo.tomTatTonKhoBan.dirty > 0 ? 'Cần làm sạch trước khi nhận lượt mới.' : 'Không có bàn đang dọn.',
+        detail: duLieuNoiBo.tomTatTonKhoBan.dirty > 0 ? 'Cần dọn hoặc xử lý bảo trì trước khi nhận lượt mới.' : 'Không có bàn cần xử lý.',
         tone: duLieuNoiBo.tomTatTonKhoBan.dirty > 0 ? 'warning' : 'neutral',
       },
     ],

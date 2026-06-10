@@ -21,8 +21,8 @@ const layMoTaMacDinh = (mucUuTien) => {
         : 'Chưa có lượt khách sắp đến cần chuẩn bị.'
     case 'dirty-tables':
       return giaTri > 0
-        ? 'Cần điều phối dọn bàn để sẵn sàng đón khách.'
-        : 'Không có bàn nào đang chờ dọn lúc này.'
+        ? 'Cần dọn hoặc xử lý bảo trì trước khi nhận lượt mới.'
+        : 'Không có bàn nào đang chờ xử lý lúc này.'
     default:
       return giaTri > 0
         ? 'Đây là nhóm việc cần theo dõi ngay.'

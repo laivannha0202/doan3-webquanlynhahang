@@ -1,5 +1,6 @@
 import { trinhKhachApi, tachPhanHoiApi, coSuDungMayChu } from '../trinhKhachApi'
 import { layNguoiDungHienTai } from '../dichVuXacThuc'
+import { chuanHoaVaiTroNoiBo } from '../../utils/chuanHoaVaiTro'
 import {
   taoPhanHoiOffline,
   xacThucDangNhapOffline,
@@ -14,7 +15,7 @@ import {
 const chuanHoaNguoiDung = (nguoiDung) => {
   if (!nguoiDung || typeof nguoiDung !== 'object') return null
   const vaiTroGoc = nguoiDung.vaiTro || nguoiDung.VaiTro || nguoiDung.role || ''
-  const vaiTro = vaiTroGoc === 'Admin' ? 'admin' : vaiTroGoc === 'NhanVien' ? 'staff' : 'customer'
+  const vaiTro = chuanHoaVaiTroNoiBo(vaiTroGoc)
 
   return {
     ...nguoiDung,

@@ -50,7 +50,7 @@ const taoDuLieuBangDieuKhien = (duLieuNoiBo = {}) => {
       },
       {
         key: 'dirty-tables',
-        title: 'Bàn cần dọn',
+        title: 'Bàn cần xử lý',
         value: duLieuNoiBo.tomTatTonKhoBan?.dirty || 0,
         tone: 'danger',
       },
