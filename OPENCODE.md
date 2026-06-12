@@ -1,4 +1,39 @@
+# Scope Lock — Docs-only / Read-only
+
+Nếu user ghi một trong các cụm sau trong prompt, scope lock có hiệu lực
+tuyệt đối và ưu tiên hơn mọi auto-router/workflow khác:
+
+- "chỉ kiểm tra" / "không sửa file" / "read-only" / "docs-only"
+- "chỉ tài liệu" / "không code" / "không sửa backend/frontend/database"
+- "không migration" / "không commit" / "không push"
+
+Khi scope lock kích hoạt: KHÔNG gọi build-strong, KHÔNG tự chuyển sang
+implementation/fix code, KHÔNG tạo Todo implementation, KHÔNG sửa
+backend/frontend/database, KHÔNG commit/push. Chỉ đọc đúng phạm vi user
+cho phép, ghi checklist nếu phát hiện lệch, rồi dừng.
+
+Quy trình "sửa code" chỉ áp dụng khi task là code/fix/build rõ ràng.
+Với task docs-only/read-only → chỉ đọc và báo cáo.
+
+---
+
 # OpenCode Project Guide
+
+## Full Auto Permission Mode (v1.6.0)
+
+- OpenCode được cấu hình với `"permission": "allow"`.
+- Agent có thể tự chạy tool, sửa file, tạo file, chạy bash/test/build
+  mà không hỏi lại.
+- Vẫn phải tuân thủ safety rule trong instruction:
+  - Không tự `git push` nếu user chưa yêu cầu rõ.
+  - Không tự `git reset --hard`.
+  - Không tự `git clean -fd`.
+  - Không tự xóa file lớn/hàng loạt nếu chưa cần.
+  - Không tự sửa `.env`/secrets/token nếu user chưa yêu cầu rõ.
+  - Trước task lớn nên chạy `git status` và báo tóm tắt.
+  - Sau task nên chạy `git diff --stat` và báo cáo tiếng Việt.
+
+---
 
 ## Khi nào dùng Superpowers
 
@@ -39,6 +74,19 @@
 - Controller → Service → Repository pattern (NestJS).
 - naming: `camelCase` cho biến/hàm, `PascalCase` cho class/component.
 - Mỗi file max ~300 dòng, split nếu dài hơn.
+
+---
+
+## Vietnamese Language Lock
+
+Rule bắt buộc cho mọi tương tác:
+
+1. **Mặc định trả lời user bằng tiếng Việt.** Mọi kế hoạch, giải thích, báo cáo, kết luận dùng tiếng Việt.
+2. **Giữ tiếng Anh cho:** tên lệnh, slash command, tên agent, tên file/path, code, API, package name, error log, stacktrace, keyword kỹ thuật.
+3. **Không tự chuyển sang tiếng Anh.** Nếu user dùng tiếng Việt, agent đáp lại tiếng Việt.
+4. **Code/comment trong repo giữ nguyên.** Không dịch code comment.
+5. **Nếu user yêu cầu tiếng Anh** thì mới dùng tiếng Anh.
+6. **Báo cáo cuối task bằng tiếng Việt:** đã làm gì, file sửa, verify, rủi ro.
 
 ---
 
@@ -110,8 +158,21 @@ Triggers: "dọn rác", "xóa file bug tự tạo", "cleanup".
 - Cấm in secret / sửa `.env` secret.
 - Slash command thắng auto-router.
 
-
 <!-- OPENCODE-POWER-KIT-MARKER: fullstack-profile-begin -->
+
+## Scope Gate — Fullstack workflow chỉ chạy khi user yêu cầu code
+
+Fullstack workflow DB → BE → FE **CHỈ** áp dụng khi user yêu cầu
+code/fix/build rõ ràng.
+
+Nếu user ghi docs-only/read-only/chỉ kiểm tra/không sửa file:
+
+- KHÔNG chạy fullstack workflow
+- KHÔNG sửa backend/frontend/database
+- Nếu phát hiện code lệch spec → chỉ ghi checklist, không sửa
+- Sau khi báo cáo → dừng
+
+---
 
 ## Full-Stack Workflow (NestJS + React/Vite + MySQL)
 
@@ -154,5 +215,13 @@ Phần này append tự động. Workflow mặc định cho mọi task full-stac
 - JS/TS quality → `/js-quality-check`.
 - Docker dev → `/docker-dev-doctor`.
 - Env → `/env-doctor`.
+
+### Vietnamese Language Lock
+
+- **Mặc định trả lời user bằng tiếng Việt.**
+- **Giữ tiếng Anh cho:** lệnh, path, code, API, log, keyword kỹ thuật.
+- **Không tự chuyển sang tiếng Anh** khi user viết tiếng Việt.
+- **Code/comment repo giữ nguyên.**
+- **Báo cáo cuối task bằng tiếng Việt.**
 
 <!-- OPENCODE-POWER-KIT-MARKER: fullstack-profile-end -->

@@ -121,3 +121,4 @@ pnpm-debug.log*
 .test/
 .opencode-power-*.log
 # <<< opencode-power-kit
+.opk-trash/

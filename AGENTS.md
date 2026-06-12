@@ -1,3 +1,39 @@
+# Scope Lock — Docs-only / Read-only
+
+Nếu user ghi một trong các cụm sau trong prompt, scope lock có hiệu lực
+**tuyệt đối** và ưu tiên hơn mọi auto-router/workflow khác:
+
+- "chỉ kiểm tra"
+- "không sửa file"
+- "read-only"
+- "docs-only"
+- "chỉ tài liệu"
+- "không code"
+- "không sửa backend/frontend/database"
+- "không migration"
+- "không commit"
+- "không push"
+
+Khi scope lock kích hoạt, **bắt buộc**:
+
+- KHÔNG gọi build-strong.
+- KHÔNG gọi /power-build.
+- KHÔNG gọi /agent-router.
+- KHÔNG gọi build-slice.
+- KHÔNG tự chuyển sang implementation/fix code.
+- KHÔNG tạo Todo implementation (migration, constants, contracts, service, seed).
+- KHÔNG sửa backend, frontend, hay database.
+- KHÔNG tạo migration.
+- KHÔNG commit.
+- KHÔNG push.
+- Nếu phát hiện code/spec lệch nhau → chỉ ghi checklist hoặc báo cáo.
+- Sau khi báo cáo xong → **dừng**.
+
+`docs/` là tài liệu tham khảo, không phải danh sách task tự động để thực thi.
+Không tự đọc toàn bộ `docs/**/*.md` nếu user không chỉ định rõ.
+
+---
+
 # Agent Rules - OpenCode Project
 
 ## Quy tắc bắt buộc
@@ -50,11 +86,52 @@
 - Ưu tiên dùng `trash-put` thay vì `rm`.
 - Trước khi xóa untracked files phải chạy `git clean -nd` để xem trước.
 
+## Full Auto Permission Mode (v1.6.0)
+
+**OpenCode được cấu hình với `"permission": "allow"`.** Agent có thể
+tự chạy tool, sửa file, tạo file, chạy bash/test/build mà **không hỏi
+lại permission**. Phù hợp máy/project cá nhân.
+
+### Safety rules — vẫn tuân thủ
+
+Dù `permission: allow`, agent vẫn phải tuân theo các safety rule sau
+(được enforce bằng instruction, không phải bằng OpenCode permission
+prompt):
+
+1. **Không tự `git push`** nếu user chưa yêu cầu rõ.
+2. **Không tự `git reset --hard`**, `git clean -fd`.
+3. **Không tự xóa file lớn/hàng loạt** nếu chưa cần.
+4. **Không tự sửa `.env`/secrets/token** nếu user chưa yêu cầu rõ.
+5. **Trước task lớn:** chạy `git status` và báo tóm tắt.
+6. **Sau task:** chạy `git diff --stat` và báo cáo bằng tiếng Việt.
+
+### Kế thừa agent frontmatter (backward compatible)
+
+Mỗi agent vẫn giữ `permission` frontmatter với `"*": "ask"` fallback
+và safe command allowlist. Khi copy template qua project mới, agent
+vẫn hoạt động an toàn — **Full Auto Permission Mode** là global
+config override cho phép agent bypass permission prompt.
+
+---
+
 ## Checkpoints
 
 - Trước khi sửa lớn, dùng `/checkpoint` để snapshot working tree ra
   `.opk-checkpoints/<ts>.patch` + `.summary.md`.
 - Không `git reset --hard` để "undo" — restore từ patch bằng `git apply`.
+
+---
+
+## Vietnamese Language Lock
+
+Đây là rule bắt buộc cho toàn bộ tương tác:
+
+1. **Mặc định trả lời user bằng tiếng Việt.** Toàn bộ kế hoạch, giải thích, báo cáo, kết luận phải bằng tiếng Việt.
+2. **Giữ tiếng Anh cho:** tên lệnh, slash command, tên agent, tên file/path, code, API, package name, error log, stacktrace, keyword kỹ thuật bắt buộc.
+3. **Không tự chuyển câu trả lời sang tiếng Anh.** Nếu user viết tiếng Việt thì agent trả lời tiếng Việt.
+4. **Code/comment trong repo giữ nguyên.** Không dịch code comment hay tài liệu có sẵn.
+5. **Nếu user yêu cầu tiếng Anh** thì mới dùng tiếng Anh.
+6. **Cuối task báo cáo bằng tiếng Việt** gồm: đã làm gì, file đã sửa, kiểm tra đã chạy, rủi ro còn lại.
 
 ---
 
@@ -129,8 +206,23 @@ Triggers: "dọn rác", "xóa file bug tự tạo", "cleanup",
 - Cấm in secret hoặc sửa `.env` secret.
 - Slash command luôn thắng auto-router.
 
-
 <!-- OPENCODE-POWER-KIT-MARKER: fullstack-profile-begin -->
+
+## Scope Gate — Fullstack workflow chỉ chạy khi user yêu cầu code
+
+Fullstack workflow DB → BE → FE (migration → entity → DTO → service → controller → FE)
+**CHỈ** áp dụng khi user yêu cầu code/fix/build rõ ràng (feature, bugfix, refactor,
+thêm/sửa endpoint, migration mới).
+
+Nếu user ghi docs-only/read-only/chỉ kiểm tra/không sửa file:
+
+- KHÔNG chạy fullstack workflow
+- KHÔNG chạy migration
+- KHÔNG sửa backend/frontend/database
+- Nếu phát hiện code lệch spec → chỉ ghi checklist, không sửa
+- Sau khi báo cáo → dừng
+
+---
 
 ## Full-Stack Rules (NestJS + React/Vite + MySQL)
 
@@ -191,5 +283,13 @@ KHÔNG xóa marker nếu muốn script idempotent.
 4. Chạy lint + typecheck + test của layer đó.
 5. Chạy `/api-e2e-flow` cho happy path.
 6. Commit riêng từng layer nếu có thể.
+
+### Vietnamese Language Lock
+
+- **Mặc định trả lời user bằng tiếng Việt.** Kế hoạch, giải thích, báo cáo đều bằng tiếng Việt.
+- **Giữ tiếng Anh cho:** tên lệnh, slash command, tên agent, file/path, code, API, package name, error log, stacktrace.
+- **Không tự chuyển sang tiếng Anh** khi user đang dùng tiếng Việt.
+- **Code/comment giữ nguyên**, không dịch.
+- **Báo cáo cuối task bằng tiếng Việt**: đã làm gì, file sửa, verify, rủi ro.
 
 <!-- OPENCODE-POWER-KIT-MARKER: fullstack-profile-end -->
