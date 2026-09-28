@@ -17,11 +17,12 @@
     "test:frontend": "npm --prefix frontend run test",
     "test:backend": "npm --prefix backend/nest-api run test",
     "check": "npm run lint && npm run build && npm run test",
+    "typecheck": "npm --prefix backend/nest-api run typecheck",
+    "lint:fix": "npm --prefix frontend run lint -- --fix && npm --prefix backend/nest-api run lint:fix",
     "preview": "npm --prefix frontend run preview",
-    "smoke:api": "bash -lc 'set -a && source .env && set +a && node scripts/smoke-api.mjs'"
+    "smoke:api": "node scripts/smoke-api.mjs"
   },
-  "dependencies": {
-    "@nestjs/swagger": "^11.3.0",
-    "swagger-ui-express": "^5.0.1"
+  "devDependencies": {
+    "lefthook": "^2.1.14"
   }
 }

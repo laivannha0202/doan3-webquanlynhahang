@@ -76,6 +76,10 @@ thuc-don-current.png
 thuc-don-after-fix.png
 .gstack/
 frontend/.vite/
+# UES agent scratch (cache / traces / work)
+.ues-cache/
+.ues-traces/
+.ues-work/
 graphify-out/
 .serena/
 .agents/
