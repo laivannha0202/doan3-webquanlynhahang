@@ -421,7 +421,7 @@ function NoiBoMaGiamGiaPage() {
         ),
       },
     ],
-    [banDoKhachHang, moNganKeoSua, xuLyXoá],
+    [banDoKhachHang, moNganKeoSua, xuLyXoá, xuLySaoChepMa],
   )
 
   return (

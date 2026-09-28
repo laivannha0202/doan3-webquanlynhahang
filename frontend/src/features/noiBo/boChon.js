@@ -1,4 +1,4 @@
-import { chuanHoaTrangThaiBan } from '../../constants/trangThaiBan'
+import { chuanHoaTrangThaiBan } from '../../constants/trangThaiBan.js'
 import {
   CAC_TRANG_THAI_DAT_BAN_DANG_HOAT_DONG,
   CAC_TRANG_THAI_DAT_BAN_DA_XAC_NHAN,
@@ -7,8 +7,8 @@ import {
   CAC_BO_LOC_CA,
   CAC_KHU_VUC_BAN,
   chuanHoaTrangThaiDatBan,
-} from './hangSo'
-import { laySacThaiDonHang } from './dinhDang'
+} from './hangSo.js'
+import { laySacThaiDonHang } from './dinhDang.js'
 
 export const laDatBanVip = (datBan) => datBan.seatingArea === 'PHONG_VIP'
 const laTrangThaiChoXuLy = (trangThai) => {

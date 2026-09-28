@@ -184,8 +184,16 @@ describe('DonHangCreateOrderService', () => {
       chiTiet: [{ maMon: 'M01', soLuong: 1 }],
     });
 
-    expect(query.mock.calls.some((call: any[]) => String(call[0]).includes('TrangThai IN'))).toBe(true);
-    expect(execute.mock.calls.some((call: any[]) => String(call[0]).includes('INSERT INTO DonHang'))).toBe(true);
+    expect(
+      query.mock.calls.some((call: any[]) =>
+        String(call[0]).includes('TrangThai IN'),
+      ),
+    ).toBe(true);
+    expect(
+      execute.mock.calls.some((call: any[]) =>
+        String(call[0]).includes('INSERT INTO DonHang'),
+      ),
+    ).toBe(true);
     expect(execute).not.toHaveBeenCalledWith(
       expect.stringContaining('UPDATE DonHang SET TongTien = ?'),
       expect.any(Array),
@@ -231,7 +239,10 @@ describe('DonHangCreateOrderService', () => {
     };
 
     const diemTichLuyService = {
-      doiDiem: jest.fn(async () => ({ success: true, data: { maGiaoDichDiem: 'GDDL_TEST' } })),
+      doiDiem: jest.fn(async () => ({
+        success: true,
+        data: { maGiaoDichDiem: 'GDDL_TEST' },
+      })),
     };
 
     const service = new DonHangCreateOrderService(

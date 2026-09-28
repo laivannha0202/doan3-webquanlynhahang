@@ -104,12 +104,15 @@ export class KhachHangController {
   @Roles('Admin', 'NhanVien')
   @Post()
   tao(@CurrentUser() nguoiDung: any, @Body() body: TaoKhachHangDto) {
-    return this.khachHangService.tao({
-      tenKH: body.tenKH,
-      sdt: body.sdt,
-      diaChi: body.diaChi,
-      diemTichLuy: body.diemTichLuy,
-    }, nguoiDung);
+    return this.khachHangService.tao(
+      {
+        tenKH: body.tenKH,
+        sdt: body.sdt,
+        diaChi: body.diaChi,
+        diemTichLuy: body.diemTichLuy,
+      },
+      nguoiDung,
+    );
   }
 
   @Roles('Admin', 'NhanVien')
@@ -137,9 +140,13 @@ export class KhachHangController {
   ) {
     if (Number.isNaN(body.soDiem))
       throw new BadRequestException('Số điểm không hợp lệ.');
-    return this.khachHangService.capNhatDiem(maKH, {
-      soDiem: body.soDiem,
-      moTa: body.moTa,
-    }, nguoiDung);
+    return this.khachHangService.capNhatDiem(
+      maKH,
+      {
+        soDiem: body.soDiem,
+        moTa: body.moTa,
+      },
+      nguoiDung,
+    );
   }
 }

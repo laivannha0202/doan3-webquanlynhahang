@@ -23,17 +23,19 @@ describe('KhachHangService', () => {
     };
 
     const diemTichLuyService = {
-      dieuChinhDiemKhachHang: jest.fn(async (nguoiDung, maKH, soDiem, moTa) => ({
-        success: true,
-        data: {
-          maKH,
-          soDiem,
-          moTa,
-          nguoiThucHien: nguoiDung.maND,
-          diemTruoc: 120,
-          diemSau: 100,
-        },
-      })),
+      dieuChinhDiemKhachHang: jest.fn(
+        async (nguoiDung, maKH, soDiem, moTa) => ({
+          success: true,
+          data: {
+            maKH,
+            soDiem,
+            moTa,
+            nguoiThucHien: nguoiDung.maND,
+            diemTruoc: 120,
+            diemSau: 100,
+          },
+        }),
+      ),
       layTongQuanDiemTichLuyTheoMaKH: jest.fn(),
       layLichSuDiemTichLuyTheoMaKH: jest.fn(),
     };
@@ -149,8 +151,12 @@ describe('KhachHangService', () => {
 
     const ketQua = await service.layLichSu('KH001');
 
-    expect(diemTichLuyService.layTongQuanDiemTichLuyTheoMaKH).toHaveBeenCalledWith('KH001');
-    expect(diemTichLuyService.layLichSuDiemTichLuyTheoMaKH).toHaveBeenCalledWith('KH001');
+    expect(
+      diemTichLuyService.layTongQuanDiemTichLuyTheoMaKH,
+    ).toHaveBeenCalledWith('KH001');
+    expect(
+      diemTichLuyService.layLichSuDiemTichLuyTheoMaKH,
+    ).toHaveBeenCalledWith('KH001');
     expect((ketQua as any).data).toMatchObject({
       tongQuanDiemTichLuy: {
         maKH: 'KH001',
@@ -236,15 +242,23 @@ describe('KhachHangService', () => {
         }
       }),
       query: jest.fn(async (query: string) => {
-        if (String(query).includes('SELECT * FROM KhachHang WHERE MaKH = ? LIMIT 1')) {
-          return [[{
-            MaKH: 'KH777',
-            MaND: null,
-            TenKH: 'Khach hang moi',
-            SDT: '0901111222',
-            DiaChi: 'TP HCM',
-            DiemTichLuy: store.diem,
-          }]];
+        if (
+          String(query).includes(
+            'SELECT * FROM KhachHang WHERE MaKH = ? LIMIT 1',
+          )
+        ) {
+          return [
+            [
+              {
+                MaKH: 'KH777',
+                MaND: null,
+                TenKH: 'Khach hang moi',
+                SDT: '0901111222',
+                DiaChi: 'TP HCM',
+                DiemTichLuy: store.diem,
+              },
+            ],
+          ];
         }
 
         return [[]];
@@ -258,11 +272,13 @@ describe('KhachHangService', () => {
     };
 
     const diemTichLuyService = {
-      dieuChinhDiemKhachHang: jest.fn(async (_nguoiDung, _maKH, soDiem, _moTa, ketNoi) => {
-        expect(ketNoi).toBe(connection);
-        store.diem += soDiem;
-        return { success: true, data: { soDiem, diemSau: store.diem } };
-      }),
+      dieuChinhDiemKhachHang: jest.fn(
+        async (_nguoiDung, _maKH, soDiem, _moTa, ketNoi) => {
+          expect(ketNoi).toBe(connection);
+          store.diem += soDiem;
+          return { success: true, data: { soDiem, diemSau: store.diem } };
+        },
+      ),
       layTongQuanDiemTichLuyTheoMaKH: jest.fn(),
       layLichSuDiemTichLuyTheoMaKH: jest.fn(),
     };

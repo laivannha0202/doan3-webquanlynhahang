@@ -31,7 +31,9 @@ const tapTinMacDinh = join(thuMucBackend, '.env');
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
-        limit: 10,
+        // Giới hạn tổng: 120 request/phút/IP để dashboard + polling hoạt động
+        // bình thường. Các endpoint nhạy cảm (auth) tự khai @Throttle riêng.
+        limit: 120,
       },
     ]),
     ServeStaticModule.forRoot({

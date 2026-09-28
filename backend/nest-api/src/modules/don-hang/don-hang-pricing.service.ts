@@ -178,7 +178,9 @@ export class DonHangPricingService {
         trangThaiRuntime: trangThai.maTrangThai,
         trangThaiHienThi: trangThai.nhanTrangThai,
         coTheApDung: trangThai.coTheApDung,
-        phamVi: normalizePhamViMaGiamGia(ma.PhamVi || PHAM_VI_MA_GIAM_GIA.CA_HAI),
+        phamVi: normalizePhamViMaGiamGia(
+          ma.PhamVi || PHAM_VI_MA_GIAM_GIA.CA_HAI,
+        ),
       },
       soTienGiamThucTe,
     );

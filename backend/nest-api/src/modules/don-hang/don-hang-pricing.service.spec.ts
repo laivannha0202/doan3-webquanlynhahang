@@ -80,7 +80,12 @@ describe('DonHangPricingService', () => {
     );
 
     await expect(
-      service.layThongTinMaGiamApDung('LOYALTY-TEST', 37000, 'KH001', ketNoi as any),
+      service.layThongTinMaGiamApDung(
+        'LOYALTY-TEST',
+        37000,
+        'KH001',
+        ketNoi as any,
+      ),
     ).rejects.toThrow('chưa đến thời gian áp dụng');
   });
 
@@ -93,7 +98,12 @@ describe('DonHangPricingService', () => {
     );
 
     await expect(
-      service.layThongTinMaGiamApDung('LOYALTY-TEST', 37000, 'KH001', ketNoi as any),
+      service.layThongTinMaGiamApDung(
+        'LOYALTY-TEST',
+        37000,
+        'KH001',
+        ketNoi as any,
+      ),
     ).rejects.toThrow('đã hết hạn');
   });
 
@@ -125,7 +135,12 @@ describe('DonHangPricingService', () => {
     );
 
     await expect(
-      service.layThongTinMaGiamApDung('LOYALTY-TEST', 37000, 'KH001', ketNoi as any),
+      service.layThongTinMaGiamApDung(
+        'LOYALTY-TEST',
+        37000,
+        'KH001',
+        ketNoi as any,
+      ),
     ).rejects.toThrow('đã đạt giới hạn sử dụng');
   });
 
@@ -137,7 +152,12 @@ describe('DonHangPricingService', () => {
     );
 
     await expect(
-      service.layThongTinMaGiamApDung('LOYALTY-TEST', 37000, 'KH001', ketNoi as any),
+      service.layThongTinMaGiamApDung(
+        'LOYALTY-TEST',
+        37000,
+        'KH001',
+        ketNoi as any,
+      ),
     ).rejects.toThrow('không còn hiệu lực');
   });
 
@@ -145,7 +165,12 @@ describe('DonHangPricingService', () => {
     const { service, ketNoi } = taoService(taoVoucher());
 
     await expect(
-      service.layThongTinMaGiamApDung('LOYALTY-TEST', 37000, 'KH999', ketNoi as any),
+      service.layThongTinMaGiamApDung(
+        'LOYALTY-TEST',
+        37000,
+        'KH999',
+        ketNoi as any,
+      ),
     ).rejects.toThrow('không thuộc về khách hàng này');
   });
 

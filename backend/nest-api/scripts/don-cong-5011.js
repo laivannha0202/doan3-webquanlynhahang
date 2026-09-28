@@ -200,15 +200,19 @@ async function donSoiCong() {
 async function khoiDong() {
   await donSoiCong();
 
+  // Chạy nest CLI trực tiếp bằng node để cross-platform.
+  // Không spawn file .cmd với shell:false vì Node 20.12+/22 throw EINVAL (CVE-2024-27980).
   const duongDanNest = path.join(
     __dirname,
     '..',
     'node_modules',
-    '.bin',
-    process.platform === 'win32' ? 'nest.cmd' : 'nest',
+    '@nestjs',
+    'cli',
+    'bin',
+    'nest.js',
   );
 
-  const con = spawn(duongDanNest, ['start', '--watch'], {
+  const con = spawn(process.execPath, [duongDanNest, 'start', '--watch'], {
     cwd: path.join(__dirname, '..'),
     env: {
       ...process.env,

@@ -67,10 +67,13 @@ export const TRANG_THAI_BAN_KHONG_THE_DAT = [
 export function chuanHoaTrangThaiBan(trangThai: string): string {
   const gt = (trangThai || '').trim().toUpperCase();
   if (['TRONG', 'AVAILABLE'].includes(gt)) return TRANG_THAI_BAN.TRONG;
-  if (['DA_DAT', 'RESERVED', 'GIU_CHO'].includes(gt)) return TRANG_THAI_BAN.DA_DAT;
-  if (['CO_KHACH', 'DANG_SU_DUNG', 'OCCUPIED'].includes(gt)) return TRANG_THAI_BAN.CO_KHACH;
+  if (['DA_DAT', 'RESERVED', 'GIU_CHO'].includes(gt))
+    return TRANG_THAI_BAN.DA_DAT;
+  if (['CO_KHACH', 'DANG_SU_DUNG', 'OCCUPIED'].includes(gt))
+    return TRANG_THAI_BAN.CO_KHACH;
   if (['DANG_DON'].includes(gt)) return TRANG_THAI_BAN.DANG_DON;
-  if (['BAO_TRI', 'BAN', 'CAN_DON', 'MAINTENANCE', 'DIRTY'].includes(gt)) return TRANG_THAI_BAN.BAO_TRI;
+  if (['BAO_TRI', 'BAN', 'CAN_DON', 'MAINTENANCE', 'DIRTY'].includes(gt))
+    return TRANG_THAI_BAN.BAO_TRI;
   // Fallback an toàn: coi là chờ dọn
   return TRANG_THAI_BAN.BAO_TRI;
 }

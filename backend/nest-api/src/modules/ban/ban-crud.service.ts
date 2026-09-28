@@ -40,7 +40,8 @@ export class BanCrudService {
     const [banCuoi] = await this.mysql.truyVan(
       "SELECT MaBan FROM Ban WHERE MaBan REGEXP '^B[0-9]+$' ORDER BY CAST(SUBSTRING(MaBan, 2) AS UNSIGNED) DESC LIMIT 1",
     );
-    const soThuTuCuoi = Number(String(banCuoi?.MaBan || '').replace(/^B/, '')) || 0;
+    const soThuTuCuoi =
+      Number(String(banCuoi?.MaBan || '').replace(/^B/, '')) || 0;
     return `B${String(soThuTuCuoi + 1).padStart(3, '0')}`;
   }
 

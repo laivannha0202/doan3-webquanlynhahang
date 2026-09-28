@@ -34,10 +34,10 @@ export class ThuNganGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const needThuNgan = this.reflector.getAllAndOverride<boolean>(THU_NGAN_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const needThuNgan = this.reflector.getAllAndOverride<boolean>(
+      THU_NGAN_KEY,
+      [context.getHandler(), context.getClass()],
+    );
 
     if (!needThuNgan) return true;
 

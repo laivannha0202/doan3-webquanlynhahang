@@ -227,9 +227,7 @@ export class MaGiamGiaService {
     return taoPhanHoi(
       danhSach
         .map((ma) => this.chuanHoaMaGiamGia(ma))
-        .filter((ma) =>
-          kiemTraPhamViMaGiamGia(ma.phamVi, phamViYeuCau).hopLe,
-        )
+        .filter((ma) => kiemTraPhamViMaGiamGia(ma.phamVi, phamViYeuCau).hopLe)
         .filter((ma) => ma.coTheApDung),
       'Lấy voucher công khai thành công',
     );
@@ -285,9 +283,7 @@ export class MaGiamGiaService {
     return taoPhanHoi(
       danhSach
         .map((ma) => this.chuanHoaMaGiamGia(ma))
-        .filter((ma) =>
-          kiemTraPhamViMaGiamGia(ma.phamVi, phamViYeuCau).hopLe,
-        )
+        .filter((ma) => kiemTraPhamViMaGiamGia(ma.phamVi, phamViYeuCau).hopLe)
         .filter((ma) => ma.coTheApDung),
       'Lấy voucher checkout của khách hàng thành công',
     );
@@ -573,7 +569,9 @@ export class MaGiamGiaService {
       phamVi ||
       (loaiMaSauCapNhat === LOAI_MA_GIAM_GIA.DOI_DIEM
         ? PHAM_VI_MA_GIAM_GIA.DON_HANG
-        : normalizePhamViMaGiamGia(tonTai.PhamVi || PHAM_VI_MA_GIAM_GIA.CA_HAI));
+        : normalizePhamViMaGiamGia(
+            tonTai.PhamVi || PHAM_VI_MA_GIAM_GIA.CA_HAI,
+          ));
     const maKHSauCapNhat =
       loaiMaSauCapNhat === LOAI_MA_GIAM_GIA.CONG_KHAI
         ? null

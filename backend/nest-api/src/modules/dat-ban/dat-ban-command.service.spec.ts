@@ -195,7 +195,9 @@ describe('DatBanCommandService', () => {
         ])
         .mockResolvedValueOnce([]),
       thucThi: jest.fn().mockResolvedValue(undefined),
-      giaoDich: jest.fn(async (callback) => callback({ execute, query: jest.fn().mockResolvedValue([[]]) })),
+      giaoDich: jest.fn(async (callback) =>
+        callback({ execute, query: jest.fn().mockResolvedValue([[]]) }),
+      ),
     };
     const service = new DatBanCommandService(
       mysql as any,

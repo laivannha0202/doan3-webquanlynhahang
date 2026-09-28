@@ -6,7 +6,10 @@ import { DiemTichLuyService } from '../diem-tich-luy/diem-tich-luy.service';
 import { taoPhanHoi } from '../../common/phan-hoi';
 import { taoMa } from '../../common/tao-ma';
 import { BanGhi } from '../../common/types';
-import { TRANG_THAI_BAN, TRANG_THAI_DON_HANG_DANG_MO } from '../../common/constants';
+import {
+  TRANG_THAI_BAN,
+  TRANG_THAI_DON_HANG_DANG_MO,
+} from '../../common/constants';
 
 @Injectable()
 export class DonHangCreateOrderService {
@@ -133,7 +136,11 @@ export class DonHangCreateOrderService {
       if (soDiem > 0) {
         const ketQuaDoiDiem = await this.diemTichLuyService.doiDiem(
           nguoiDung,
-          { soDiem, moTa: 'Đổi điểm thanh toán đơn hàng ' + maDonHang, maYeuCau: maDonHang },
+          {
+            soDiem,
+            moTa: 'Đổi điểm thanh toán đơn hàng ' + maDonHang,
+            maYeuCau: maDonHang,
+          },
           ketNoi,
         );
         diemDaDoi = ketQuaDoiDiem.data || ketQuaDoiDiem;

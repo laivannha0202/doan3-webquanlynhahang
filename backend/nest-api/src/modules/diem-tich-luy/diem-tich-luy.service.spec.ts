@@ -18,7 +18,9 @@ describe('DiemTichLuyService', () => {
     };
 
     const maGiamGiaService = {
-      tinhSoTienGiamTuDiem: jest.fn((soDiem: number) => Math.floor(Number(soDiem || 0) / 100) * 10000),
+      tinhSoTienGiamTuDiem: jest.fn(
+        (soDiem: number) => Math.floor(Number(soDiem || 0) / 100) * 10000,
+      ),
       taoVoucherTuDoiDiem: jest.fn(async (_payload, con) => ({
         voucher: {
           maCode: 'LOYAL25K',
@@ -70,15 +72,23 @@ describe('DiemTichLuyService', () => {
     };
 
     const ketNoi = {
-      query: jest.fn(async (query: string, thamSo: any[]) => {
-        if (String(query).includes('FROM KhachHang WHERE MaKH = ? LIMIT 1 FOR UPDATE')) {
+      query: jest.fn(async (query: string) => {
+        if (
+          String(query).includes(
+            'FROM KhachHang WHERE MaKH = ? LIMIT 1 FOR UPDATE',
+          )
+        ) {
           return [[{ MaKH: 'KH006', DiemTichLuy: store.diemTichLuy }]];
         }
 
         return [[]];
       }),
       execute: jest.fn(async (query: string, thamSo: any[]) => {
-        if (String(query).includes('UPDATE KhachHang SET DiemTichLuy = ? WHERE MaKH = ?')) {
+        if (
+          String(query).includes(
+            'UPDATE KhachHang SET DiemTichLuy = ? WHERE MaKH = ?',
+          )
+        ) {
           store.diemTichLuy = Number(thamSo?.[0] || 0);
           return;
         }
@@ -112,11 +122,16 @@ describe('DiemTichLuyService', () => {
             'COALESCE(SUM(CASE WHEN SoDiem < 0 THEN ABS(SoDiem) ELSE 0 END), 0) AS TongDiemDaDung',
           )
         ) {
-          return [{
-            TongDiemDaDung: store.lichSu
-              .filter((item) => Number(item.SoDiem || 0) < 0)
-              .reduce((tong, item) => tong + Math.abs(Number(item.SoDiem || 0)), 0),
-          }];
+          return [
+            {
+              TongDiemDaDung: store.lichSu
+                .filter((item) => Number(item.SoDiem || 0) < 0)
+                .reduce(
+                  (tong, item) => tong + Math.abs(Number(item.SoDiem || 0)),
+                  0,
+                ),
+            },
+          ];
         }
 
         return [[]];
@@ -129,7 +144,10 @@ describe('DiemTichLuyService', () => {
       taoVoucherTuDoiDiem: jest.fn(),
     };
 
-    const service = new DiemTichLuyService(mysql as any, maGiamGiaService as any);
+    const service = new DiemTichLuyService(
+      mysql as any,
+      maGiamGiaService as any,
+    );
 
     await service.dieuChinhDiemKhachHang(
       { maND: 'ND_ADMIN', vaiTro: 'Admin' },
@@ -177,23 +195,39 @@ describe('DiemTichLuyService', () => {
     };
 
     const ketNoi = {
-      query: jest.fn(async (query: string, thamSo: any[]) => {
+      query: jest.fn(async (query: string) => {
         if (String(query).includes('FROM KhachHang WHERE MaND = ?')) {
-          return [[{ MaKH: 'KH006', MaND: 'ND010', DiemTichLuy: store.diemTichLuy }]];
+          return [
+            [{ MaKH: 'KH006', MaND: 'ND010', DiemTichLuy: store.diemTichLuy }],
+          ];
         }
 
-        if (String(query).includes('FROM KhachHang WHERE MaKH = ? LIMIT 1 FOR UPDATE')) {
-          return [[{ MaKH: 'KH006', MaND: 'ND010', DiemTichLuy: store.diemTichLuy }]];
+        if (
+          String(query).includes(
+            'FROM KhachHang WHERE MaKH = ? LIMIT 1 FOR UPDATE',
+          )
+        ) {
+          return [
+            [{ MaKH: 'KH006', MaND: 'ND010', DiemTichLuy: store.diemTichLuy }],
+          ];
         }
 
-        if (String(query).includes('FROM LichSuDiemTichLuy WHERE MaGiaoDichDiem = ?')) {
+        if (
+          String(query).includes(
+            'FROM LichSuDiemTichLuy WHERE MaGiaoDichDiem = ?',
+          )
+        ) {
           return [[]];
         }
 
         return [[]];
       }),
       execute: jest.fn(async (query: string, thamSo: any[]) => {
-        if (String(query).includes('UPDATE KhachHang SET DiemTichLuy = ? WHERE MaKH = ?')) {
+        if (
+          String(query).includes(
+            'UPDATE KhachHang SET DiemTichLuy = ? WHERE MaKH = ?',
+          )
+        ) {
           store.diemTichLuy = Number(thamSo?.[0] || 0);
           return;
         }
@@ -219,7 +253,9 @@ describe('DiemTichLuyService', () => {
       giaoDich: jest.fn(async (callback) => callback(ketNoi)),
       truyVan: jest.fn(async (query: string) => {
         if (String(query).includes('FROM KhachHang')) {
-          return [{ MaKH: 'KH006', MaND: 'ND010', DiemTichLuy: store.diemTichLuy }];
+          return [
+            { MaKH: 'KH006', MaND: 'ND010', DiemTichLuy: store.diemTichLuy },
+          ];
         }
 
         return [];
@@ -259,16 +295,26 @@ describe('DiemTichLuyService', () => {
     const ketNoi = {
       query: jest.fn(async (query: string, thamSo: any[]) => {
         if (String(query).includes('FROM KhachHang WHERE MaND = ?')) {
-          return [[{ MaKH: 'KH006', MaND: 'ND010', DiemTichLuy: store.diemTichLuy }]];
+          return [
+            [{ MaKH: 'KH006', MaND: 'ND010', DiemTichLuy: store.diemTichLuy }],
+          ];
         }
 
         if (String(query).includes('FROM KhachHang WHERE MaKH = ?')) {
-          return [[{ MaKH: 'KH006', MaND: 'ND010', DiemTichLuy: store.diemTichLuy }]];
+          return [
+            [{ MaKH: 'KH006', MaND: 'ND010', DiemTichLuy: store.diemTichLuy }],
+          ];
         }
 
-        if (String(query).includes('FROM LichSuDiemTichLuy WHERE MaGiaoDichDiem = ?')) {
+        if (
+          String(query).includes(
+            'FROM LichSuDiemTichLuy WHERE MaGiaoDichDiem = ?',
+          )
+        ) {
           const maGiaoDich = String(thamSo?.[0] || '');
-          const lichSu = store.lichSu.find((item) => item.MaGiaoDichDiem === maGiaoDich);
+          const lichSu = store.lichSu.find(
+            (item) => item.MaGiaoDichDiem === maGiaoDich,
+          );
           return [[lichSu ? { ...lichSu } : null].filter(Boolean)];
         }
 
@@ -281,7 +327,11 @@ describe('DiemTichLuyService', () => {
         return [[]];
       }),
       execute: jest.fn(async (query: string, thamSo: any[]) => {
-        if (String(query).includes('UPDATE KhachHang SET DiemTichLuy = ? WHERE MaKH = ?')) {
+        if (
+          String(query).includes(
+            'UPDATE KhachHang SET DiemTichLuy = ? WHERE MaKH = ?',
+          )
+        ) {
           store.diemTichLuy = Number(thamSo?.[0] || 0);
           return;
         }
@@ -328,7 +378,9 @@ describe('DiemTichLuyService', () => {
       giaoDich: jest.fn(async (callback) => callback(ketNoi)),
       truyVan: jest.fn(async (query: string) => {
         if (String(query).includes('FROM KhachHang')) {
-          return [{ MaKH: 'KH006', MaND: 'ND010', DiemTichLuy: store.diemTichLuy }];
+          return [
+            { MaKH: 'KH006', MaND: 'ND010', DiemTichLuy: store.diemTichLuy },
+          ];
         }
 
         return [];
@@ -337,7 +389,9 @@ describe('DiemTichLuyService', () => {
     };
 
     const maGiamGiaService = {
-      tinhSoTienGiamTuDiem: jest.fn((soDiem: number) => Math.floor(Number(soDiem || 0) / 100) * 10000),
+      tinhSoTienGiamTuDiem: jest.fn(
+        (soDiem: number) => Math.floor(Number(soDiem || 0) / 100) * 10000,
+      ),
       taoVoucherTuDoiDiem: jest.fn(async (payload) => {
         const maCode = `LOYALTY-KH006_REQ001`;
         const daCo = store.voucher.find((item) => item.MaCode === maCode);
@@ -446,22 +500,36 @@ describe('DiemTichLuyService', () => {
 
     const ketNoi = {
       query: jest.fn(async (query: string, thamSo: any[]) => {
-        if (String(query).includes('FROM DonHang WHERE MaDonHang = ? LIMIT 1 FOR UPDATE')) {
+        if (
+          String(query).includes(
+            'FROM DonHang WHERE MaDonHang = ? LIMIT 1 FOR UPDATE',
+          )
+        ) {
           return [[{ ...store.donHang }]];
         }
 
-        if (String(query).includes('FROM LichSuDiemTichLuy WHERE MaDonHang = ? AND LoaiBienDong = ?')) {
+        if (
+          String(query).includes(
+            'FROM LichSuDiemTichLuy WHERE MaDonHang = ? AND LoaiBienDong = ?',
+          )
+        ) {
           const loaiBienDong = String(thamSo?.[1] || '');
           if (loaiBienDong === 'CONG') {
             return [[{ ...store.lichSu[0] }]];
           }
           if (loaiBienDong === 'DIEU_CHINH') {
-            const daHoan = store.lichSu.find((item) => item.LoaiBienDong === 'DIEU_CHINH');
+            const daHoan = store.lichSu.find(
+              (item) => item.LoaiBienDong === 'DIEU_CHINH',
+            );
             return [[daHoan ? { ...daHoan } : null].filter(Boolean)];
           }
         }
 
-        if (String(query).includes('FROM KhachHang WHERE MaKH = ? LIMIT 1 FOR UPDATE')) {
+        if (
+          String(query).includes(
+            'FROM KhachHang WHERE MaKH = ? LIMIT 1 FOR UPDATE',
+          )
+        ) {
           return [[{ MaKH: 'KH006', DiemTichLuy: store.diemTichLuy }]];
         }
 
@@ -472,7 +540,11 @@ describe('DiemTichLuyService', () => {
         return [[]];
       }),
       execute: jest.fn(async (query: string, thamSo: any[]) => {
-        if (String(query).includes('UPDATE KhachHang SET DiemTichLuy = ? WHERE MaKH = ?')) {
+        if (
+          String(query).includes(
+            'UPDATE KhachHang SET DiemTichLuy = ? WHERE MaKH = ?',
+          )
+        ) {
           store.diemTichLuy = Number(thamSo?.[0] || 0);
           return;
         }
@@ -521,7 +593,9 @@ describe('DiemTichLuyService', () => {
     );
 
     expect(ketNoi.execute).toHaveBeenCalledWith(
-      expect.stringContaining('UPDATE KhachHang SET DiemTichLuy = ? WHERE MaKH = ?'),
+      expect.stringContaining(
+        'UPDATE KhachHang SET DiemTichLuy = ? WHERE MaKH = ?',
+      ),
       [50, 'KH006'],
     );
     expect(ketQua.data).toMatchObject({
@@ -560,22 +634,36 @@ describe('DiemTichLuyService', () => {
 
     const ketNoi = {
       query: jest.fn(async (query: string, thamSo: any[]) => {
-        if (String(query).includes('FROM DonHang WHERE MaDonHang = ? LIMIT 1 FOR UPDATE')) {
+        if (
+          String(query).includes(
+            'FROM DonHang WHERE MaDonHang = ? LIMIT 1 FOR UPDATE',
+          )
+        ) {
           return [[{ ...store.donHang }]];
         }
 
-        if (String(query).includes('FROM LichSuDiemTichLuy WHERE MaDonHang = ? AND LoaiBienDong = ?')) {
+        if (
+          String(query).includes(
+            'FROM LichSuDiemTichLuy WHERE MaDonHang = ? AND LoaiBienDong = ?',
+          )
+        ) {
           const loaiBienDong = String(thamSo?.[1] || '');
           if (loaiBienDong === 'CONG') {
             return [[{ ...store.lichSu[0] }]];
           }
           if (loaiBienDong === 'DIEU_CHINH') {
-            const daHoan = store.lichSu.find((item) => item.LoaiBienDong === 'DIEU_CHINH');
+            const daHoan = store.lichSu.find(
+              (item) => item.LoaiBienDong === 'DIEU_CHINH',
+            );
             return [[daHoan ? { ...daHoan } : null].filter(Boolean)];
           }
         }
 
-        if (String(query).includes('FROM KhachHang WHERE MaKH = ? LIMIT 1 FOR UPDATE')) {
+        if (
+          String(query).includes(
+            'FROM KhachHang WHERE MaKH = ? LIMIT 1 FOR UPDATE',
+          )
+        ) {
           return [[{ MaKH: 'KH006', DiemTichLuy: store.diemTichLuy }]];
         }
 
@@ -586,7 +674,11 @@ describe('DiemTichLuyService', () => {
         return [[]];
       }),
       execute: jest.fn(async (query: string, thamSo: any[]) => {
-        if (String(query).includes('UPDATE KhachHang SET DiemTichLuy = ? WHERE MaKH = ?')) {
+        if (
+          String(query).includes(
+            'UPDATE KhachHang SET DiemTichLuy = ? WHERE MaKH = ?',
+          )
+        ) {
           store.diemTichLuy = Number(thamSo?.[0] || 0);
           return;
         }
@@ -645,10 +737,14 @@ describe('DiemTichLuyService', () => {
     );
 
     const soLanCapNhat = ketNoi.execute.mock.calls.filter((call: any[]) =>
-      String(call[0]).includes('UPDATE KhachHang SET DiemTichLuy = ? WHERE MaKH = ?'),
+      String(call[0]).includes(
+        'UPDATE KhachHang SET DiemTichLuy = ? WHERE MaKH = ?',
+      ),
     ).length;
 
     expect(soLanCapNhat).toBe(1);
-    expect(store.lichSu.filter((item) => item.LoaiBienDong === 'DIEU_CHINH')).toHaveLength(1);
+    expect(
+      store.lichSu.filter((item) => item.LoaiBienDong === 'DIEU_CHINH'),
+    ).toHaveLength(1);
   });
 });

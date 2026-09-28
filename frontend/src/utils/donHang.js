@@ -1,4 +1,4 @@
-import { LOAI_DON_HANG } from '../features/donHang/contracts'
+import { LOAI_DON_HANG } from '../features/donHang/contracts.js'
 
 export { LOAI_DON_HANG }
 

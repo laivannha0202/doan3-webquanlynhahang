@@ -1,6 +1,6 @@
-import { NHAN_KHU_VUC_DAT_BAN } from '../datBan/constants/duLieuDatBan'
-import { laySacThaiDonHang as laySacThaiDonHangChuan } from '../../utils/donHang'
-import { chuanHoaTrangThaiDatBan } from './hangSo'
+import { NHAN_KHU_VUC_DAT_BAN } from '../datBan/constants/duLieuDatBan.js'
+import { laySacThaiDonHang as laySacThaiDonHangChuan } from '../../utils/donHang.js'
+import { chuanHoaTrangThaiDatBan } from './hangSo.js'
 
 export const dinhDangNgay = (giaTri) => {
   if (!giaTri) return '--'

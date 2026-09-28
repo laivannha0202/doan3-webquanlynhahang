@@ -1,4 +1,4 @@
-import { CAC_KHU_VUC_BAN_CHUAN } from '../../constants/khuVucBan'
+import { CAC_KHU_VUC_BAN_CHUAN } from '../../constants/khuVucBan.js'
 
 export const CAC_BO_LOC_NGAY = Object.freeze([
   { key: 'all', label: 'Tất cả ngày' },

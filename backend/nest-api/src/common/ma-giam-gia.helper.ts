@@ -40,7 +40,9 @@ const chuyenNgaySangDate = (giaTri: unknown, cuoiNgay = false) => {
 };
 
 const chuanHoaTrangThaiLuuTru = (giaTri: unknown) =>
-  String(giaTri || '').trim().toUpperCase();
+  String(giaTri || '')
+    .trim()
+    .toUpperCase();
 
 const chuanHoaMaThanhChuoi = (giaTri: unknown) =>
   String(giaTri || '')

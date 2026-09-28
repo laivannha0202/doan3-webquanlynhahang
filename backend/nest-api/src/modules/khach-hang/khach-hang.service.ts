@@ -138,12 +138,15 @@ export class KhachHangService {
     );
   }
 
-  async tao(body: {
-    tenKH: string;
-    sdt?: string;
-    diaChi?: string;
-    diemTichLuy?: number;
-  }, nguoiDung?: any) {
+  async tao(
+    body: {
+      tenKH: string;
+      sdt?: string;
+      diaChi?: string;
+      diemTichLuy?: number;
+    },
+    nguoiDung?: any,
+  ) {
     const tenKH = String(body.tenKH || '').trim();
     const sdt = String(body.sdt || '').trim();
     const diaChi = String(body.diaChi || '').trim();
@@ -316,9 +319,12 @@ export class KhachHangService {
       this.diemTichLuyService.layLichSuDiemTichLuyTheoMaKH(maKH),
     ]);
     const tongQuanDiem =
-      tongQuanDiemRes.status === 'fulfilled' ? tongQuanDiemRes.value?.data || null : null;
+      tongQuanDiemRes.status === 'fulfilled'
+        ? tongQuanDiemRes.value?.data || null
+        : null;
     const lichSuDiem =
-      lichSuDiemRes.status === 'fulfilled' && Array.isArray(lichSuDiemRes.value?.data)
+      lichSuDiemRes.status === 'fulfilled' &&
+      Array.isArray(lichSuDiemRes.value?.data)
         ? lichSuDiemRes.value.data
         : [];
 

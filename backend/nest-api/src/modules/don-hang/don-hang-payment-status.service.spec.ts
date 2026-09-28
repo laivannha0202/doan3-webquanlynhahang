@@ -36,17 +36,15 @@ describe('DonHangPaymentStatusService', () => {
 
   it('giu ban dang occupied khi yeu cau thanh toan tai ban', async () => {
     const mysql = {
-      truyVan: jest
-        .fn()
-        .mockResolvedValue([
-          {
-            MaDonHang: 'DH_TEST',
-            MaBan: 'B003',
-            MaKH: 'KH001',
-            TongTien: 180000,
-            TrangThai: 'DANG_CHUAN_BI',
-          },
-        ]),
+      truyVan: jest.fn().mockResolvedValue([
+        {
+          MaDonHang: 'DH_TEST',
+          MaBan: 'B003',
+          MaKH: 'KH001',
+          TongTien: 180000,
+          TrangThai: 'DANG_CHUAN_BI',
+        },
+      ]),
       thucThi: jest.fn().mockResolvedValue(undefined),
     };
     const donHangQueryService = {
@@ -81,17 +79,15 @@ describe('DonHangPaymentStatusService', () => {
       .fn()
       .mockResolvedValue({ success: true, data: null });
     const mysql = {
-      truyVan: jest
-        .fn()
-        .mockResolvedValue([
-          {
-            MaDonHang: 'DH_TEST',
-            MaBan: 'B003',
-            MaKH: 'KH001',
-            TongTien: 180000,
-            TrangThai: 'DANG_CHUAN_BI',
-          },
-        ]),
+      truyVan: jest.fn().mockResolvedValue([
+        {
+          MaDonHang: 'DH_TEST',
+          MaBan: 'B003',
+          MaKH: 'KH001',
+          TongTien: 180000,
+          TrangThai: 'DANG_CHUAN_BI',
+        },
+      ]),
       giaoDich: jest.fn(async (callback) => callback(connection)),
     };
     const donHangQueryService = {
@@ -141,17 +137,15 @@ describe('DonHangPaymentStatusService', () => {
       .fn()
       .mockResolvedValue({ success: true, data: null });
     const mysql = {
-      truyVan: jest
-        .fn()
-        .mockResolvedValue([
-          {
-            MaDonHang: 'DH_TEST',
-            MaBan: 'B003',
-            MaKH: 'KH001',
-            TongTien: 180000,
-            TrangThai: 'DANG_CHUAN_BI',
-          },
-        ]),
+      truyVan: jest.fn().mockResolvedValue([
+        {
+          MaDonHang: 'DH_TEST',
+          MaBan: 'B003',
+          MaKH: 'KH001',
+          TongTien: 180000,
+          TrangThai: 'DANG_CHUAN_BI',
+        },
+      ]),
       giaoDich: jest.fn(async (callback) => callback(connection)),
     };
     const donHangQueryService = {
@@ -193,17 +187,15 @@ describe('DonHangPaymentStatusService', () => {
       query: jest.fn().mockResolvedValue([[]]),
     };
     const mysql = {
-      truyVan: jest
-        .fn()
-        .mockResolvedValue([
-          {
-            MaDonHang: 'DH_TEST',
-            MaBan: 'B003',
-            MaKH: 'KH001',
-            TongTien: 180000,
-            TrangThai: 'DANG_CHUAN_BI',
-          },
-        ]),
+      truyVan: jest.fn().mockResolvedValue([
+        {
+          MaDonHang: 'DH_TEST',
+          MaBan: 'B003',
+          MaKH: 'KH001',
+          TongTien: 180000,
+          TrangThai: 'DANG_CHUAN_BI',
+        },
+      ]),
       giaoDich: jest.fn(async (callback) => callback(connection)),
     };
     const donHangQueryService = {

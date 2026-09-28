@@ -292,8 +292,14 @@ export class DatBanQueryService {
          AND TrangThai IN (${[
            ...Array.from(TRANG_THAI_DAT_BAN_GIU_BAN),
            ...Array.from(TRANG_THAI_DAT_BAN_SU_DUNG_BAN),
-         ].map(() => '?').join(', ')})`,
-      [ngayDat, ...Array.from(TRANG_THAI_DAT_BAN_GIU_BAN), ...Array.from(TRANG_THAI_DAT_BAN_SU_DUNG_BAN)],
+         ]
+           .map(() => '?')
+           .join(', ')})`,
+      [
+        ngayDat,
+        ...Array.from(TRANG_THAI_DAT_BAN_GIU_BAN),
+        ...Array.from(TRANG_THAI_DAT_BAN_SU_DUNG_BAN),
+      ],
     );
     const danhSachDonHangDangMo =
       (await this.mysql.truyVan(
@@ -331,9 +337,7 @@ export class DatBanQueryService {
 
     const danhSachBanKhaDung = danhSachBan
       .filter((ban) => !tapBanDaDuocDung.has(String(ban.MaBan || '').trim()))
-      .filter(
-        (ban) => String(ban.TrangThai || '') === TRANG_THAI_BAN.TRONG,
-      )
+      .filter((ban) => String(ban.TrangThai || '') === TRANG_THAI_BAN.TRONG)
       .filter((ban) => {
         if (!khuVuc || khuVuc === 'KHONG_UU_TIEN') return true;
 

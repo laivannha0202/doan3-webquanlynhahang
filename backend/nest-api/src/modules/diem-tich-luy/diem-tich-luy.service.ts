@@ -14,9 +14,7 @@ import {
   TI_LE_QUY_DOI_DIEM,
   TI_LE_TICH_DIEM_MAC_DINH,
 } from '../../common/constants';
-import {
-  taoMaGiaoDichDiemTheoYeuCau,
-} from '../../common/ma-giam-gia.helper';
+import { taoMaGiaoDichDiemTheoYeuCau } from '../../common/ma-giam-gia.helper';
 import { MaGiamGiaService } from '../ma-giam-gia/ma-giam-gia.service';
 
 @Injectable()
@@ -174,7 +172,9 @@ export class DiemTichLuyService {
   }
 
   private layNguoiThucHien(nguoiDung?: any) {
-    return String(nguoiDung?.maND || nguoiDung?.MaND || 'SYSTEM').trim() || 'SYSTEM';
+    return (
+      String(nguoiDung?.maND || nguoiDung?.MaND || 'SYSTEM').trim() || 'SYSTEM'
+    );
   }
 
   private async xuLyBienDongDiem(
@@ -321,14 +321,13 @@ export class DiemTichLuyService {
     }
 
     const lichSu = await this.layLichSuDiemTheoMaKH(khachHang.MaKH);
-    return taoPhanHoi(
-      lichSu,
-      'Lấy lịch sử điểm tích lũy thành công',
-    );
+    return taoPhanHoi(lichSu, 'Lấy lịch sử điểm tích lũy thành công');
   }
 
   async layTongQuanDiemTichLuyTheoMaKH(maKH: string) {
-    const tongQuan = await this.layTongQuanDiemTheoMaKH(String(maKH || '').trim());
+    const tongQuan = await this.layTongQuanDiemTheoMaKH(
+      String(maKH || '').trim(),
+    );
     if (!tongQuan) {
       throw new NotFoundException('Không tìm thấy thông tin điểm tích lũy.');
     }
@@ -337,7 +336,9 @@ export class DiemTichLuyService {
   }
 
   async layLichSuDiemTichLuyTheoMaKH(maKH: string) {
-    const khachHang = await this.layKhachHangTheoMaKH(String(maKH || '').trim());
+    const khachHang = await this.layKhachHangTheoMaKH(
+      String(maKH || '').trim(),
+    );
     if (!khachHang) {
       return taoPhanHoi([], 'Không có lịch sử điểm tích lũy');
     }
@@ -353,9 +354,7 @@ export class DiemTichLuyService {
       String(maDonHang || '').trim(),
       loaiBienDong,
     );
-    return lichSu
-      ? this.chuyenLichSuDiemSangPhanHoi(lichSu)
-      : null;
+    return lichSu ? this.chuyenLichSuDiemSangPhanHoi(lichSu) : null;
   }
 
   async tinhDiemTuDonHang(
@@ -373,7 +372,8 @@ export class DiemTichLuyService {
     const soDiemTichDuoc = Math.floor(tongTienSo / TI_LE_TICH_DIEM_MAC_DINH);
     if (soDiemTichDuoc <= 0) {
       const khachHangHienTai = await this.layKhachHangTheoMaKH(maKH, ketNoi);
-      if (!khachHangHienTai) return taoPhanHoi(null, 'Không tìm thấy khách hàng');
+      if (!khachHangHienTai)
+        return taoPhanHoi(null, 'Không tìm thấy khách hàng');
 
       return taoPhanHoi(
         {
@@ -442,7 +442,10 @@ export class DiemTichLuyService {
       loaiBienDong: 'CONG',
       moTa: body.moTa || `Tích điểm từ đơn hàng ${body.maDonHang}`,
       nguoiThucHien: this.layNguoiThucHien(nguoiDung),
-      maGiaoDichDiem: taoMaGiaoDichDiemTheoYeuCau(khachHang.MaKH, body.maDonHang),
+      maGiaoDichDiem: taoMaGiaoDichDiemTheoYeuCau(
+        khachHang.MaKH,
+        body.maDonHang,
+      ),
     });
   }
 
@@ -488,9 +491,8 @@ export class DiemTichLuyService {
         );
         if (lichSuDaCo) {
           const soDiemDaDoi = Math.abs(Number(lichSuDaCo.SoDiem || 0));
-          const soTienGiam = this.maGiamGiaService.tinhSoTienGiamTuDiem(
-            soDiemDaDoi,
-          );
+          const soTienGiam =
+            this.maGiamGiaService.tinhSoTienGiamTuDiem(soDiemDaDoi);
           const voucher = await this.maGiamGiaService.taoVoucherTuDoiDiem(
             {
               maKH: khachHangTrongTxn.MaKH,
@@ -633,12 +635,15 @@ export class DiemTichLuyService {
     ketNoi?: PoolConnection,
   ) {
     const nguoiThucHien = this.layNguoiThucHien(nguoiDung);
-    return this.xuLyBienDongDiem({
-      maKH,
-      soDiem,
-      loaiBienDong: 'DIEU_CHINH',
-      moTa,
-      nguoiThucHien,
-    }, ketNoi);
+    return this.xuLyBienDongDiem(
+      {
+        maKH,
+        soDiem,
+        loaiBienDong: 'DIEU_CHINH',
+        moTa,
+        nguoiThucHien,
+      },
+      ketNoi,
+    );
   }
 }

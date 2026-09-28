@@ -1,7 +1,17 @@
 {
-  "$schema": "https://knip.dev/schema.json",
-  "entry": ["src/**/*.{ts,tsx}"],
-  "project": ["src/**/*.{ts,tsx}"],
-  "ignore": ["**/*.test.*", "**/*.spec.*", "**/*.d.ts"],
-  "ignoreDependencies": ["@types/*"]
+  "$schema": "https://knip.dev/reference/schema",
+  "entry": [
+    "frontend/src/**/*.{js,jsx}",
+    "backend/nest-api/src/**/*.ts"
+  ],
+  "project": [
+    "frontend/src/**/*.{js,jsx}",
+    "backend/nest-api/src/**/*.ts"
+  ],
+  "ignore": [
+    "**/*.test.*",
+    "**/*.spec.*",
+    "**/*.d.ts"
+  ],
+  "ignoreDependencies": ["@types/*", "@rollup/*", "msw"]
 }

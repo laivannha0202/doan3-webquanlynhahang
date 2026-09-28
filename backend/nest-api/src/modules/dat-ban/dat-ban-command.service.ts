@@ -131,7 +131,9 @@ export class DatBanCommandService {
        LEFT JOIN ChiTietDonHang ct ON ct.MaDonHang = dh.MaDonHang
        WHERE dh.MaBan = ?
          AND dh.MaDatBan = ?
-         AND dh.TrangThai IN (${Array.from(TRANG_THAI_DON_HANG_DANG_MO).map(() => '?').join(', ')})
+         AND dh.TrangThai IN (${Array.from(TRANG_THAI_DON_HANG_DANG_MO)
+           .map(() => '?')
+           .join(', ')})
        GROUP BY dh.MaDonHang
        LIMIT 1`,
       [maBan, maDatBan, ...Array.from(TRANG_THAI_DON_HANG_DANG_MO)],
@@ -495,7 +497,10 @@ export class DatBanCommandService {
       );
     }
 
-    if (maBan !== maBanHienTai && String(banHopLe.TrangThai || '') !== TRANG_THAI_BAN.TRONG) {
+    if (
+      maBan !== maBanHienTai &&
+      String(banHopLe.TrangThai || '') !== TRANG_THAI_BAN.TRONG
+    ) {
       throw new BadRequestException(
         'Chỉ có thể gán bàn đang trống cho đặt bàn.',
       );

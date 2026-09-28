@@ -9,6 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { DangNhapDto } from './dto/dang-nhap.dto';
@@ -25,12 +26,14 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Public()
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('register')
   dangKy(@Body() body: TaoNguoiDungDto) {
     return this.authService.dangKy(body);
   }
 
   @Public()
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('login')
   async dangNhap(
     @Body() body: DangNhapDto,
@@ -47,6 +50,7 @@ export class AuthController {
   }
 
   @Public()
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('internal-login')
   async dangNhapNoiBo(
     @Body() body: DangNhapDto,
@@ -67,6 +71,7 @@ export class AuthController {
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
   @Post('logout')
   dangXuat(@Res({ passthrough: true }) res: Response) {
     res.setHeader('Set-Cookie', this.authService.xoaCookieRefreshToken());
@@ -74,6 +79,7 @@ export class AuthController {
   }
 
   @Public()
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
   @Post('refresh')
   async lamMoiToken(
     @Req() req: Request,
@@ -115,6 +121,7 @@ export class AuthController {
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Put('doi-mat-khau')
   doiMatKhau(@CurrentUser() user: any, @Body() body: Record<string, unknown>) {
     return this.authService.doiMatKhauTuUser(user, body);

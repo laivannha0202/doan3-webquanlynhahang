@@ -209,6 +209,10 @@ describe('DatBanQueryService', () => {
       expect.objectContaining({ maBan: 'B001' }),
       expect.objectContaining({ maBan: 'B002' }),
     ]);
-    expect(mysql.truyVan.mock.calls.some(([sql]) => String(sql).includes('TrangThai IN'))).toBe(true);
+    expect(
+      mysql.truyVan.mock.calls.some(([sql]) =>
+        String(sql).includes('TrangThai IN'),
+      ),
+    ).toBe(true);
   });
 });

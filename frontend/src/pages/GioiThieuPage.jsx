@@ -1,4 +1,4 @@
-import chefPortrait from '../assets/img/chef.02d6c5b61bfdc70303b4.png'
+import chefPortrait from '../assets/img/chef.02d6c5b61bfdc70303b4.webp'
 import anhGiaiThuong from '../assets/img/dish_1.png'
 
 function GioiThieuPage() {

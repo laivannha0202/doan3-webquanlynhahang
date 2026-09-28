@@ -1,21 +1,17 @@
-# Lefthook configuration for OpenCode Power Kit
+# Lefthook configuration — đã hiệu chỉnh để chạy thật được trên repo này:
+# - Không dùng eslint/prettier/commitlint ở root (repo không cài các tool đó ở root)
+# - Gọi script npm của từng package thay vì npx eslint {staged_files}
 # Docs: https://github.com/evilmartians/lefthook
 
 pre-commit:
   parallel: true
   commands:
-    lint:
-      glob: "*.{js,ts,jsx,tsx,json,md}"
-      run: npx eslint {staged_files} --fix --max-warnings=0
-      stage_fixed: true
+    lint-frontend:
+      glob: "frontend/**/*.{js,jsx,mjs}"
+      run: npm run lint:frontend
+    lint-backend:
+      glob: "backend/**/*.{ts,js}"
+      run: npm run lint:backend
     typecheck:
-      run: npx tsc --noEmit
-    format:
-      glob: "*.{js,ts,jsx,tsx,json,css,md}"
-      run: npx prettier --write {staged_files}
-      stage_fixed: true
-
-commit-msg:
-  commands:
-    lint-commit:
-      run: npx commitlint --edit {1}
+      glob: "backend/**/*.ts"
+      run: npm --prefix backend/nest-api run typecheck
